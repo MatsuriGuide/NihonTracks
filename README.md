@@ -58,4 +58,4 @@ et du système de rôles/permissions.
 - [x] Playlists (création, publique/privée, ajout/retrait de vidéos)
 - [x] Modération (signalements, file de traitement, historique — rollback complet pas encore implémenté)
 - [ ] Traduction assistée par OpenAI (admin uniquement)
-- [ ] Interface FR / EN / JP
+- [x] Interface FR / EN / JA (contenu artistes/vidéos encore saisi en FR uniquement — EN/JA viendront via la traduction OpenAI)
