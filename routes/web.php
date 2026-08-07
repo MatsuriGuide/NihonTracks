@@ -19,6 +19,8 @@ $router->post('/artists/create', 'ArtistController@store');
 $router->get('/artists/{id}/edit', 'ArtistController@edit');
 $router->post('/artists/{id}/edit', 'ArtistController@update');
 $router->post('/artists/{id}/delete', 'ArtistController@delete');
+$router->post('/artists/{id}/relations', 'ArtistController@addRelation');
+$router->post('/artists/{id}/relations/{relationId}/delete', 'ArtistController@deleteRelation');
 $router->get('/artists/{slug}', 'ArtistController@show');
 
 // Idem : les routes fixes doivent précéder le pattern générique /videos/{id}
