@@ -231,4 +231,16 @@ return [
     // Creation rapide d'artiste depuis le formulaire video
     'videos.new_artist_toggle' => '+ 新しいアーティストを今すぐ作成',
     'videos.new_artist_hint' => 'このアーティストは最小限の情報で作成されます。プロフィール（経歴、リンク、関連アーティストなど）は後でページから編集できます。',
+
+    // Gestion admin des tags
+    'admin.tags.delete' => '削除',
+    'admin.tags.delete_confirm' => 'このタグを削除しますか？使用しているすべてのアーティスト・動画から削除されます。',
+    'admin.tags.empty_category' => 'このカテゴリーにタグはありません。',
+    'admin.tags.add_title' => 'タグを追加',
+    'admin.tags.category_label' => 'カテゴリー',
+    'admin.tags.name_fr' => '名前（フランス語）',
+    'admin.tags.name_en' => '名前（英語、任意）',
+    'admin.tags.name_ja' => '名前（日本語、任意）',
+    'admin.tags.add_hint' => '空欄の言語はフランス語名を代わりに表示します。',
+    'admin.tags.submit' => 'タグを作成',
 ];

@@ -231,4 +231,16 @@ return [
     // Creation rapide d'artiste depuis le formulaire video
     'videos.new_artist_toggle' => '+ Create a new artist now',
     'videos.new_artist_hint' => 'This artist will be created with the bare minimum; you can complete their profile (bio, links, relations...) later from their page.',
+
+    // Gestion admin des tags
+    'admin.tags.delete' => 'Delete',
+    'admin.tags.delete_confirm' => 'Delete this tag? It will be removed from all artists/videos using it.',
+    'admin.tags.empty_category' => 'No tags in this category.',
+    'admin.tags.add_title' => 'Add a tag',
+    'admin.tags.category_label' => 'Category',
+    'admin.tags.name_fr' => 'Name (French)',
+    'admin.tags.name_en' => 'Name (English, optional)',
+    'admin.tags.name_ja' => 'Name (Japanese, optional)',
+    'admin.tags.add_hint' => 'Languages left blank will fall back to the French name.',
+    'admin.tags.submit' => 'Create tag',
 ];
