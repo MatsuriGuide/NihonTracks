@@ -43,16 +43,27 @@
 
     <fieldset>
         <legend><?= e(t('videos.artists_legend')) ?></legend>
+
+        <?php if (!empty($autoDetected)): ?>
+            <p class="hint hint-success"><?= e(t('videos.autodetected')) ?></p>
+        <?php endif; ?>
+
         <?php if (empty($artists)): ?>
             <p><?= e(t('videos.no_artists')) ?> <a href="<?= url('/artists/create') ?>"><?= e(t('videos.create_artist')) ?></a></p>
+        <?php else: ?>
+            <?php if (count($artists) > 8): ?>
+                <input type="text" id="artist-search" placeholder="<?= e(t('videos.search_artist')) ?>" autocomplete="off">
+            <?php endif; ?>
+            <div id="artist-checklist" class="checklist">
+                <?php foreach ($artists as $artist): ?>
+                    <label class="artist-option" data-name="<?= e(mb_strtolower($artist['name'] ?? $artist['slug'])) ?>">
+                        <input type="checkbox" name="artist_ids[]" value="<?= (int) $artist['id'] ?>"
+                            <?= in_array((int) $artist['id'], $selectedArtistIds, true) ? 'checked' : '' ?>>
+                        <?= e($artist['name'] ?? $artist['slug']) ?>
+                    </label>
+                <?php endforeach; ?>
+            </div>
         <?php endif; ?>
-        <?php foreach ($artists as $artist): ?>
-            <label>
-                <input type="checkbox" name="artist_ids[]" value="<?= (int) $artist['id'] ?>"
-                    <?= in_array((int) $artist['id'], $selectedArtistIds, true) ? 'checked' : '' ?>>
-                <?= e($artist['name'] ?? $artist['slug']) ?>
-            </label><br>
-        <?php endforeach; ?>
     </fieldset>
 
     <?php foreach ($tagGroups as $categorySlug => $tags): ?>
@@ -70,3 +81,5 @@
 
     <button type="submit"><?= $mode === 'edit' ? e(t('videos.submit_edit')) : e(t('videos.submit_create')) ?></button>
 </form>
+
+<script src="<?= asset('js/artist-filter.js') ?>"></script>
