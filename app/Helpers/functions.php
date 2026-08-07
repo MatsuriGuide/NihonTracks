@@ -1,6 +1,15 @@
 <?php
 
 /**
+ * Génère un numéro de catalogue façon cote de bibliothèque, purement
+ * présentationnel (dérivé de l'ID, aucune colonne dédiée en base).
+ */
+function catalog_no(string $prefix, int $id): string
+{
+    return 'NT-' . strtoupper($prefix) . str_pad((string) $id, 3, '0', STR_PAD_LEFT);
+}
+
+/**
  * Traduit une clé d'interface dans la langue courante du site.
  */
 function t(string $key, ?string $default = null): string
