@@ -15,7 +15,7 @@ class HomeController extends Controller
 
         // Exemple : dernières vidéos publiées (une fois la table remplie)
         $latestVideos = $db->fetchAll(
-            'SELECT v.id, v.youtube_id, v.release_date,
+            'SELECT v.id, v.youtube_id, v.release_date, v.thumbnail_url,
                     COALESCE(vi.title, vi_fr.title) AS title,
                     GROUP_CONCAT(DISTINCT COALESCE(ai.name, ai_fr.name) ORDER BY ai.name SEPARATOR ", ") AS artist_names
              FROM videos v
