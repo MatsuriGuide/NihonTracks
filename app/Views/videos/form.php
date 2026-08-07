@@ -46,6 +46,11 @@
 
         <?php if (!empty($autoDetected)): ?>
             <p class="hint hint-success"><?= e(t('videos.autodetected')) ?></p>
+        <?php elseif (!empty($detectedChannelId)): ?>
+            <p class="hint">
+                <?= e(t('videos.channel_id_debug')) ?> <code><?= e($detectedChannelId) ?></code>
+                — <?= e(t('videos.channel_id_debug_hint')) ?>
+            </p>
         <?php endif; ?>
 
         <?php if (empty($artists)): ?>
