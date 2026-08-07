@@ -59,3 +59,4 @@ et du système de rôles/permissions.
 - [x] Modération (signalements, file de traitement, historique — rollback complet pas encore implémenté)
 - [x] Traduction assistée par OpenAI (admin uniquement, EN/JA à partir du contenu FR)
 - [x] Interface FR / EN / JA (contenu artistes/vidéos encore saisi en FR uniquement — EN/JA viendront via la traduction OpenAI)
+- [x] Relations entre artistes (membre/groupe, ex-membre, projet solo, collaboration)
