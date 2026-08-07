@@ -1,0 +1,623 @@
+/* ==========================================================================
+   NihonTracks — Design system "carnet de catalogue"
+   Palette : bleu nuit d'archive + accents corail/menthe façon fiche cartonnée
+   ========================================================================== */
+
+:root {
+    /* Couleurs */
+    --navy-950: #10122a;
+    --navy-900: #171a3a;
+    --navy-800: #1f234a;
+    --navy-700: #2a2f5e;
+    --paper:    #edeae1;
+    --ink-dim:  #9b9dc4;
+    --coral:    #ff6a72;
+    --coral-ink:#2a0e10;
+    --mint:     #38d6b4;
+    --line:     rgba(237, 234, 225, 0.12);
+    --danger:   #ff6a72;
+
+    /* Typo */
+    --font-display: 'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+    --radius: 3px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    color-scheme: dark;
+}
+
+body {
+    margin: 0;
+    background: var(--navy-950);
+    background-image:
+        radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255, 106, 114, 0.10), transparent),
+        radial-gradient(ellipse 700px 500px at 100% 0%, rgba(56, 214, 180, 0.08), transparent);
+    color: var(--paper);
+    font-family: var(--font-display);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: var(--mint);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--coral);
+}
+
+:focus-visible {
+    outline: 2px solid var(--mint);
+    outline-offset: 2px;
+}
+
+.mono {
+    font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   Typographie
+   ========================================================================== */
+
+h1, h2, h3 {
+    font-family: var(--font-display);
+    color: var(--paper);
+    line-height: 1.15;
+}
+
+h1 {
+    font-size: clamp(1.8rem, 1.4rem + 1.6vw, 2.6rem);
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    margin: 0 0 1.25rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 3px solid var(--coral);
+    display: inline-block;
+}
+
+h2 {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mint);
+    margin: 2.5rem 0 1rem;
+}
+
+h2::before {
+    content: "// ";
+    color: var(--ink-dim);
+}
+
+h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--paper);
+    margin: 1.5rem 0 0.75rem;
+}
+
+p {
+    color: var(--paper);
+}
+
+small {
+    color: var(--ink-dim);
+}
+
+/* ==========================================================================
+   Layout général
+   ========================================================================== */
+
+.site-main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+.site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--line);
+    background: rgba(16, 18, 42, 0.85);
+    backdrop-filter: blur(6px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.brand {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.brand-mark {
+    font-weight: 900;
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+    color: var(--paper);
+}
+
+.brand:hover .brand-mark {
+    color: var(--coral);
+}
+
+.brand-tagline {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+}
+
+.site-nav {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.site-nav a {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    padding: 0.3rem 0;
+    border-bottom: 2px solid transparent;
+}
+
+.site-nav a:hover {
+    color: var(--paper);
+    border-bottom-color: var(--coral);
+}
+
+.site-header-side {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.lang-switcher {
+    display: flex;
+    gap: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+}
+
+.lang-switcher a {
+    padding: 0.2rem 0.45rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    color: var(--ink-dim);
+}
+
+.lang-switcher a.is-active {
+    color: var(--navy-950);
+    background: var(--mint);
+    border-color: var(--mint);
+    font-weight: 700;
+}
+
+.user-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.85rem;
+}
+
+.user-nav a {
+    color: var(--ink-dim);
+}
+
+.user-nav a:hover {
+    color: var(--coral);
+}
+
+.user-greeting {
+    color: var(--ink-dim);
+    font-size: 0.8rem;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.site-footer {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 3rem;
+    border-top: 1px solid var(--line);
+    text-align: center;
+}
+
+.site-footer p {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    color: var(--ink-dim);
+}
+
+/* ==========================================================================
+   Numéro de catalogue — élément signature
+   ========================================================================== */
+
+.catalog-no {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--navy-950);
+    background: var(--coral);
+    padding: 0.15rem 0.45rem;
+    border-radius: var(--radius);
+    vertical-align: middle;
+    margin-right: 0.6rem;
+}
+
+.catalog-no.is-muted {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-dim);
+}
+
+/* ==========================================================================
+   Cartes (grilles artistes / vidéos)
+   ========================================================================== */
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    background: var(--navy-900);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.card:hover {
+    border-color: var(--coral);
+    transform: translateY(-2px);
+}
+
+.card-thumb {
+    aspect-ratio: 16 / 9;
+    background: var(--navy-800);
+    background-size: cover;
+    background-position: center;
+    border-bottom: 1px solid var(--line);
+}
+
+.card-body {
+    padding: 0.85rem 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.card-title {
+    color: var(--paper);
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1.3;
+}
+
+.card:hover .card-title {
+    color: var(--coral);
+}
+
+.card-meta {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ink-dim);
+    letter-spacing: 0.02em;
+}
+
+/* ==========================================================================
+   Listes "ledger" (fallback générique pour ul/ol de contenu)
+   ========================================================================== */
+
+.site-main ul:not(.card-grid),
+.site-main ol {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+}
+
+.site-main ul:not(.card-grid) > li,
+.site-main ol > li {
+    padding: 0.7rem 0.25rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.site-main ul:not(.card-grid) > li:hover,
+.site-main ol > li:hover {
+    background: rgba(237, 234, 225, 0.03);
+}
+
+/* ==========================================================================
+   Tags / chips
+   ========================================================================== */
+
+.tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--mint);
+    background: rgba(56, 214, 180, 0.10);
+    border: 1px solid rgba(56, 214, 180, 0.30);
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    margin: 0 0.3rem 0.3rem 0;
+}
+
+/* ==========================================================================
+   Formulaires
+   ========================================================================== */
+
+form {
+    margin: 0;
+}
+
+label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 0.35rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+input[type="date"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    max-width: 420px;
+    background: var(--navy-900);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    color: var(--paper);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    padding: 0.55rem 0.7rem;
+}
+
+textarea {
+    max-width: 100%;
+    font-family: var(--font-display);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--coral);
+}
+
+fieldset {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem 1.1rem;
+    margin: 0 0 1.25rem;
+}
+
+legend {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mint);
+    padding: 0 0.4rem;
+}
+
+fieldset label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 400;
+    font-family: var(--font-display);
+    color: var(--paper);
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+}
+
+/* ==========================================================================
+   Boutons
+   ========================================================================== */
+
+button,
+input[type="submit"],
+a.btn {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--coral-ink);
+    background: var(--coral);
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.6rem 1.1rem;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+button:hover,
+input[type="submit"]:hover,
+a.btn:hover {
+    background: #ff868c;
+    color: var(--coral-ink);
+}
+
+button:active,
+input[type="submit"]:active {
+    transform: translateY(1px);
+}
+
+.btn-small {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.68rem;
+}
+
+/* Boutons secondaires : "Retirer" / "Rejeter" / suppression dans une liste */
+form + form button,
+li form button {
+    background: transparent;
+    color: var(--ink-dim);
+    border: 1px solid var(--line);
+}
+
+form + form button:hover,
+li form button:hover {
+    color: var(--coral);
+    border-color: var(--coral);
+    background: transparent;
+}
+
+/* ==========================================================================
+   Details / summary (signalement, traduction)
+   ========================================================================== */
+
+details {
+    background: var(--navy-900);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0.9rem 1.1rem;
+    margin: 1rem 0;
+}
+
+details summary {
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mint);
+}
+
+details[open] summary {
+    margin-bottom: 0.9rem;
+}
+
+/* ==========================================================================
+   Blocs spécifiques : report, admin-translate, admin dashboard
+   ========================================================================== */
+
+.admin-translate {
+    background: var(--navy-900);
+    border-left: 3px solid var(--coral);
+    border-radius: var(--radius);
+    padding: 0.9rem 1.1rem;
+    margin: 1.5rem 0;
+}
+
+.admin-translate h3 {
+    margin-top: 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mint);
+}
+
+.report {
+    background: var(--navy-900);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--coral);
+    border-radius: var(--radius);
+    padding: 1rem 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.report p {
+    margin: 0.3rem 0;
+}
+
+.errors {
+    background: rgba(255, 106, 114, 0.10);
+    border: 1px solid rgba(255, 106, 114, 0.35);
+    border-radius: var(--radius);
+    padding: 0.85rem 1.1rem;
+    color: var(--coral);
+    font-size: 0.9rem;
+}
+
+.errors li {
+    border: none !important;
+    padding: 0.15rem 0 !important;
+}
+
+/* ==========================================================================
+   Vidéo embed
+   ========================================================================== */
+
+iframe {
+    max-width: 100%;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 640px) {
+    .site-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .site-nav {
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .card-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+    }
+}
