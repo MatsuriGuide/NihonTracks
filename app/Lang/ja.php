@@ -223,4 +223,8 @@ return [
     // Detection artiste / recherche
     'videos.autodetected' => 'YouTubeチャンネルからアーティストを自動検出しました。送信前にご確認ください。',
     'videos.search_artist' => 'アーティストを検索...',
+
+    // Debug detection chaine
+    'videos.channel_id_debug' => '一致するアーティストが見つかりませんでした。YouTubeが検出したチャンネルID：',
+    'videos.channel_id_debug_hint' => 'アーティストページに保存されているものと比較してください。',
 ];

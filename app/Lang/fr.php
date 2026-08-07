@@ -223,4 +223,8 @@ return [
     // Detection artiste / recherche
     'videos.autodetected' => 'Artiste détecté automatiquement à partir de la chaîne YouTube — vérifie avant de valider.',
     'videos.search_artist' => 'Rechercher un artiste...',
+
+    // Debug detection chaine
+    'videos.channel_id_debug' => 'Aucun artiste correspondant trouvé. ID de chaîne détecté par YouTube :',
+    'videos.channel_id_debug_hint' => 'compare-le avec celui enregistré sur la fiche artiste.',
 ];
