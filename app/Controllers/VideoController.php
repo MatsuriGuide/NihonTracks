@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Core\Auth;
 use App\Core\Controller;
 use App\Models\Artist;
+use App\Models\ArtistLink;
 use App\Models\Playlist;
 use App\Models\Tag;
 use App\Models\Video;
@@ -85,6 +86,19 @@ class VideoController extends Controller
         ];
         $prefill['youtube_url'] = 'https://www.youtube.com/watch?v=' . $youtubeId;
 
+        // Détection automatique de l'artiste : d'abord via l'ID de chaîne
+        // (fiable, nécessite un lien YouTube au format /channel/UC... sur la
+        // fiche artiste), puis en repli via une correspondance exacte de nom.
+        $detectedArtistIds = [];
+
+        if (!empty($prefill['channel_id'])) {
+            $detectedArtistIds = ArtistLink::findArtistIdsByYoutubeChannelId($prefill['channel_id']);
+        }
+
+        if (empty($detectedArtistIds) && !empty($prefill['channel_name'])) {
+            $detectedArtistIds = Artist::findIdsByExactName($prefill['channel_name']);
+        }
+
         $this->render('videos/form', [
             'errors'            => $metadata === null
                 ? [t('videos.api_fallback')]
@@ -93,8 +107,9 @@ class VideoController extends Controller
             'mode'              => 'create',
             'artists'           => Artist::all(),
             'tagGroups'         => Tag::selectable(),
-            'selectedArtistIds' => [],
+            'selectedArtistIds' => $detectedArtistIds,
             'selectedTagIds'    => [],
+            'autoDetected'      => !empty($detectedArtistIds),
         ]);
     }
 
