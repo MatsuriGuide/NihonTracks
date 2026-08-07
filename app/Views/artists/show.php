@@ -1,4 +1,4 @@
-<h1><?= e($translation['name'] ?? $artist['slug']) ?></h1>
+<h1><span class="catalog-no"><?= e(catalog_no('a', (int) $artist['id'])) ?></span><?= e($translation['name'] ?? $artist['slug']) ?></h1>
 
 <p>
     <?= e(t('artists.type')) ?> : <?= e(t('artists.type.' . $artist['type'])) ?> —
@@ -25,6 +25,49 @@
             <button type="submit"><?= e(t('artists.delete')) ?></button>
         </form>
     </p>
+<?php endif; ?>
+
+<h2><?= e(t('artists.links.title')) ?></h2>
+
+<?php if (empty($links)): ?>
+    <p><?= e(t('artists.links.none')) ?></p>
+<?php else: ?>
+    <ul>
+        <?php foreach ($links as $link): ?>
+            <li>
+                <strong><?= e(t('artists.links.platform.' . $link['platform'])) ?></strong> :
+                <a href="<?= e($link['url']) ?>" target="_blank" rel="noopener"><?= e($link['url']) ?></a>
+                <?php if (\App\Core\Auth::canEdit((int) $artist['created_by'])): ?>
+                    <form method="post" action="<?= url('/artists/' . $artist['id'] . '/links/' . $link['id'] . '/delete') ?>"
+                          onsubmit="return confirm('<?= e(t('artists.links.remove_confirm')) ?>');" style="display:inline">
+                        <button type="submit"><?= e(t('artists.links.remove')) ?></button>
+                    </form>
+                <?php endif; ?>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>
+
+<?php if (\App\Core\Auth::canEdit((int) $artist['created_by'])): ?>
+    <details>
+        <summary><?= e(t('artists.links.add_title')) ?></summary>
+        <form method="post" action="<?= url('/artists/' . $artist['id'] . '/links') ?>">
+            <p>
+                <label for="platform"><?= e(t('artists.links.platform_label')) ?></label><br>
+                <select id="platform" name="platform">
+                    <?php foreach (\App\Models\ArtistLink::PLATFORMS as $platform): ?>
+                        <option value="<?= e($platform) ?>"><?= e(t('artists.links.platform.' . $platform)) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </p>
+            <p>
+                <label for="url"><?= e(t('artists.links.url_label')) ?></label><br>
+                <input type="url" id="url" name="url" placeholder="https://..." required>
+            </p>
+            <p><small><?= e(t('artists.links.youtube_hint')) ?></small></p>
+            <button type="submit"><?= e(t('artists.links.submit')) ?></button>
+        </form>
+    </details>
 <?php endif; ?>
 
 <h2><?= e(t('artists.relations.title')) ?></h2>
