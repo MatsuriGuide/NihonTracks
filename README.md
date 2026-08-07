@@ -55,7 +55,7 @@ et du système de rôles/permissions.
 - [x] CRUD Artistes (création, édition, suppression, fiche publique)
 - [x] CRUD Vidéos + intégration API YouTube (métadonnées auto, fallback manuel)
 - [x] Attribution de tags (genre/langue) sur les vidéos — gestion des catégories/fusion encore à faire côté admin
-- [ ] Playlists
+- [x] Playlists (création, publique/privée, ajout/retrait de vidéos)
 - [ ] Modération (signalements, file de traitement, historique/rollback)
 - [ ] Traduction assistée par OpenAI (admin uniquement)
 - [ ] Interface FR / EN / JP
