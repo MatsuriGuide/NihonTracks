@@ -55,6 +55,20 @@ class Artist
         return $result;
     }
 
+    /**
+     * Repli de détection : artistes dont le nom (langue courante ou français)
+     * correspond exactement au nom de la chaîne YouTube (insensible à la casse).
+     */
+    public static function findIdsByExactName(string $name): array
+    {
+        $rows = Database::getInstance()->fetchAll(
+            'SELECT DISTINCT artist_id FROM artists_i18n WHERE LOWER(name) = LOWER(?)',
+            [$name]
+        );
+
+        return array_map(static fn (array $r): int => (int) $r['artist_id'], $rows);
+    }
+
     public static function slugExists(string $slug, ?int $excludeId = null): bool
     {
         $db = Database::getInstance();
