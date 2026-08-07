@@ -1,0 +1,83 @@
+<h1><?= $mode === 'edit' ? 'Modifier' : 'Ajouter' ?> une vidéo</h1>
+
+<?php if (!empty($errors)): ?>
+    <ul class="errors">
+        <?php foreach ($errors as $error): ?>
+            <li><?= e($error) ?></li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>
+
+<?php if (!empty($old['thumbnail_url'])): ?>
+    <img src="<?= e($old['thumbnail_url']) ?>" alt="" style="max-width: 320px; display:block; margin-bottom: 1em;">
+<?php endif; ?>
+
+<form method="post" action="<?= $mode === 'edit' ? url('/videos/' . $videoId . '/edit') : url('/videos/store') ?>">
+    <input type="hidden" name="youtube_id" value="<?= e($old['youtube_id'] ?? '') ?>">
+    <input type="hidden" name="youtube_url" value="<?= e($old['youtube_url'] ?? '') ?>">
+    <input type="hidden" name="thumbnail_url" value="<?= e($old['thumbnail_url'] ?? '') ?>">
+    <input type="hidden" name="channel_name" value="<?= e($old['channel_name'] ?? '') ?>">
+    <input type="hidden" name="duration_seconds" value="<?= e((string) ($old['duration_seconds'] ?? '')) ?>">
+
+    <p>
+        <label for="title">Titre</label><br>
+        <input type="text" id="title" name="title" value="<?= e($old['title'] ?? '') ?>" required
+               style="width: 100%; max-width: 500px;">
+    </p>
+
+    <p>
+        <label for="release_date">Date de sortie</label><br>
+        <input type="date" id="release_date" name="release_date" value="<?= e($old['release_date'] ?? '') ?>">
+    </p>
+
+    <p>
+        <label for="video_type">Type</label><br>
+        <select id="video_type" name="video_type">
+            <?php
+            $types = [
+                'mv'          => 'MV officiel',
+                'lyric_video' => 'Lyric video',
+                'live'        => 'Live',
+                'performance' => 'Performance',
+                'cover'       => 'Cover',
+                'teaser'      => 'Teaser',
+                'other'       => 'Autre',
+            ];
+            foreach ($types as $value => $label):
+            ?>
+                <option value="<?= e($value) ?>" <?= ($old['video_type'] ?? 'mv') === $value ? 'selected' : '' ?>>
+                    <?= e($label) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </p>
+
+    <fieldset>
+        <legend>Artiste(s)</legend>
+        <?php if (empty($artists)): ?>
+            <p>Aucun artiste enregistré. <a href="<?= url('/artists/create') ?>">En créer un</a> d'abord.</p>
+        <?php endif; ?>
+        <?php foreach ($artists as $artist): ?>
+            <label>
+                <input type="checkbox" name="artist_ids[]" value="<?= (int) $artist['id'] ?>"
+                    <?= in_array((int) $artist['id'], $selectedArtistIds, true) ? 'checked' : '' ?>>
+                <?= e($artist['name'] ?? $artist['slug']) ?>
+            </label><br>
+        <?php endforeach; ?>
+    </fieldset>
+
+    <?php foreach ($tagGroups as $categorySlug => $tags): ?>
+        <fieldset>
+            <legend><?= e(ucfirst($categorySlug)) ?></legend>
+            <?php foreach ($tags as $tag): ?>
+                <label>
+                    <input type="checkbox" name="tag_ids[]" value="<?= (int) $tag['id'] ?>"
+                        <?= in_array((int) $tag['id'], $selectedTagIds, true) ? 'checked' : '' ?>>
+                    <?= e($tag['name'] ?? $tag['slug']) ?>
+                </label><br>
+            <?php endforeach; ?>
+        </fieldset>
+    <?php endforeach; ?>
+
+    <button type="submit"><?= $mode === 'edit' ? 'Enregistrer' : 'Ajouter la vidéo' ?></button>
+</form>
