@@ -1,15 +1,20 @@
 <h1><?= e(t('artists.title')) ?></h1>
 
-<p><a href="<?= url('/artists/create') ?>"><?= e(t('artists.add')) ?></a></p>
+<p><a href="<?= url('/artists/create') ?>" class="btn"><?= e(t('artists.add')) ?></a></p>
 
 <?php if (empty($artists)): ?>
     <p><?= e(t('artists.empty')) ?></p>
 <?php else: ?>
-    <ul>
+    <ul class="card-grid">
         <?php foreach ($artists as $artist): ?>
-            <li>
-                <a href="<?= url('/artists/' . $artist['slug']) ?>"><?= e($artist['name'] ?? $artist['slug']) ?></a>
-                <small>(<?= e(t('artists.type.' . $artist['type'])) ?>)</small>
+            <li class="card">
+                <div class="card-body">
+                    <span class="catalog-no is-muted"><?= e(catalog_no('a', (int) $artist['id'])) ?></span>
+                    <a href="<?= url('/artists/' . $artist['slug']) ?>" class="card-title">
+                        <?= e($artist['name'] ?? $artist['slug']) ?>
+                    </a>
+                    <span class="card-meta"><?= e(t('artists.type.' . $artist['type'])) ?></span>
+                </div>
             </li>
         <?php endforeach; ?>
     </ul>
