@@ -27,4 +27,29 @@
     </p>
 <?php endif; ?>
 
+<?php if (\App\Core\Auth::check()): ?>
+    <details>
+        <summary>Signaler cette fiche</summary>
+        <form method="post" action="<?= url('/reports') ?>">
+            <input type="hidden" name="reportable_type" value="artist">
+            <input type="hidden" name="reportable_id" value="<?= (int) $artist['id'] ?>">
+            <p>
+                <label for="reason">Motif</label><br>
+                <select id="reason" name="reason">
+                    <option value="duplicate">Doublon</option>
+                    <option value="wrong_info">Information erronée</option>
+                    <option value="spam">Spam</option>
+                    <option value="inappropriate">Contenu inapproprié</option>
+                    <option value="other">Autre</option>
+                </select>
+            </p>
+            <p>
+                <label for="comment">Commentaire (optionnel)</label><br>
+                <textarea id="comment" name="comment" rows="3"></textarea>
+            </p>
+            <button type="submit">Envoyer le signalement</button>
+        </form>
+    </details>
+<?php endif; ?>
+
 <p><a href="<?= url('/artists') ?>">&larr; Retour à la liste</a></p>
