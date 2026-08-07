@@ -22,52 +22,74 @@ class Video
         );
     }
 
-    public static function all(): array
+    public static function all(?string $lang = null): array
     {
+        $lang ??= \App\Core\Lang::current();
+
         return Database::getInstance()->fetchAll(
             'SELECT v.id, v.youtube_id, v.thumbnail_url, v.release_date, v.video_type,
-                    vi.title,
-                    GROUP_CONCAT(DISTINCT ai.name ORDER BY ai.name SEPARATOR ", ") AS artist_names
+                    COALESCE(vi.title, vi_fr.title) AS title,
+                    GROUP_CONCAT(DISTINCT COALESCE(ai.name, ai_fr.name) ORDER BY ai.name SEPARATOR ", ") AS artist_names
              FROM videos v
-             LEFT JOIN videos_i18n vi ON vi.video_id = v.id AND vi.lang = "fr"
+             LEFT JOIN videos_i18n vi ON vi.video_id = v.id AND vi.lang = ?
+             LEFT JOIN videos_i18n vi_fr ON vi_fr.video_id = v.id AND vi_fr.lang = "fr"
              LEFT JOIN video_artists va ON va.video_id = v.id
-             LEFT JOIN artists_i18n ai ON ai.artist_id = va.artist_id AND ai.lang = "fr"
+             LEFT JOIN artists_i18n ai ON ai.artist_id = va.artist_id AND ai.lang = ?
+             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
              WHERE v.status = "published"
              GROUP BY v.id
-             ORDER BY v.release_date DESC, v.id DESC'
+             ORDER BY v.release_date DESC, v.id DESC',
+            [$lang, $lang]
         );
     }
 
-    public static function artistsFor(int $videoId): array
+    public static function artistsFor(int $videoId, ?string $lang = null): array
     {
+        $lang ??= \App\Core\Lang::current();
+
         return Database::getInstance()->fetchAll(
-            'SELECT a.id, ai.name
+            'SELECT a.id, COALESCE(ai.name, ai_fr.name) AS name
              FROM video_artists va
              JOIN artists a ON a.id = va.artist_id
-             LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = "fr"
+             LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = ?
+             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
              WHERE va.video_id = ?',
-            [$videoId]
+            [$lang, $videoId]
         );
     }
 
-    public static function tagsFor(int $videoId): array
+    public static function tagsFor(int $videoId, ?string $lang = null): array
     {
+        $lang ??= \App\Core\Lang::current();
+
         return Database::getInstance()->fetchAll(
-            'SELECT t.id, ti.name, tc.slug AS category_slug
+            'SELECT t.id, COALESCE(ti.name, ti_fr.name) AS name, tc.slug AS category_slug
              FROM video_tags vt
              JOIN tags t ON t.id = vt.tag_id
-             LEFT JOIN tags_i18n ti ON ti.tag_id = t.id AND ti.lang = "fr"
+             LEFT JOIN tags_i18n ti ON ti.tag_id = t.id AND ti.lang = ?
+             LEFT JOIN tags_i18n ti_fr ON ti_fr.tag_id = t.id AND ti_fr.lang = "fr"
              LEFT JOIN tag_categories tc ON tc.id = t.category_id
              WHERE vt.video_id = ?',
-            [$videoId]
+            [$lang, $videoId]
         );
     }
 
-    public static function translation(int $videoId, string $lang = 'fr'): ?array
+    public static function translation(int $videoId, ?string $lang = null): ?array
     {
-        return Database::getInstance()->fetchOne(
+        $lang ??= \App\Core\Lang::current();
+
+        $translation = Database::getInstance()->fetchOne(
             'SELECT * FROM videos_i18n WHERE video_id = ? AND lang = ?',
             [$videoId, $lang]
+        );
+
+        if ($translation !== null || $lang === 'fr') {
+            return $translation;
+        }
+
+        return Database::getInstance()->fetchOne(
+            'SELECT * FROM videos_i18n WHERE video_id = ? AND lang = "fr"',
+            [$videoId]
         );
     }
 

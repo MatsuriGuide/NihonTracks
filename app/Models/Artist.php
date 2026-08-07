@@ -6,13 +6,18 @@ use App\Core\Database;
 
 class Artist
 {
-    public static function all(): array
+    public static function all(?string $lang = null): array
     {
+        $lang ??= \App\Core\Lang::current();
+
         return Database::getInstance()->fetchAll(
-            'SELECT a.id, a.slug, a.type, a.status, ai.name
+            'SELECT a.id, a.slug, a.type, a.status,
+                    COALESCE(ai.name, ai_fr.name) AS name
              FROM artists a
-             LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = "fr"
-             ORDER BY ai.name'
+             LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = ?
+             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
+             ORDER BY name',
+            [$lang]
         );
     }
 
