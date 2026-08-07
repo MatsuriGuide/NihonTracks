@@ -182,4 +182,22 @@ return [
     'admin.translate.translate' => 'Translate',
     'admin.translate.retranslate' => 'Re-translate',
     'admin.translate.auto_flag' => '(auto-translated)',
+
+    // Relations entre artistes
+    'artists.relations.title' => 'Relations',
+    'artists.relations.none' => 'No relations recorded.',
+    'artists.relations.add_title' => 'Add a relation',
+    'artists.relations.target_label' => 'Related artist',
+    'artists.relations.type_label' => 'Relation type',
+    'artists.relations.note_label' => 'Note (optional)',
+    'artists.relations.submit' => 'Add',
+    'artists.relations.remove' => 'Remove',
+    'artists.relations.remove_confirm' => 'Delete this relation?',
+    'artists.relations.member_of_out' => 'Member of',
+    'artists.relations.member_of_in' => 'Members',
+    'artists.relations.former_member_of_out' => 'Former member of',
+    'artists.relations.former_member_of_in' => 'Former members',
+    'artists.relations.solo_project_of_out' => 'Solo project of',
+    'artists.relations.solo_project_of_in' => 'Solo projects',
+    'artists.relations.collaborates_with' => 'Collaborates with',
 ];

@@ -182,4 +182,22 @@ return [
     'admin.translate.translate' => 'Traduire',
     'admin.translate.retranslate' => 'Re-traduire',
     'admin.translate.auto_flag' => '(traduction automatique)',
+
+    // Relations entre artistes
+    'artists.relations.title' => 'Relations',
+    'artists.relations.none' => 'Aucune relation enregistrée.',
+    'artists.relations.add_title' => 'Ajouter une relation',
+    'artists.relations.target_label' => 'Artiste concerné',
+    'artists.relations.type_label' => 'Type de relation',
+    'artists.relations.note_label' => 'Note (optionnel)',
+    'artists.relations.submit' => 'Ajouter',
+    'artists.relations.remove' => 'Retirer',
+    'artists.relations.remove_confirm' => 'Supprimer cette relation ?',
+    'artists.relations.member_of_out' => 'Membre de',
+    'artists.relations.member_of_in' => 'Membres',
+    'artists.relations.former_member_of_out' => 'Ancien membre de',
+    'artists.relations.former_member_of_in' => 'Anciens membres',
+    'artists.relations.solo_project_of_out' => 'Projet solo de',
+    'artists.relations.solo_project_of_in' => 'Projets solo',
+    'artists.relations.collaborates_with' => 'Collabore avec',
 ];

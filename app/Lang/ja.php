@@ -182,4 +182,22 @@ return [
     'admin.translate.translate' => '翻訳する',
     'admin.translate.retranslate' => '再翻訳',
     'admin.translate.auto_flag' => '（自動翻訳）',
+
+    // Relations entre artistes
+    'artists.relations.title' => '関連アーティスト',
+    'artists.relations.none' => '登録されている関連はありません。',
+    'artists.relations.add_title' => '関連を追加',
+    'artists.relations.target_label' => '対象アーティスト',
+    'artists.relations.type_label' => '関連タイプ',
+    'artists.relations.note_label' => 'メモ（任意）',
+    'artists.relations.submit' => '追加',
+    'artists.relations.remove' => '削除',
+    'artists.relations.remove_confirm' => 'この関連を削除しますか？',
+    'artists.relations.member_of_out' => '所属グループ',
+    'artists.relations.member_of_in' => 'メンバー',
+    'artists.relations.former_member_of_out' => '元所属グループ',
+    'artists.relations.former_member_of_in' => '元メンバー',
+    'artists.relations.solo_project_of_out' => 'ソロプロジェクト元',
+    'artists.relations.solo_project_of_in' => 'ソロプロジェクト',
+    'artists.relations.collaborates_with' => 'コラボレーション',
 ];
