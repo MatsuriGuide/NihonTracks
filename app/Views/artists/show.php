@@ -27,6 +27,24 @@
     </p>
 <?php endif; ?>
 
+<?php if (\App\Core\Auth::role() === 'admin'): ?>
+    <div class="admin-translate">
+        <h3><?= e(t('admin.translate.title')) ?></h3>
+        <?php foreach (['en', 'ja'] as $targetLang): ?>
+            <?php $existing = $allTranslations[$targetLang] ?? null; ?>
+            <form method="post" action="<?= url('/admin/translate/artist/' . $artist['id'] . '/' . $targetLang) ?>" style="display:inline">
+                <button type="submit">
+                    <?= $existing ? e(t('admin.translate.retranslate')) : e(t('admin.translate.translate')) ?>
+                    (<?= e(strtoupper($targetLang)) ?>)
+                </button>
+            </form>
+            <?php if (!empty($existing['is_auto_translated'])): ?>
+                <small><?= e(t('admin.translate.auto_flag')) ?></small>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
 <?php if (\App\Core\Auth::check()): ?>
     <details>
         <summary><?= e(t('artists.report_this')) ?></summary>
