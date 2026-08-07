@@ -57,5 +57,5 @@ et du système de rôles/permissions.
 - [x] Attribution de tags (genre/langue) sur les vidéos — gestion des catégories/fusion encore à faire côté admin
 - [x] Playlists (création, publique/privée, ajout/retrait de vidéos)
 - [x] Modération (signalements, file de traitement, historique — rollback complet pas encore implémenté)
-- [ ] Traduction assistée par OpenAI (admin uniquement)
+- [x] Traduction assistée par OpenAI (admin uniquement, EN/JA à partir du contenu FR)
 - [x] Interface FR / EN / JA (contenu artistes/vidéos encore saisi en FR uniquement — EN/JA viendront via la traduction OpenAI)
