@@ -30,11 +30,12 @@ class VideoController extends Controller
         }
 
         $this->render('videos/show', [
-            'video'         => $video,
-            'translation'   => Video::translation($id),
-            'artists'       => Video::artistsFor($id),
-            'tags'          => Video::tagsFor($id),
-            'userPlaylists' => Auth::check() ? Playlist::allByUser((int) Auth::id()) : [],
+            'video'           => $video,
+            'translation'     => Video::translation($id),
+            'allTranslations' => Video::translations($id),
+            'artists'         => Video::artistsFor($id),
+            'tags'            => Video::tagsFor($id),
+            'userPlaylists'   => Auth::check() ? Playlist::allByUser((int) Auth::id()) : [],
         ]);
     }
 

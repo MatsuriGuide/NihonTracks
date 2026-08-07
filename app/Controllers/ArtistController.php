@@ -30,8 +30,9 @@ class ArtistController extends Controller
         $lang = \App\Core\Lang::current();
 
         $this->render('artists/show', [
-            'artist'      => $artist,
-            'translation' => $translations[$lang] ?? $translations['fr'] ?? null,
+            'artist'          => $artist,
+            'translation'     => $translations[$lang] ?? $translations['fr'] ?? null,
+            'allTranslations' => $translations,
         ]);
     }
 
