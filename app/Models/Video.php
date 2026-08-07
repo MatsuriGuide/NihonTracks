@@ -48,7 +48,7 @@ class Video
         $lang ??= \App\Core\Lang::current();
 
         return Database::getInstance()->fetchAll(
-            'SELECT a.id, COALESCE(ai.name, ai_fr.name) AS name
+            'SELECT a.id, a.slug, COALESCE(ai.name, ai_fr.name) AS name
              FROM video_artists va
              JOIN artists a ON a.id = va.artist_id
              LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = ?
