@@ -66,6 +66,7 @@ class YoutubeApiService
             'youtube_id'       => $videoId,
             'title'            => $snippet['title'] ?? '',
             'channel_name'     => $snippet['channelTitle'] ?? null,
+            'channel_id'       => $snippet['channelId'] ?? null,
             'release_date'     => isset($snippet['publishedAt'])
                 ? substr($snippet['publishedAt'], 0, 10)
                 : null,
