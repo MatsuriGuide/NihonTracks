@@ -19,6 +19,13 @@ Composer (compatible hébergement mutualisé sans SSH).
    - Si ce n'est pas possible sur ton hébergement, garde le `.htaccess` à la racine
      du projet : il redirige automatiquement vers `public/`.
 5. Vérifier que `storage/logs/` et `public/uploads/` sont accessibles en écriture (chmod 755/775).
+6. Créer un compte via `/register`, puis le promouvoir admin manuellement en base
+   (aucun compte n'est admin par défaut) :
+   ```sql
+   UPDATE users SET role = 'admin' WHERE email = 'ton@email.com';
+   ```
+   Il faudra se déconnecter puis se reconnecter pour que le nouveau rôle soit pris
+   en compte dans la session.
 
 ## Débogage
 
@@ -44,7 +51,7 @@ et du système de rôles/permissions.
 - [x] Squelette applicatif (routing, DB, Auth, Lang, layout de base)
 - [x] Page d'accueil (liste des vidéos publiées)
 - [x] Dashboard admin + gestion des tags (lecture seule)
-- [ ] Authentification complète (register/login, hashing, rôles)
+- [x] Authentification (register/login/logout, hashing bcrypt, session par rôle)
 - [ ] CRUD Artistes
 - [ ] CRUD Vidéos + intégration API YouTube (métadonnées auto)
 - [ ] Système de tags (attribution, catégories, fusion de doublons)
