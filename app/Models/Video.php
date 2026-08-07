@@ -74,6 +74,24 @@ class Video
         );
     }
 
+    /**
+     * Retourne les traductions existantes d'une vidéo, indexées par langue.
+     */
+    public static function translations(int $videoId): array
+    {
+        $rows = Database::getInstance()->fetchAll(
+            'SELECT lang, title, description FROM videos_i18n WHERE video_id = ?',
+            [$videoId]
+        );
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row['lang']] = $row;
+        }
+
+        return $result;
+    }
+
     public static function translation(int $videoId, ?string $lang = null): ?array
     {
         $lang ??= \App\Core\Lang::current();
