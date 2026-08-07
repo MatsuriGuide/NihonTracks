@@ -1,6 +1,14 @@
 <?php
 
 /**
+ * Traduit une clé d'interface dans la langue courante du site.
+ */
+function t(string $key, ?string $default = null): string
+{
+    return \App\Core\Lang::t($key, $default);
+}
+
+/**
  * Échappe une chaîne pour affichage HTML sûr.
  */
 function e(?string $value): string
