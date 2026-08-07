@@ -203,7 +203,7 @@ class PlaylistController extends Controller
         $errors = [];
 
         if ($data['name'] === '') {
-            $errors[] = 'Le nom de la playlist est requis.';
+            $errors[] = t('playlists.error.name_required');
         }
 
         return [$data, $errors];

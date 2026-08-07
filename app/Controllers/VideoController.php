@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Core\Auth;
 use App\Core\Controller;
 use App\Models\Artist;
+use App\Models\Playlist;
 use App\Models\Tag;
 use App\Models\Video;
 use App\Services\YoutubeApiService;
@@ -29,10 +30,11 @@ class VideoController extends Controller
         }
 
         $this->render('videos/show', [
-            'video'       => $video,
-            'translation' => Video::translation($id),
-            'artists'     => Video::artistsFor($id),
-            'tags'        => Video::tagsFor($id),
+            'video'         => $video,
+            'translation'   => Video::translation($id),
+            'artists'       => Video::artistsFor($id),
+            'tags'          => Video::tagsFor($id),
+            'userPlaylists' => Auth::check() ? Playlist::allByUser((int) Auth::id()) : [],
         ]);
     }
 
@@ -56,7 +58,7 @@ class VideoController extends Controller
 
         if ($youtubeId === null) {
             $this->render('videos/create_url', [
-                'error' => "Impossible d'extraire un identifiant vidéo de cette URL. Vérifie le lien YouTube.",
+                'error' => t('videos.bad_url'),
             ]);
 
             return;
@@ -64,7 +66,7 @@ class VideoController extends Controller
 
         if (Video::findByYoutubeId($youtubeId)) {
             $this->render('videos/create_url', [
-                'error' => 'Cette vidéo est déjà dans le catalogue.',
+                'error' => t('videos.already_exists'),
             ]);
 
             return;
@@ -84,7 +86,7 @@ class VideoController extends Controller
 
         $this->render('videos/form', [
             'errors'            => $metadata === null
-                ? ["Métadonnées non récupérées automatiquement (quota API atteint, clé absente/invalide, ou vidéo privée). Complète le formulaire manuellement."]
+                ? [t('videos.api_fallback')]
                 : [],
             'old'               => $prefill,
             'mode'              => 'create',
@@ -102,14 +104,14 @@ class VideoController extends Controller
         [$data, $errors] = $this->validate();
 
         if ($data['youtube_id'] !== '' && Video::findByYoutubeId($data['youtube_id'])) {
-            $errors[] = 'Cette vidéo est déjà dans le catalogue.';
+            $errors[] = t('videos.already_exists');
         }
 
         $artistIds = array_map('intval', (array) $this->input('artist_ids', []));
         $tagIds = array_map('intval', (array) $this->input('tag_ids', []));
 
         if (empty($artistIds)) {
-            $errors[] = 'Sélectionne au moins un artiste.';
+            $errors[] = t('videos.error.select_artist');
         }
 
         if (!empty($errors)) {
@@ -188,7 +190,7 @@ class VideoController extends Controller
         $tagIds = array_map('intval', (array) $this->input('tag_ids', []));
 
         if (empty($artistIds)) {
-            $errors[] = 'Sélectionne au moins un artiste.';
+            $errors[] = t('videos.error.select_artist');
         }
 
         if (!empty($errors)) {
@@ -251,12 +253,12 @@ class VideoController extends Controller
         }
 
         if ($data['title'] === '') {
-            $errors[] = 'Le titre est requis.';
+            $errors[] = t('videos.error.title_required');
         }
 
         $validTypes = ['mv', 'lyric_video', 'live', 'performance', 'cover', 'teaser', 'other'];
         if (!in_array($data['video_type'], $validTypes, true)) {
-            $errors[] = 'Type de vidéo invalide.';
+            $errors[] = t('videos.error.type_invalid');
         }
 
         return [$data, $errors];

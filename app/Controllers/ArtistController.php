@@ -27,10 +27,11 @@ class ArtistController extends Controller
         }
 
         $translations = Artist::translations((int) $artist['id']);
+        $lang = \App\Core\Lang::current();
 
         $this->render('artists/show', [
             'artist'      => $artist,
-            'translation' => $translations['fr'] ?? null,
+            'translation' => $translations[$lang] ?? $translations['fr'] ?? null,
         ]);
     }
 
@@ -155,15 +156,15 @@ class ArtistController extends Controller
         $errors = [];
 
         if ($data['name'] === '') {
-            $errors[] = "Le nom de l'artiste est requis.";
+            $errors[] = t('artists.error.name_required');
         }
 
         if (!in_array($data['type'], ['solo', 'group', 'duo', 'other'], true)) {
-            $errors[] = 'Type invalide.';
+            $errors[] = t('artists.error.type_invalid');
         }
 
         if (!in_array($data['status'], ['active', 'disbanded', 'hiatus'], true)) {
-            $errors[] = 'Statut invalide.';
+            $errors[] = t('artists.error.status_invalid');
         }
 
         return [$data, $errors];
