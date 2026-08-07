@@ -629,6 +629,15 @@ iframe {
     color: var(--mint);
 }
 
+code {
+    font-family: var(--font-mono);
+    background: var(--navy-800);
+    padding: 0.1rem 0.4rem;
+    border-radius: var(--radius);
+    color: var(--coral);
+    font-size: 0.85em;
+}
+
 /* ==========================================================================
    Lecteur de playlist
    ========================================================================== */
