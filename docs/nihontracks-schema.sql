@@ -55,7 +55,7 @@ CREATE TABLE artists_i18n (
 CREATE TABLE artist_links (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     artist_id       INT UNSIGNED NOT NULL,
-    platform        ENUM('website', 'twitter', 'instagram', 'tiktok', 'youtube', 'spotify', 'other') NOT NULL,
+    platform        ENUM('website', 'twitter', 'instagram', 'facebook', 'tiktok', 'youtube', 'spotify', 'other') NOT NULL,
     url             VARCHAR(500) NOT NULL,
     FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
