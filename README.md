@@ -64,4 +64,5 @@ et du système de rôles/permissions.
 - [x] Lecteur de playlist intégré (YouTube IFrame API, sticky, lecture automatique du morceau suivant)
 - [x] Liens réseaux sur les fiches artiste (X, Instagram, Facebook, YouTube, TikTok, Spotify, site officiel)
 - [x] Détection automatique de l'artiste à l'ajout d'une vidéo (via lien YouTube /channel/UC... ou nom de chaîne, reste éditable)
+- [x] Création rapide d'un nouvel artiste directement depuis le formulaire d'ajout/édition de vidéo
 - [x] Recherche par nom dans la liste d'artistes du formulaire vidéo (filtrage JS, dès 8 artistes)
