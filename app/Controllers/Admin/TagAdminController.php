@@ -18,11 +18,14 @@ class TagAdminController extends AdminController
         $db = Database::getInstance();
 
         $categories = $db->fetchAll('SELECT * FROM tag_categories ORDER BY id');
+        $lang = \App\Core\Lang::current();
         $tags = $db->fetchAll(
-            'SELECT t.id, t.slug, t.category_id, ti.name
+            'SELECT t.id, t.slug, t.category_id, COALESCE(ti.name, ti_fr.name) AS name
              FROM tags t
-             LEFT JOIN tags_i18n ti ON ti.tag_id = t.id AND ti.lang = "fr"
-             ORDER BY t.category_id, ti.name'
+             LEFT JOIN tags_i18n ti ON ti.tag_id = t.id AND ti.lang = ?
+             LEFT JOIN tags_i18n ti_fr ON ti_fr.tag_id = t.id AND ti_fr.lang = "fr"
+             ORDER BY t.category_id, name',
+            [$lang]
         );
 
         $this->render('admin/tags/index', [
