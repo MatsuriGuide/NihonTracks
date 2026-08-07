@@ -53,8 +53,8 @@ et du système de rôles/permissions.
 - [x] Dashboard admin + gestion des tags (lecture seule)
 - [x] Authentification (register/login/logout, hashing bcrypt, session par rôle)
 - [x] CRUD Artistes (création, édition, suppression, fiche publique)
-- [ ] CRUD Vidéos + intégration API YouTube (métadonnées auto)
-- [ ] Système de tags (attribution, catégories, fusion de doublons)
+- [x] CRUD Vidéos + intégration API YouTube (métadonnées auto, fallback manuel)
+- [x] Attribution de tags (genre/langue) sur les vidéos — gestion des catégories/fusion encore à faire côté admin
 - [ ] Playlists
 - [ ] Modération (signalements, file de traitement, historique/rollback)
 - [ ] Traduction assistée par OpenAI (admin uniquement)
