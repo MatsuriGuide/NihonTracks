@@ -27,6 +27,91 @@
     </p>
 <?php endif; ?>
 
+<h2><?= e(t('artists.relations.title')) ?></h2>
+
+<?php
+$relationLabels = [
+    'member_of'        => 'member_of_out',
+    'former_member_of' => 'former_member_of_out',
+    'solo_project_of'  => 'solo_project_of_out',
+    'collaborates_with' => 'collaborates_with',
+];
+$reverseLabels = [
+    'member_of'        => 'member_of_in',
+    'former_member_of' => 'former_member_of_in',
+    'solo_project_of'  => 'solo_project_of_in',
+    'collaborates_with' => 'collaborates_with',
+];
+$hasRelations = !empty($outgoingRelations) || !empty($incomingRelations);
+?>
+
+<?php if (!$hasRelations): ?>
+    <p><?= e(t('artists.relations.none')) ?></p>
+<?php else: ?>
+    <ul>
+        <?php foreach ($outgoingRelations as $relation): ?>
+            <li>
+                <?= e(t('artists.relations.' . $relationLabels[$relation['relation_type']])) ?> :
+                <a href="<?= url('/artists/' . $relation['other_slug']) ?>"><?= e($relation['other_name'] ?? $relation['other_slug']) ?></a>
+                <?php if (!empty($relation['note'])): ?>
+                    — <?= e($relation['note']) ?>
+                <?php endif; ?>
+                <?php if (\App\Core\Auth::canEdit((int) $artist['created_by'])): ?>
+                    <form method="post" action="<?= url('/artists/' . $artist['id'] . '/relations/' . $relation['id'] . '/delete') ?>"
+                          onsubmit="return confirm('<?= e(t('artists.relations.remove_confirm')) ?>');" style="display:inline">
+                        <button type="submit"><?= e(t('artists.relations.remove')) ?></button>
+                    </form>
+                <?php endif; ?>
+            </li>
+        <?php endforeach; ?>
+        <?php foreach ($incomingRelations as $relation): ?>
+            <li>
+                <?= e(t('artists.relations.' . $reverseLabels[$relation['relation_type']])) ?> :
+                <a href="<?= url('/artists/' . $relation['other_slug']) ?>"><?= e($relation['other_name'] ?? $relation['other_slug']) ?></a>
+                <?php if (!empty($relation['note'])): ?>
+                    — <?= e($relation['note']) ?>
+                <?php endif; ?>
+                <?php if (\App\Core\Auth::canEdit((int) $artist['created_by'])): ?>
+                    <form method="post" action="<?= url('/artists/' . $artist['id'] . '/relations/' . $relation['id'] . '/delete') ?>"
+                          onsubmit="return confirm('<?= e(t('artists.relations.remove_confirm')) ?>');" style="display:inline">
+                        <button type="submit"><?= e(t('artists.relations.remove')) ?></button>
+                    </form>
+                <?php endif; ?>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>
+
+<?php if (\App\Core\Auth::canEdit((int) $artist['created_by']) && !empty($otherArtists)): ?>
+    <details>
+        <summary><?= e(t('artists.relations.add_title')) ?></summary>
+        <form method="post" action="<?= url('/artists/' . $artist['id'] . '/relations') ?>">
+            <p>
+                <label for="related_artist_id"><?= e(t('artists.relations.target_label')) ?></label><br>
+                <select id="related_artist_id" name="related_artist_id" required>
+                    <?php foreach ($otherArtists as $other): ?>
+                        <option value="<?= (int) $other['id'] ?>"><?= e($other['name'] ?? $other['slug']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </p>
+            <p>
+                <label for="relation_type"><?= e(t('artists.relations.type_label')) ?></label><br>
+                <select id="relation_type" name="relation_type">
+                    <option value="member_of"><?= e(t('artists.relations.member_of_out')) ?></option>
+                    <option value="former_member_of"><?= e(t('artists.relations.former_member_of_out')) ?></option>
+                    <option value="solo_project_of"><?= e(t('artists.relations.solo_project_of_out')) ?></option>
+                    <option value="collaborates_with"><?= e(t('artists.relations.collaborates_with')) ?></option>
+                </select>
+            </p>
+            <p>
+                <label for="note"><?= e(t('artists.relations.note_label')) ?></label><br>
+                <input type="text" id="note" name="note">
+            </p>
+            <button type="submit"><?= e(t('artists.relations.submit')) ?></button>
+        </form>
+    </details>
+<?php endif; ?>
+
 <?php if (\App\Core\Auth::role() === 'admin'): ?>
     <div class="admin-translate">
         <h3><?= e(t('admin.translate.title')) ?></h3>
