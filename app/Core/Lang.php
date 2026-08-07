@@ -7,6 +7,7 @@ class Lang
     private static array $siteLangs = ['fr', 'en', 'ja'];
     private static string $defaultLang = 'fr';
     private static ?string $currentLang = null;
+    private static array $dictionaries = [];
 
     public static function getSiteLangs(): array
     {
@@ -33,6 +34,34 @@ class Lang
             $_SESSION['lang'] = $lang;
             self::$currentLang = $lang;
         }
+    }
+
+    /**
+     * Traduit une clé d'interface (menus, boutons, labels...) dans la langue
+     * courante, avec repli sur la langue par défaut puis sur la clé elle-même
+     * si aucune traduction n'existe.
+     */
+    public static function t(string $key, ?string $default = null): string
+    {
+        $dict = self::dictionary(self::current());
+
+        if (isset($dict[$key])) {
+            return $dict[$key];
+        }
+
+        $fallback = self::dictionary(self::$defaultLang);
+
+        return $fallback[$key] ?? ($default ?? $key);
+    }
+
+    private static function dictionary(string $lang): array
+    {
+        if (!isset(self::$dictionaries[$lang])) {
+            $file = dirname(__DIR__) . "/Lang/{$lang}.php";
+            self::$dictionaries[$lang] = file_exists($file) ? require $file : [];
+        }
+
+        return self::$dictionaries[$lang];
     }
 
     private static function detect(): string
