@@ -30,3 +30,15 @@ $router->get('/videos/{id}/edit', 'VideoController@edit');
 $router->post('/videos/{id}/edit', 'VideoController@update');
 $router->post('/videos/{id}/delete', 'VideoController@delete');
 $router->get('/videos/{id}', 'VideoController@show');
+
+// Idem : routes fixes avant le pattern générique /playlists/{id}
+$router->get('/playlists', 'PlaylistController@index');
+$router->get('/playlists/mine', 'PlaylistController@mine');
+$router->get('/playlists/create', 'PlaylistController@create');
+$router->post('/playlists/create', 'PlaylistController@store');
+$router->get('/playlists/{id}/edit', 'PlaylistController@edit');
+$router->post('/playlists/{id}/edit', 'PlaylistController@update');
+$router->post('/playlists/{id}/delete', 'PlaylistController@delete');
+$router->post('/playlists/{id}/videos', 'PlaylistController@addVideo');
+$router->post('/playlists/{id}/videos/{videoId}/remove', 'PlaylistController@removeVideo');
+$router->get('/playlists/{id}', 'PlaylistController@show');
