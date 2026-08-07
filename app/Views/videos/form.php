@@ -69,6 +69,23 @@
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
+
+        <details>
+            <summary><?= e(t('videos.new_artist_toggle')) ?></summary>
+            <p>
+                <label for="new_artist_name"><?= e(t('artists.name')) ?></label><br>
+                <input type="text" id="new_artist_name" name="new_artist_name" placeholder="<?= e(t('artists.name')) ?>">
+            </p>
+            <p>
+                <label for="new_artist_type"><?= e(t('artists.type')) ?></label><br>
+                <select id="new_artist_type" name="new_artist_type">
+                    <?php foreach (['solo', 'group', 'duo', 'other'] as $value): ?>
+                        <option value="<?= e($value) ?>"><?= e(t('artists.type.' . $value)) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </p>
+            <p class="hint"><?= e(t('videos.new_artist_hint')) ?></p>
+        </details>
     </fieldset>
 
     <?php foreach ($tagGroups as $categorySlug => $tags): ?>
