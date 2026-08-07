@@ -54,7 +54,7 @@ et du système de rôles/permissions.
 - [x] Authentification (register/login/logout, hashing bcrypt, session par rôle)
 - [x] CRUD Artistes (création, édition, suppression, fiche publique)
 - [x] CRUD Vidéos + intégration API YouTube (métadonnées auto, fallback manuel)
-- [x] Attribution de tags (genre/langue) sur les vidéos — gestion des catégories/fusion encore à faire côté admin
+- [x] Attribution de tags (genre/langue) sur les vidéos — création de nouveaux tags par un admin depuis /admin/tags
 - [x] Playlists (création, publique/privée, ajout/retrait de vidéos)
 - [x] Modération (signalements, file de traitement, historique — rollback complet pas encore implémenté)
 - [x] Traduction assistée par OpenAI (admin uniquement, EN/JA à partir du contenu FR)
