@@ -1,4 +1,4 @@
-<h1><?= e($playlist['name']) ?></h1>
+<h1><span class="catalog-no"><?= e(catalog_no('p', (int) $playlist['id'])) ?></span><?= e($playlist['name']) ?></h1>
 
 <?php if (!empty($playlist['description'])): ?>
     <p><?= nl2br(e($playlist['description'])) ?></p>
@@ -22,23 +22,34 @@
 <?php if (empty($videos)): ?>
     <p><?= e(t('playlists.no_videos')) ?></p>
 <?php else: ?>
-    <ol>
-        <?php foreach ($videos as $video): ?>
-            <li>
-                <a href="<?= url('/videos/' . $video['id']) ?>"><?= e($video['title'] ?? $video['youtube_id']) ?></a>
-                <?php if (!empty($video['artist_names'])): ?>
-                    — <?= e($video['artist_names']) ?>
-                <?php endif; ?>
+    <div class="playlist-player" id="playlist-player-panel">
+        <div id="playlist-player"></div>
+        <p class="now-playing" id="now-playing-label"></p>
+    </div>
+
+    <ol class="tracklist" id="playlist-tracklist">
+        <?php foreach ($videos as $i => $video): ?>
+            <li class="track" data-youtube-id="<?= e($video['youtube_id']) ?>">
+                <button type="button" class="track-play" data-index="<?= (int) $i ?>">
+                    <span class="track-number"><?= (int) $i + 1 ?></span>
+                    <span class="track-title"><?= e($video['title'] ?? $video['youtube_id']) ?></span>
+                    <?php if (!empty($video['artist_names'])): ?>
+                        <span class="track-artist"><?= e($video['artist_names']) ?></span>
+                    <?php endif; ?>
+                </button>
+                <a href="<?= url('/videos/' . $video['id']) ?>" class="track-link" title="<?= e(t('videos.title_label')) ?>">↗</a>
                 <?php if (\App\Core\Auth::canEdit((int) $playlist['user_id'])): ?>
                     <form method="post"
                           action="<?= url('/playlists/' . $playlist['id'] . '/videos/' . $video['id'] . '/remove') ?>"
                           style="display:inline">
-                        <button type="submit"><?= e(t('playlists.remove')) ?></button>
+                        <button type="submit" class="track-remove"><?= e(t('playlists.remove')) ?></button>
                     </form>
                 <?php endif; ?>
             </li>
         <?php endforeach; ?>
     </ol>
+
+    <script src="<?= asset('js/playlist-player.js') ?>"></script>
 <?php endif; ?>
 
 <?php if (\App\Core\Auth::canEdit((int) $playlist['user_id']) && !empty($availableVideos)): ?>
