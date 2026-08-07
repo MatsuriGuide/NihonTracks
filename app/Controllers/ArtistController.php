@@ -6,6 +6,7 @@ use App\Core\Auth;
 use App\Core\Controller;
 use App\Core\Slug;
 use App\Models\Artist;
+use App\Models\ArtistRelation;
 
 class ArtistController extends Controller
 {
@@ -30,9 +31,15 @@ class ArtistController extends Controller
         $lang = \App\Core\Lang::current();
 
         $this->render('artists/show', [
-            'artist'          => $artist,
-            'translation'     => $translations[$lang] ?? $translations['fr'] ?? null,
-            'allTranslations' => $translations,
+            'artist'            => $artist,
+            'translation'       => $translations[$lang] ?? $translations['fr'] ?? null,
+            'allTranslations'   => $translations,
+            'outgoingRelations' => ArtistRelation::outgoing((int) $artist['id']),
+            'incomingRelations' => ArtistRelation::incoming((int) $artist['id']),
+            'otherArtists'      => array_values(array_filter(
+                Artist::all(),
+                fn (array $a): bool => (int) $a['id'] !== (int) $artist['id']
+            )),
         ]);
     }
 
@@ -137,6 +144,63 @@ class ArtistController extends Controller
 
         Artist::delete($id);
         $this->redirect('/artists');
+    }
+
+    public function addRelation(int $id): void
+    {
+        Auth::requireLogin();
+
+        $artist = Artist::findById($id);
+
+        if (!$artist || !Auth::canEdit((int) $artist['created_by'])) {
+            http_response_code(403);
+            require dirname(__DIR__) . '/Views/errors/403.php';
+
+            return;
+        }
+
+        $relatedId = (int) $this->input('related_artist_id', 0);
+        $type = (string) $this->input('relation_type', '');
+        $note = trim((string) $this->input('note', '')) ?: null;
+
+        $validTypes = ['member_of', 'former_member_of', 'solo_project_of', 'collaborates_with'];
+
+        if ($relatedId > 0 && $relatedId !== $id && in_array($type, $validTypes, true) && Artist::findById($relatedId)) {
+            ArtistRelation::create($id, $relatedId, $type, $note);
+        }
+
+        $this->redirect('/artists/' . $artist['slug']);
+    }
+
+    public function deleteRelation(int $id, int $relationId): void
+    {
+        Auth::requireLogin();
+
+        $relation = ArtistRelation::findById($relationId);
+
+        if (!$relation) {
+            $this->redirect('/artists');
+
+            return;
+        }
+
+        $sourceArtist = Artist::findById((int) $relation['artist_id']);
+        $targetArtist = Artist::findById((int) $relation['related_artist_id']);
+
+        $canDelete = ($sourceArtist && Auth::canEdit((int) $sourceArtist['created_by']))
+            || ($targetArtist && Auth::canEdit((int) $targetArtist['created_by']));
+
+        if (!$canDelete) {
+            http_response_code(403);
+            require dirname(__DIR__) . '/Views/errors/403.php';
+
+            return;
+        }
+
+        ArtistRelation::delete($relationId);
+
+        $artist = Artist::findById($id);
+        $this->redirect($artist ? '/artists/' . $artist['slug'] : '/artists');
     }
 
     /**
