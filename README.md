@@ -52,7 +52,7 @@ et du système de rôles/permissions.
 - [x] Page d'accueil (liste des vidéos publiées)
 - [x] Dashboard admin + gestion des tags (lecture seule)
 - [x] Authentification (register/login/logout, hashing bcrypt, session par rôle)
-- [ ] CRUD Artistes
+- [x] CRUD Artistes (création, édition, suppression, fiche publique)
 - [ ] CRUD Vidéos + intégration API YouTube (métadonnées auto)
 - [ ] Système de tags (attribution, catégories, fusion de doublons)
 - [ ] Playlists
