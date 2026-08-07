@@ -1,4 +1,4 @@
-<h1><?= e($translation['title'] ?? $video['youtube_id']) ?></h1>
+<h1><span class="catalog-no"><?= e(catalog_no('v', (int) $video['id'])) ?></span><?= e($translation['title'] ?? $video['youtube_id']) ?></h1>
 
 <p>
     <iframe width="560" height="315"
@@ -20,7 +20,7 @@
     <p>
         <?= e(t('videos.artists_label')) ?> :
         <?php foreach ($artists as $i => $artist): ?>
-            <?= $i > 0 ? ', ' : '' ?><?= e($artist['name'] ?? '') ?>
+            <?= $i > 0 ? ', ' : '' ?><a href="<?= url('/artists/' . $artist['slug']) ?>"><?= e($artist['name'] ?? '') ?></a>
         <?php endforeach; ?>
     </p>
 <?php endif; ?>
