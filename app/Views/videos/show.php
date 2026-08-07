@@ -34,6 +34,20 @@
     </p>
 <?php endif; ?>
 
+<?php if (\App\Core\Auth::check()): ?>
+    <h2>Ajouter à une playlist</h2>
+    <?php if (empty($userPlaylists)): ?>
+        <p>Tu n'as pas encore de playlist. <a href="<?= url('/playlists/create') ?>">En créer une</a>.</p>
+    <?php else: ?>
+        <?php foreach ($userPlaylists as $playlist): ?>
+            <form method="post" action="<?= url('/playlists/' . $playlist['id'] . '/videos') ?>" style="display:inline">
+                <input type="hidden" name="video_id" value="<?= (int) $video['id'] ?>">
+                <button type="submit"><?= e($playlist['name']) ?></button>
+            </form>
+        <?php endforeach; ?>
+    <?php endif; ?>
+<?php endif; ?>
+
 <?php if (\App\Core\Auth::canEdit((int) $video['added_by'])): ?>
     <p>
         <a href="<?= url('/videos/' . $video['id'] . '/edit') ?>">Modifier</a>
