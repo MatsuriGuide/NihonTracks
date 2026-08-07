@@ -4,8 +4,8 @@
 
 $router->get('/admin', 'Admin\DashboardController@index');
 $router->get('/admin/tags', 'Admin\TagAdminController@index');
+$router->get('/admin/reports', 'Admin\ReportController@index');
+$router->post('/admin/reports/{id}/resolve', 'Admin\ReportController@resolve');
 
 // À compléter au fur et à mesure :
-// $router->get('/admin/reports', 'Admin\ReportController@index');
-// $router->post('/admin/reports/{id}/resolve', 'Admin\ReportController@resolve');
 // $router->get('/admin/users', 'Admin\UserAdminController@index');
