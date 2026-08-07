@@ -200,4 +200,27 @@ return [
     'artists.relations.solo_project_of_out' => 'ソロプロジェクト元',
     'artists.relations.solo_project_of_in' => 'ソロプロジェクト',
     'artists.relations.collaborates_with' => 'コラボレーション',
+
+    // Liens artiste
+    'artists.links.title' => 'リンク',
+    'artists.links.none' => 'リンクはまだありません。',
+    'artists.links.add_title' => 'リンクを追加',
+    'artists.links.platform_label' => 'プラットフォーム',
+    'artists.links.url_label' => 'URL',
+    'artists.links.submit' => '追加',
+    'artists.links.remove' => '削除',
+    'artists.links.remove_confirm' => 'このリンクを削除しますか？',
+    'artists.links.youtube_hint' => '動画追加時の自動検出のため、https://www.youtube.com/channel/UC... の形式のURLを使用してください。',
+    'artists.links.platform.website' => '公式サイト',
+    'artists.links.platform.twitter' => 'X / Twitter',
+    'artists.links.platform.instagram' => 'Instagram',
+    'artists.links.platform.facebook' => 'Facebook',
+    'artists.links.platform.tiktok' => 'TikTok',
+    'artists.links.platform.youtube' => 'YouTube',
+    'artists.links.platform.spotify' => 'Spotify',
+    'artists.links.platform.other' => 'その他',
+
+    // Detection artiste / recherche
+    'videos.autodetected' => 'YouTubeチャンネルからアーティストを自動検出しました。送信前にご確認ください。',
+    'videos.search_artist' => 'アーティストを検索...',
 ];

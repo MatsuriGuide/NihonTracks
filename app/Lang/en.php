@@ -200,4 +200,27 @@ return [
     'artists.relations.solo_project_of_out' => 'Solo project of',
     'artists.relations.solo_project_of_in' => 'Solo projects',
     'artists.relations.collaborates_with' => 'Collaborates with',
+
+    // Liens artiste
+    'artists.links.title' => 'Links',
+    'artists.links.none' => 'No links added yet.',
+    'artists.links.add_title' => 'Add a link',
+    'artists.links.platform_label' => 'Platform',
+    'artists.links.url_label' => 'URL',
+    'artists.links.submit' => 'Add',
+    'artists.links.remove' => 'Remove',
+    'artists.links.remove_confirm' => 'Delete this link?',
+    'artists.links.youtube_hint' => 'For automatic detection when adding videos, use the URL format https://www.youtube.com/channel/UC...',
+    'artists.links.platform.website' => 'Official website',
+    'artists.links.platform.twitter' => 'X / Twitter',
+    'artists.links.platform.instagram' => 'Instagram',
+    'artists.links.platform.facebook' => 'Facebook',
+    'artists.links.platform.tiktok' => 'TikTok',
+    'artists.links.platform.youtube' => 'YouTube',
+    'artists.links.platform.spotify' => 'Spotify',
+    'artists.links.platform.other' => 'Other',
+
+    // Detection artiste / recherche
+    'videos.autodetected' => 'Artist auto-detected from the YouTube channel — check before submitting.',
+    'videos.search_artist' => 'Search for an artist...',
 ];
