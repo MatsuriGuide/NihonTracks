@@ -9,6 +9,18 @@
 <body>
     <header>
         <a href="<?= url('/') ?>">NihonTracks</a>
+        <nav>
+            <?php if (\App\Core\Auth::check()): ?>
+                <span>Bonjour, <?= e(\App\Core\Auth::user()['name']) ?></span>
+                <?php if (in_array(\App\Core\Auth::role(), ['moderator', 'admin'], true)): ?>
+                    <a href="<?= url('/admin') ?>">Administration</a>
+                <?php endif; ?>
+                <a href="<?= url('/logout') ?>">Déconnexion</a>
+            <?php else: ?>
+                <a href="<?= url('/login') ?>">Connexion</a>
+                <a href="<?= url('/register') ?>">Créer un compte</a>
+            <?php endif; ?>
+        </nav>
     </header>
 
     <main>
