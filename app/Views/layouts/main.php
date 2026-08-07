@@ -10,19 +10,27 @@
     <header>
         <a href="<?= url('/') ?>">NihonTracks</a>
         <nav>
-            <a href="<?= url('/artists') ?>">Artistes</a>
-            <a href="<?= url('/videos') ?>">Vidéos</a>
-            <a href="<?= url('/playlists') ?>">Playlists</a>
+            <a href="<?= url('/artists') ?>"><?= e(t('nav.artists')) ?></a>
+            <a href="<?= url('/videos') ?>"><?= e(t('nav.videos')) ?></a>
+            <a href="<?= url('/playlists') ?>"><?= e(t('nav.playlists')) ?></a>
             <?php if (\App\Core\Auth::check()): ?>
-                <span>Bonjour, <?= e(\App\Core\Auth::user()['name']) ?></span>
+                <span><?= e(t('nav.hello')) ?> <?= e(\App\Core\Auth::user()['name']) ?></span>
                 <?php if (in_array(\App\Core\Auth::role(), ['moderator', 'admin'], true)): ?>
-                    <a href="<?= url('/admin') ?>">Administration</a>
+                    <a href="<?= url('/admin') ?>"><?= e(t('nav.admin')) ?></a>
                 <?php endif; ?>
-                <a href="<?= url('/logout') ?>">Déconnexion</a>
+                <a href="<?= url('/logout') ?>"><?= e(t('nav.logout')) ?></a>
             <?php else: ?>
-                <a href="<?= url('/login') ?>">Connexion</a>
-                <a href="<?= url('/register') ?>">Créer un compte</a>
+                <a href="<?= url('/login') ?>"><?= e(t('nav.login')) ?></a>
+                <a href="<?= url('/register') ?>"><?= e(t('nav.register')) ?></a>
             <?php endif; ?>
+        </nav>
+        <nav class="lang-switcher">
+            <?php foreach (\App\Core\Lang::getSiteLangs() as $code): ?>
+                <a href="<?= url('/lang/' . $code) ?>"
+                   <?= $code === \App\Core\Lang::current() ? 'style="font-weight:bold;"' : '' ?>>
+                    <?= e(strtoupper($code)) ?>
+                </a>
+            <?php endforeach; ?>
         </nav>
     </header>
 

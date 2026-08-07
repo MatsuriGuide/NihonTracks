@@ -1,4 +1,4 @@
-<h1>Connexion</h1>
+<h1><?= e(t('auth.login.title')) ?></h1>
 
 <?php if (!empty($errors)): ?>
     <ul class="errors">
@@ -10,17 +10,17 @@
 
 <form method="post" action="<?= url('/login') ?>">
     <p>
-        <label for="email">Email</label><br>
+        <label for="email"><?= e(t('auth.login.email')) ?></label><br>
         <input type="email" id="email" name="email"
                value="<?= e($old['email'] ?? '') ?>" required>
     </p>
 
     <p>
-        <label for="password">Mot de passe</label><br>
+        <label for="password"><?= e(t('auth.login.password')) ?></label><br>
         <input type="password" id="password" name="password" required>
     </p>
 
-    <button type="submit">Se connecter</button>
+    <button type="submit"><?= e(t('auth.login.submit')) ?></button>
 </form>
 
-<p><a href="<?= url('/register') ?>">Créer un compte</a></p>
+<p><a href="<?= url('/register') ?>"><?= e(t('auth.login.no_account')) ?></a></p>

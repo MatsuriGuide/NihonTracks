@@ -4,23 +4,23 @@
     <p><?= nl2br(e($playlist['description'])) ?></p>
 <?php endif; ?>
 
-<p><?= $playlist['is_public'] ? 'Playlist publique' : 'Playlist privée' ?></p>
+<p><?= $playlist['is_public'] ? e(t('playlists.is_public_state')) : e(t('playlists.is_private_state')) ?></p>
 
 <?php if (\App\Core\Auth::canEdit((int) $playlist['user_id'])): ?>
     <p>
-        <a href="<?= url('/playlists/' . $playlist['id'] . '/edit') ?>">Modifier</a>
+        <a href="<?= url('/playlists/' . $playlist['id'] . '/edit') ?>"><?= e(t('playlists.edit')) ?></a>
         &nbsp;
         <form method="post" action="<?= url('/playlists/' . $playlist['id'] . '/delete') ?>"
-              onsubmit="return confirm('Supprimer cette playlist ?');" style="display:inline">
-            <button type="submit">Supprimer</button>
+              onsubmit="return confirm('<?= e(t('playlists.delete_confirm')) ?>');" style="display:inline">
+            <button type="submit"><?= e(t('playlists.delete')) ?></button>
         </form>
     </p>
 <?php endif; ?>
 
-<h2>Vidéos</h2>
+<h2><?= e(t('playlists.videos_title')) ?></h2>
 
 <?php if (empty($videos)): ?>
-    <p>Aucune vidéo dans cette playlist.</p>
+    <p><?= e(t('playlists.no_videos')) ?></p>
 <?php else: ?>
     <ol>
         <?php foreach ($videos as $video): ?>
@@ -33,7 +33,7 @@
                     <form method="post"
                           action="<?= url('/playlists/' . $playlist['id'] . '/videos/' . $video['id'] . '/remove') ?>"
                           style="display:inline">
-                        <button type="submit">Retirer</button>
+                        <button type="submit"><?= e(t('playlists.remove')) ?></button>
                     </form>
                 <?php endif; ?>
             </li>
@@ -42,16 +42,16 @@
 <?php endif; ?>
 
 <?php if (\App\Core\Auth::canEdit((int) $playlist['user_id']) && !empty($availableVideos)): ?>
-    <h2>Ajouter une vidéo</h2>
+    <h2><?= e(t('playlists.add_video_title')) ?></h2>
     <form method="post" action="<?= url('/playlists/' . $playlist['id'] . '/videos') ?>">
         <select name="video_id" required>
-            <option value="">-- Choisir une vidéo --</option>
+            <option value=""><?= e(t('playlists.add_video_placeholder')) ?></option>
             <?php foreach ($availableVideos as $video): ?>
                 <option value="<?= (int) $video['id'] ?>"><?= e($video['title'] ?? $video['youtube_id']) ?></option>
             <?php endforeach; ?>
         </select>
-        <button type="submit">Ajouter</button>
+        <button type="submit"><?= e(t('playlists.add_video_submit')) ?></button>
     </form>
 <?php endif; ?>
 
-<p><a href="<?= url('/playlists') ?>">&larr; Retour aux playlists</a></p>
+<p><a href="<?= url('/playlists') ?>"><?= e(t('playlists.back')) ?></a></p>

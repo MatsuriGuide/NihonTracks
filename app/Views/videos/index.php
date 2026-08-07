@@ -1,9 +1,9 @@
-<h1>Vidéos</h1>
+<h1><?= e(t('videos.title')) ?></h1>
 
-<p><a href="<?= url('/videos/create') ?>">+ Ajouter une vidéo</a></p>
+<p><a href="<?= url('/videos/create') ?>"><?= e(t('videos.add')) ?></a></p>
 
 <?php if (empty($videos)): ?>
-    <p>Aucune vidéo pour le moment.</p>
+    <p><?= e(t('videos.empty')) ?></p>
 <?php else: ?>
     <ul>
         <?php foreach ($videos as $video): ?>

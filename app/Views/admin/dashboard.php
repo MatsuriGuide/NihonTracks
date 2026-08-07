@@ -1,8 +1,8 @@
-<h1>Administration</h1>
+<h1><?= e(t('admin.dashboard_title')) ?></h1>
 
-<p>Signalements en attente : <strong><?= (int) $pendingReports ?></strong></p>
+<p><?= e(t('admin.pending_reports')) ?> <strong><?= (int) $pendingReports ?></strong></p>
 
 <ul>
-    <li><a href="<?= url('/admin/reports') ?>">Traiter les signalements</a></li>
-    <li><a href="<?= url('/admin/tags') ?>">Gérer les tags</a></li>
+    <li><a href="<?= url('/admin/reports') ?>"><?= e(t('admin.reports_link')) ?></a></li>
+    <li><a href="<?= url('/admin/tags') ?>"><?= e(t('admin.tags_link')) ?></a></li>
 </ul>

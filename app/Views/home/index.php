@@ -1,7 +1,7 @@
-<h1>Dernières sorties</h1>
+<h1><?= e(t('home.title')) ?></h1>
 
 <?php if (empty($latestVideos)): ?>
-    <p>Aucune vidéo pour le moment.</p>
+    <p><?= e(t('home.empty')) ?></p>
 <?php else: ?>
     <ul>
         <?php foreach ($latestVideos as $video): ?>

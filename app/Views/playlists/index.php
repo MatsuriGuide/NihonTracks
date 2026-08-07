@@ -1,22 +1,22 @@
-<h1>Playlists publiques</h1>
+<h1><?= e(t('playlists.public_title')) ?></h1>
 
 <?php if (\App\Core\Auth::check()): ?>
     <p>
-        <a href="<?= url('/playlists/mine') ?>">Mes playlists</a>
+        <a href="<?= url('/playlists/mine') ?>"><?= e(t('playlists.mine_link')) ?></a>
         &nbsp;—&nbsp;
-        <a href="<?= url('/playlists/create') ?>">+ Créer une playlist</a>
+        <a href="<?= url('/playlists/create') ?>"><?= e(t('playlists.create_link')) ?></a>
     </p>
 <?php endif; ?>
 
 <?php if (empty($playlists)): ?>
-    <p>Aucune playlist publique pour le moment.</p>
+    <p><?= e(t('playlists.empty_public')) ?></p>
 <?php else: ?>
     <ul>
         <?php foreach ($playlists as $playlist): ?>
             <li>
                 <a href="<?= url('/playlists/' . $playlist['id']) ?>"><?= e($playlist['name']) ?></a>
-                — par <?= e($playlist['owner_name']) ?>
-                (<?= (int) $playlist['video_count'] ?> vidéo<?= (int) $playlist['video_count'] > 1 ? 's' : '' ?>)
+                — <?= e(t('playlists.by')) ?> <?= e($playlist['owner_name']) ?>
+                (<?= (int) $playlist['video_count'] ?> <?= e(t('playlists.video_count')) ?>)
             </li>
         <?php endforeach; ?>
     </ul>

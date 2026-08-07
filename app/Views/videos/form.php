@@ -1,4 +1,4 @@
-<h1><?= $mode === 'edit' ? 'Modifier' : 'Ajouter' ?> une vidéo</h1>
+<h1><?= $mode === 'edit' ? e(t('videos.form_edit')) : e(t('videos.form_create')) ?></h1>
 
 <?php if (!empty($errors)): ?>
     <ul class="errors">
@@ -20,42 +20,31 @@
     <input type="hidden" name="duration_seconds" value="<?= e((string) ($old['duration_seconds'] ?? '')) ?>">
 
     <p>
-        <label for="title">Titre</label><br>
+        <label for="title"><?= e(t('videos.title_label')) ?></label><br>
         <input type="text" id="title" name="title" value="<?= e($old['title'] ?? '') ?>" required
                style="width: 100%; max-width: 500px;">
     </p>
 
     <p>
-        <label for="release_date">Date de sortie</label><br>
+        <label for="release_date"><?= e(t('videos.release_date')) ?></label><br>
         <input type="date" id="release_date" name="release_date" value="<?= e($old['release_date'] ?? '') ?>">
     </p>
 
     <p>
-        <label for="video_type">Type</label><br>
+        <label for="video_type"><?= e(t('videos.type')) ?></label><br>
         <select id="video_type" name="video_type">
-            <?php
-            $types = [
-                'mv'          => 'MV officiel',
-                'lyric_video' => 'Lyric video',
-                'live'        => 'Live',
-                'performance' => 'Performance',
-                'cover'       => 'Cover',
-                'teaser'      => 'Teaser',
-                'other'       => 'Autre',
-            ];
-            foreach ($types as $value => $label):
-            ?>
+            <?php foreach (['mv', 'lyric_video', 'live', 'performance', 'cover', 'teaser', 'other'] as $value): ?>
                 <option value="<?= e($value) ?>" <?= ($old['video_type'] ?? 'mv') === $value ? 'selected' : '' ?>>
-                    <?= e($label) ?>
+                    <?= e(t('videos.type.' . $value)) ?>
                 </option>
             <?php endforeach; ?>
         </select>
     </p>
 
     <fieldset>
-        <legend>Artiste(s)</legend>
+        <legend><?= e(t('videos.artists_legend')) ?></legend>
         <?php if (empty($artists)): ?>
-            <p>Aucun artiste enregistré. <a href="<?= url('/artists/create') ?>">En créer un</a> d'abord.</p>
+            <p><?= e(t('videos.no_artists')) ?> <a href="<?= url('/artists/create') ?>"><?= e(t('videos.create_artist')) ?></a></p>
         <?php endif; ?>
         <?php foreach ($artists as $artist): ?>
             <label>
@@ -68,7 +57,7 @@
 
     <?php foreach ($tagGroups as $categorySlug => $tags): ?>
         <fieldset>
-            <legend><?= e(ucfirst($categorySlug)) ?></legend>
+            <legend><?= e(t('videos.tags_label')) ?> — <?= e(ucfirst($categorySlug)) ?></legend>
             <?php foreach ($tags as $tag): ?>
                 <label>
                     <input type="checkbox" name="tag_ids[]" value="<?= (int) $tag['id'] ?>"
@@ -79,5 +68,5 @@
         </fieldset>
     <?php endforeach; ?>
 
-    <button type="submit"><?= $mode === 'edit' ? 'Enregistrer' : 'Ajouter la vidéo' ?></button>
+    <button type="submit"><?= $mode === 'edit' ? e(t('videos.submit_edit')) : e(t('videos.submit_create')) ?></button>
 </form>

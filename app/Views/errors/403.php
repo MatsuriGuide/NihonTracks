@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= e(\App\Core\Lang::current()) ?>">
 <head>
     <meta charset="UTF-8">
-    <title>403 - Accès refusé</title>
+    <title><?= e(t('errors.403.title')) ?></title>
 </head>
 <body>
     <h1>403</h1>
-    <p>Vous n'avez pas les droits nécessaires pour accéder à cette page.</p>
+    <p><?= e(t('errors.403.text')) ?></p>
 </body>
 </html>

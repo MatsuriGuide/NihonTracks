@@ -1,4 +1,4 @@
-<h1>Gestion des tags</h1>
+<h1><?= e(t('admin.tags_title')) ?></h1>
 
 <?php foreach ($categories as $category): ?>
     <h2><?= e($category['slug']) ?></h2>
