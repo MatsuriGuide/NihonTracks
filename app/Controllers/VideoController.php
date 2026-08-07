@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Auth;
 use App\Core\Controller;
+use App\Core\Slug;
 use App\Models\Artist;
 use App\Models\ArtistLink;
 use App\Models\Playlist;
@@ -125,6 +126,12 @@ class VideoController extends Controller
         }
 
         $artistIds = array_map('intval', (array) $this->input('artist_ids', []));
+
+        $newArtistName = trim((string) $this->input('new_artist_name', ''));
+        if ($newArtistName !== '') {
+            $artistIds[] = $this->createQuickArtist($newArtistName, (string) $this->input('new_artist_type', 'solo'));
+        }
+
         $tagIds = array_map('intval', (array) $this->input('tag_ids', []));
 
         if (empty($artistIds)) {
@@ -204,6 +211,12 @@ class VideoController extends Controller
         $data['duration_seconds'] = $video['duration_seconds'];
 
         $artistIds = array_map('intval', (array) $this->input('artist_ids', []));
+
+        $newArtistName = trim((string) $this->input('new_artist_name', ''));
+        if ($newArtistName !== '') {
+            $artistIds[] = $this->createQuickArtist($newArtistName, (string) $this->input('new_artist_type', 'solo'));
+        }
+
         $tagIds = array_map('intval', (array) $this->input('tag_ids', []));
 
         if (empty($artistIds)) {
@@ -245,6 +258,41 @@ class VideoController extends Controller
 
         Video::delete($id);
         $this->redirect('/videos');
+    }
+
+    /**
+     * Crée un artiste minimal (nom + type) à la volée depuis le formulaire
+     * vidéo, pour éviter de devoir quitter la page. Le reste de la fiche
+     * (bio, liens, relations, traductions) se complète ensuite normalement.
+     */
+    private function createQuickArtist(string $name, string $type): int
+    {
+        if (!in_array($type, ['solo', 'group', 'duo', 'other'], true)) {
+            $type = 'solo';
+        }
+
+        $base = Slug::make($name);
+        $slug = $base;
+        $i = 2;
+
+        while (Artist::slugExists($slug)) {
+            $slug = $base . '-' . $i;
+            $i++;
+        }
+
+        return Artist::create(
+            [
+                'type'       => $type,
+                'status'     => 'active',
+                'start_year' => null,
+                'end_year'   => null,
+                'label'      => null,
+                'slug'       => $slug,
+            ],
+            $name,
+            null,
+            (int) Auth::id()
+        );
     }
 
     /**
