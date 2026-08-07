@@ -1,0 +1,24 @@
+# Environnement
+.env
+
+# Logs et cache
+storage/logs/*
+!storage/logs/.gitkeep
+storage/cache/*
+!storage/cache/.gitkeep
+
+# Uploads utilisateurs (avatars, miniatures cache)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Composer (non utilisé en prod, mais si jamais installé en local)
+/vendor/
+composer.lock
+
+# Système
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/

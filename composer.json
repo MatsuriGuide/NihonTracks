@@ -1,0 +1,9 @@
+{
+    "name": "cedrick/nihontracks",
+    "description": "NihonTracks - catalogue collaboratif de vidéos musicales japonaises. Composer n'est PAS requis en production : autoloading et .env sont gérés à la main (voir autoload.php et app/Core/Env.php), pour rester compatible avec l'hébergement mutualisé.",
+    "type": "project",
+    "require": {
+        "php": ">=8.1"
+    }
+}
+
