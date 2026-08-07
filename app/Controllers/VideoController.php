@@ -111,7 +111,6 @@ class VideoController extends Controller
             'selectedArtistIds' => $detectedArtistIds,
             'selectedTagIds'    => [],
             'autoDetected'      => !empty($detectedArtistIds),
-            'detectedChannelId' => $prefill['channel_id'] ?? null,
         ]);
     }
 
