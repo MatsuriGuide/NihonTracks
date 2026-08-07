@@ -176,4 +176,10 @@ return [
     'artists.error.type_invalid' => '無効なタイプです。',
     'artists.error.status_invalid' => '無効な状態です。',
     'playlists.error.name_required' => 'プレイリスト名は必須です。',
+
+    // Traduction automatique (admin)
+    'admin.translate.title' => '自動翻訳（管理者）',
+    'admin.translate.translate' => '翻訳する',
+    'admin.translate.retranslate' => '再翻訳',
+    'admin.translate.auto_flag' => '（自動翻訳）',
 ];

@@ -176,4 +176,10 @@ return [
     'artists.error.type_invalid' => 'Type invalide.',
     'artists.error.status_invalid' => 'Statut invalide.',
     'playlists.error.name_required' => 'Le nom de la playlist est requis.',
+
+    // Traduction automatique (admin)
+    'admin.translate.title' => 'Traduction automatique (admin)',
+    'admin.translate.translate' => 'Traduire',
+    'admin.translate.retranslate' => 'Re-traduire',
+    'admin.translate.auto_flag' => '(traduction automatique)',
 ];

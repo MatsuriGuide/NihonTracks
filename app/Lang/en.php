@@ -176,4 +176,10 @@ return [
     'artists.error.type_invalid' => 'Invalid type.',
     'artists.error.status_invalid' => 'Invalid status.',
     'playlists.error.name_required' => 'Playlist name is required.',
+
+    // Traduction automatique (admin)
+    'admin.translate.title' => 'Automatic translation (admin)',
+    'admin.translate.translate' => 'Translate',
+    'admin.translate.retranslate' => 'Re-translate',
+    'admin.translate.auto_flag' => '(auto-translated)',
 ];
