@@ -6,6 +6,7 @@ use App\Core\Auth;
 use App\Core\Controller;
 use App\Core\Slug;
 use App\Models\Artist;
+use App\Models\ArtistLink;
 use App\Models\ArtistRelation;
 
 class ArtistController extends Controller
@@ -36,6 +37,7 @@ class ArtistController extends Controller
             'allTranslations'   => $translations,
             'outgoingRelations' => ArtistRelation::outgoing((int) $artist['id']),
             'incomingRelations' => ArtistRelation::incoming((int) $artist['id']),
+            'links'             => ArtistLink::forArtist((int) $artist['id']),
             'otherArtists'      => array_values(array_filter(
                 Artist::all(),
                 fn (array $a): bool => (int) $a['id'] !== (int) $artist['id']
@@ -144,6 +146,51 @@ class ArtistController extends Controller
 
         Artist::delete($id);
         $this->redirect('/artists');
+    }
+
+    public function addLink(int $id): void
+    {
+        Auth::requireLogin();
+
+        $artist = Artist::findById($id);
+
+        if (!$artist || !Auth::canEdit((int) $artist['created_by'])) {
+            http_response_code(403);
+            require dirname(__DIR__) . '/Views/errors/403.php';
+
+            return;
+        }
+
+        $platform = (string) $this->input('platform', '');
+        $url = trim((string) $this->input('url', ''));
+
+        if (in_array($platform, ArtistLink::PLATFORMS, true) && $url !== '' && filter_var($url, FILTER_VALIDATE_URL)) {
+            ArtistLink::create($id, $platform, $url);
+        }
+
+        $this->redirect('/artists/' . $artist['slug']);
+    }
+
+    public function deleteLink(int $id, int $linkId): void
+    {
+        Auth::requireLogin();
+
+        $artist = Artist::findById($id);
+
+        if (!$artist || !Auth::canEdit((int) $artist['created_by'])) {
+            http_response_code(403);
+            require dirname(__DIR__) . '/Views/errors/403.php';
+
+            return;
+        }
+
+        $link = ArtistLink::findById($linkId);
+
+        if ($link && (int) $link['artist_id'] === $id) {
+            ArtistLink::delete($linkId);
+        }
+
+        $this->redirect('/artists/' . $artist['slug']);
     }
 
     public function addRelation(int $id): void
