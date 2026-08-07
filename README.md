@@ -61,3 +61,4 @@ et du système de rôles/permissions.
 - [x] Interface FR / EN / JA (contenu artistes/vidéos encore saisi en FR uniquement — EN/JA viendront via la traduction OpenAI)
 - [x] Relations entre artistes (membre/groupe, ex-membre, projet solo, collaboration)
 - [x] Design v1 — thème "carnet de catalogue" (bleu nuit, corail/menthe, numéros de catalogue, Zen Kaku Gothic New + JetBrains Mono)
+- [x] Lecteur de playlist intégré (YouTube IFrame API, sticky, lecture automatique du morceau suivant)
