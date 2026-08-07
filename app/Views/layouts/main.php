@@ -11,6 +11,7 @@
         <a href="<?= url('/') ?>">NihonTracks</a>
         <nav>
             <a href="<?= url('/artists') ?>">Artistes</a>
+            <a href="<?= url('/videos') ?>">Vidéos</a>
             <?php if (\App\Core\Auth::check()): ?>
                 <span>Bonjour, <?= e(\App\Core\Auth::user()['name']) ?></span>
                 <?php if (in_array(\App\Core\Auth::role(), ['moderator', 'admin'], true)): ?>
