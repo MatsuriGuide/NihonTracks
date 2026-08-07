@@ -227,4 +227,8 @@ return [
     // Debug detection chaine
     'videos.channel_id_debug' => '一致するアーティストが見つかりませんでした。YouTubeが検出したチャンネルID：',
     'videos.channel_id_debug_hint' => 'アーティストページに保存されているものと比較してください。',
+
+    // Creation rapide d'artiste depuis le formulaire video
+    'videos.new_artist_toggle' => '+ 新しいアーティストを今すぐ作成',
+    'videos.new_artist_hint' => 'このアーティストは最小限の情報で作成されます。プロフィール（経歴、リンク、関連アーティストなど）は後でページから編集できます。',
 ];

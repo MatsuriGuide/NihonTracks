@@ -227,4 +227,8 @@ return [
     // Debug detection chaine
     'videos.channel_id_debug' => 'No matching artist found. Channel ID detected by YouTube:',
     'videos.channel_id_debug_hint' => 'compare it with the one saved on the artist page.',
+
+    // Creation rapide d'artiste depuis le formulaire video
+    'videos.new_artist_toggle' => '+ Create a new artist now',
+    'videos.new_artist_hint' => 'This artist will be created with the bare minimum; you can complete their profile (bio, links, relations...) later from their page.',
 ];
