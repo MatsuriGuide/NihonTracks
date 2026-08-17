@@ -39,6 +39,12 @@ class WatchController extends AdminController
 
     public function scanOne(int $linkId): void
     {
+        $limit = (int) $this->input('limit', 50);
+
+        if (!in_array($limit, [25, 50, 100], true)) {
+            $limit = 50;
+        }
+
         $link = Database::getInstance()->fetchOne(
             'SELECT * FROM artist_links WHERE id = ? AND platform = "youtube"',
             [$linkId]
@@ -50,7 +56,7 @@ class WatchController extends AdminController
             $channelId = YoutubeApiService::extractChannelId($link['url']);
 
             if ($channelId !== null) {
-                $found = ChannelWatcherService::scanArtist((int) $link['artist_id'], $channelId);
+                $found = ChannelWatcherService::scanArtist((int) $link['artist_id'], $channelId, $limit);
             }
         }
 

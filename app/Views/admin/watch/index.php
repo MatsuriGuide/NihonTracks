@@ -16,8 +16,11 @@
                 —
                 <?php if ($channel['channel_id']): ?>
                     <code><?= e($channel['channel_id']) ?></code>
+                    <?= e(t('admin.watch.scan_now')) ?>
                     <form method="post" action="<?= url('/admin/watch/' . $channel['link_id'] . '/scan') ?>" style="display:inline">
-                        <button type="submit" class="btn-small"><?= e(t('admin.watch.scan_now')) ?></button>
+                        <button type="submit" name="limit" value="25" class="btn-small">25</button>
+                        <button type="submit" name="limit" value="50" class="btn-small">50</button>
+                        <button type="submit" name="limit" value="100" class="btn-small">100</button>
                     </form>
                 <?php else: ?>
                     <small><?= e(t('admin.watch.invalid_format')) ?></small>

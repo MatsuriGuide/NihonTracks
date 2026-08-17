@@ -122,11 +122,12 @@ class YoutubeApiService
 
     /**
      * Récupère les $maxResults vidéos les plus récentes d'une playlist
-     * "uploads". 1 unité de quota, quel que soit maxResults (≤ 50).
+     * "uploads". Coût : 1 unité de quota par tranche de 50 résultats
+     * (donc 1 unité jusqu'à 50, 2 unités pour 51-100, etc.).
      *
      * @return array<int, array{youtube_id: string, title: string, thumbnail_url: ?string, channel_name: ?string, published_at: ?string}>
      */
-    public static function fetchPlaylistVideos(string $playlistId, int $maxResults = 10): array
+    public static function fetchPlaylistVideos(string $playlistId, int $maxResults = 50): array
     {
         $apiKey = $_ENV['YOUTUBE_API_KEY'] ?? '';
 
@@ -134,43 +135,95 @@ class YoutubeApiService
             return [];
         }
 
-        $endpoint = 'https://www.googleapis.com/youtube/v3/playlistItems'
-            . '?part=snippet'
-            . '&playlistId=' . urlencode($playlistId)
-            . '&maxResults=' . max(1, min(50, $maxResults))
-            . '&key=' . urlencode($apiKey);
+        $videos = [];
+        $pageToken = null;
 
-        $response = self::httpGet($endpoint);
+        do {
+            $remaining = $maxResults - count($videos);
+            $pageSize = max(1, min(50, $remaining));
 
-        if ($response === null) {
+            $endpoint = 'https://www.googleapis.com/youtube/v3/playlistItems'
+                . '?part=snippet'
+                . '&playlistId=' . urlencode($playlistId)
+                . '&maxResults=' . $pageSize
+                . '&key=' . urlencode($apiKey)
+                . ($pageToken !== null ? '&pageToken=' . urlencode($pageToken) : '');
+
+            $response = self::httpGet($endpoint);
+
+            if ($response === null) {
+                break;
+            }
+
+            $data = json_decode($response, true);
+
+            foreach ($data['items'] ?? [] as $item) {
+                $snippet = $item['snippet'] ?? [];
+                $videoId = $snippet['resourceId']['videoId'] ?? null;
+
+                if ($videoId === null) {
+                    continue;
+                }
+
+                $videos[] = [
+                    'youtube_id'    => $videoId,
+                    'title'         => $snippet['title'] ?? '',
+                    'thumbnail_url' => $snippet['thumbnails']['high']['url']
+                        ?? $snippet['thumbnails']['default']['url']
+                        ?? null,
+                    'channel_name'  => $snippet['videoOwnerChannelTitle'] ?? $snippet['channelTitle'] ?? null,
+                    'published_at'  => isset($snippet['publishedAt']) ? substr($snippet['publishedAt'], 0, 10) : null,
+                ];
+            }
+
+            $pageToken = $data['nextPageToken'] ?? null;
+        } while ($pageToken !== null && count($videos) < $maxResults);
+
+        return array_slice($videos, 0, $maxResults);
+    }
+
+    /**
+     * Récupère la durée (en secondes) de plusieurs vidéos. Coût : 1 unité de
+     * quota par tranche de 50 IDs.
+     *
+     * @param string[] $videoIds
+     * @return array<string, int> Durée indexée par ID vidéo
+     */
+    public static function fetchVideosDurations(array $videoIds): array
+    {
+        $apiKey = $_ENV['YOUTUBE_API_KEY'] ?? '';
+
+        if ($apiKey === '' || empty($videoIds)) {
             return [];
         }
 
-        $data = json_decode($response, true);
-        $items = $data['items'] ?? [];
+        $durations = [];
 
-        $videos = [];
+        foreach (array_chunk($videoIds, 50) as $chunk) {
+            $endpoint = 'https://www.googleapis.com/youtube/v3/videos'
+                . '?part=contentDetails'
+                . '&id=' . urlencode(implode(',', $chunk))
+                . '&key=' . urlencode($apiKey);
 
-        foreach ($items as $item) {
-            $snippet = $item['snippet'] ?? [];
-            $videoId = $snippet['resourceId']['videoId'] ?? null;
+            $response = self::httpGet($endpoint);
 
-            if ($videoId === null) {
+            if ($response === null) {
                 continue;
             }
 
-            $videos[] = [
-                'youtube_id'    => $videoId,
-                'title'         => $snippet['title'] ?? '',
-                'thumbnail_url' => $snippet['thumbnails']['high']['url']
-                    ?? $snippet['thumbnails']['default']['url']
-                    ?? null,
-                'channel_name'  => $snippet['videoOwnerChannelTitle'] ?? $snippet['channelTitle'] ?? null,
-                'published_at'  => isset($snippet['publishedAt']) ? substr($snippet['publishedAt'], 0, 10) : null,
-            ];
+            $data = json_decode($response, true);
+
+            foreach ($data['items'] ?? [] as $item) {
+                $id = $item['id'] ?? null;
+                $duration = $item['contentDetails']['duration'] ?? null;
+
+                if ($id !== null && $duration !== null) {
+                    $durations[$id] = self::parseDuration($duration);
+                }
+            }
         }
 
-        return $videos;
+        return $durations;
     }
 
     private static function httpGet(string $url): ?string
