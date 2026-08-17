@@ -251,4 +251,12 @@ return [
     'admin.suggestions.none' => '現在、保留中の提案はありません。',
     'admin.suggestions.publish' => '公開する',
     'admin.suggestions.dismiss' => '無視する',
+
+    // Chaines surveillees (admin)
+    'admin.watch_link' => '監視中のチャンネル',
+    'admin.watch.title' => '監視中のチャンネル',
+    'admin.watch.none' => 'アーティストページにYouTubeリンクが登録されていません。',
+    'admin.watch.scan_now' => '今すぐスキャン',
+    'admin.watch.invalid_format' => '対応していない形式です（/channel/UC...ではありません）。スキャンできません。',
+    'admin.watch.scan_result' => 'このスキャンで見つかった提案：',
 ];

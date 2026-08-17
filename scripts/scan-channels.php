@@ -22,7 +22,7 @@ require dirname(__DIR__) . '/autoload.php';
 
 use App\Core\Database;
 use App\Core\Env;
-use App\Models\VideoSuggestion;
+use App\Services\ChannelWatcherService;
 use App\Services\YoutubeApiService;
 
 Env::load(dirname(__DIR__) . '/.env');
@@ -47,43 +47,20 @@ foreach ($links as $link) {
         continue;
     }
 
-    $artistId = (int) $link['artist_id'];
+    $newSuggestions = ChannelWatcherService::scanArtist((int) $link['artist_id'], $channelId);
 
-    $uploadsPlaylistId = YoutubeApiService::fetchUploadsPlaylistId($channelId);
-
-    if ($uploadsPlaylistId === null) {
-        $errors++;
-
-        continue;
+    if ($newSuggestions === 0) {
+        // Peut être un vrai zéro (rien de nouveau) ou un échec API — on ne
+        // distingue pas les deux ici, le prochain scan retentera de toute façon.
     }
 
-    $videos = YoutubeApiService::fetchPlaylistVideos($uploadsPlaylistId, 10);
     $scanned++;
-
-    foreach ($videos as $video) {
-        if (VideoSuggestion::youtubeIdKnown($video['youtube_id'])) {
-            // Déjà en base (vidéo existante OU suggestion déjà traitée,
-            // y compris rejetée) : jamais reproposée.
-            continue;
-        }
-
-        VideoSuggestion::create(
-            $artistId,
-            $video['youtube_id'],
-            $video['title'],
-            $video['thumbnail_url'],
-            $video['channel_name'],
-            $video['published_at']
-        );
-
-        $found++;
-    }
+    $found += $newSuggestions;
 }
 
 echo sprintf(
-    "[%s] Scan terminé : %d chaîne(s) analysée(s), %d nouvelle(s) suggestion(s), %d erreur(s).\n",
+    "[%s] Scan terminé : %d chaîne(s) analysée(s), %d nouvelle(s) suggestion(s).\n",
     date('Y-m-d H:i:s'),
     $scanned,
-    $found,
-    $errors
+    $found
 );

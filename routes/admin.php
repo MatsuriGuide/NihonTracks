@@ -13,6 +13,8 @@ $router->post('/admin/translate/video/{id}/{lang}', 'Admin\TranslationController
 $router->get('/admin/suggestions', 'Admin\SuggestionController@index');
 $router->get('/admin/suggestions/{id}/publish', 'Admin\SuggestionController@publish');
 $router->post('/admin/suggestions/{id}/dismiss', 'Admin\SuggestionController@dismiss');
+$router->get('/admin/watch', 'Admin\WatchController@index');
+$router->post('/admin/watch/{linkId}/scan', 'Admin\WatchController@scanOne');
 
 // À compléter au fur et à mesure :
 // $router->get('/admin/users', 'Admin\UserAdminController@index');

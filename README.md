@@ -83,4 +83,5 @@ et du système de rôles/permissions.
 - [x] Détection automatique de l'artiste à l'ajout d'une vidéo (via lien YouTube /channel/UC... ou nom de chaîne, reste éditable)
 - [x] Création rapide d'un nouvel artiste directement depuis le formulaire d'ajout/édition de vidéo
 - [x] Surveillance des chaînes YouTube liées aux artistes (script CLI + file de suggestions à valider en admin)
+- [x] Écran /admin/watch listant les chaînes surveillées avec déclenchement manuel du scan par chaîne
 - [x] Recherche par nom dans la liste d'artistes du formulaire vidéo (filtrage JS, dès 8 artistes)

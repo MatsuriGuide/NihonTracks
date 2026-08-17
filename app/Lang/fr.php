@@ -251,4 +251,12 @@ return [
     'admin.suggestions.none' => 'Aucune suggestion en attente pour le moment.',
     'admin.suggestions.publish' => 'Publier',
     'admin.suggestions.dismiss' => 'Ignorer',
+
+    // Chaînes surveillées (admin)
+    'admin.watch_link' => 'Chaînes surveillées',
+    'admin.watch.title' => 'Chaînes surveillées',
+    'admin.watch.none' => 'Aucun lien YouTube enregistré sur les fiches artistes.',
+    'admin.watch.scan_now' => 'Scanner maintenant',
+    'admin.watch.invalid_format' => 'Format non compatible (pas de /channel/UC...), scan impossible.',
+    'admin.watch.scan_result' => 'Suggestions trouvées lors de ce scan :',
 ];

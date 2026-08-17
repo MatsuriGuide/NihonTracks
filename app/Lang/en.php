@@ -251,4 +251,12 @@ return [
     'admin.suggestions.none' => 'No pending suggestions right now.',
     'admin.suggestions.publish' => 'Publish',
     'admin.suggestions.dismiss' => 'Dismiss',
+
+    // Chaines surveillees (admin)
+    'admin.watch_link' => 'Watched channels',
+    'admin.watch.title' => 'Watched channels',
+    'admin.watch.none' => 'No YouTube link registered on any artist page.',
+    'admin.watch.scan_now' => 'Scan now',
+    'admin.watch.invalid_format' => 'Unsupported format (no /channel/UC...), can\'t scan.',
+    'admin.watch.scan_result' => 'Suggestions found during this scan:',
 ];
