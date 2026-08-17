@@ -243,4 +243,12 @@ return [
     'admin.tags.name_ja' => '名前（日本語、任意）',
     'admin.tags.add_hint' => '空欄の言語はフランス語名を代わりに表示します。',
     'admin.tags.submit' => 'タグを作成',
+
+    // Surveillance de chaines / suggestions
+    'admin.pending_suggestions' => '未対応の動画提案：',
+    'admin.suggestions_link' => '動画の提案を見る',
+    'admin.suggestions.title' => '動画の提案',
+    'admin.suggestions.none' => '現在、保留中の提案はありません。',
+    'admin.suggestions.publish' => '公開する',
+    'admin.suggestions.dismiss' => '無視する',
 ];

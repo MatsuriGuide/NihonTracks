@@ -137,6 +137,9 @@ class VideoController extends Controller
             $errors[] = t('videos.error.select_artist');
         }
 
+        $suggestionId = (int) $this->input('suggestion_id', 0);
+        $data['suggestion_id'] = $suggestionId > 0 ? $suggestionId : null;
+
         if (!empty($errors)) {
             $this->render('videos/form', [
                 'errors'            => $errors,
@@ -152,6 +155,10 @@ class VideoController extends Controller
         }
 
         $videoId = Video::create($data, $artistIds, $tagIds, (int) Auth::id());
+
+        if ($suggestionId > 0) {
+            \App\Models\VideoSuggestion::markImported($suggestionId, (int) Auth::id());
+        }
 
         $this->redirect('/videos/' . $videoId);
     }

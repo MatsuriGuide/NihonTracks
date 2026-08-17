@@ -79,6 +79,100 @@ class YoutubeApiService
         ];
     }
 
+    /**
+     * Extrait l'ID de chaîne (UC...) d'une URL au format /channel/UC...
+     * Ne fonctionne que sur ce format précis (pas /@handle ni /c/Nom).
+     */
+    public static function extractChannelId(string $url): ?string
+    {
+        if (preg_match('#/channel/([A-Za-z0-9_-]{10,})#', $url, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    /**
+     * Récupère l'ID de la playlist "uploads" d'une chaîne (toutes ses vidéos,
+     * dans l'ordre de publication). 1 unité de quota.
+     */
+    public static function fetchUploadsPlaylistId(string $channelId): ?string
+    {
+        $apiKey = $_ENV['YOUTUBE_API_KEY'] ?? '';
+
+        if ($apiKey === '') {
+            return null;
+        }
+
+        $endpoint = 'https://www.googleapis.com/youtube/v3/channels'
+            . '?part=contentDetails'
+            . '&id=' . urlencode($channelId)
+            . '&key=' . urlencode($apiKey);
+
+        $response = self::httpGet($endpoint);
+
+        if ($response === null) {
+            return null;
+        }
+
+        $data = json_decode($response, true);
+
+        return $data['items'][0]['contentDetails']['relatedPlaylists']['uploads'] ?? null;
+    }
+
+    /**
+     * Récupère les $maxResults vidéos les plus récentes d'une playlist
+     * "uploads". 1 unité de quota, quel que soit maxResults (≤ 50).
+     *
+     * @return array<int, array{youtube_id: string, title: string, thumbnail_url: ?string, channel_name: ?string, published_at: ?string}>
+     */
+    public static function fetchPlaylistVideos(string $playlistId, int $maxResults = 10): array
+    {
+        $apiKey = $_ENV['YOUTUBE_API_KEY'] ?? '';
+
+        if ($apiKey === '') {
+            return [];
+        }
+
+        $endpoint = 'https://www.googleapis.com/youtube/v3/playlistItems'
+            . '?part=snippet'
+            . '&playlistId=' . urlencode($playlistId)
+            . '&maxResults=' . max(1, min(50, $maxResults))
+            . '&key=' . urlencode($apiKey);
+
+        $response = self::httpGet($endpoint);
+
+        if ($response === null) {
+            return [];
+        }
+
+        $data = json_decode($response, true);
+        $items = $data['items'] ?? [];
+
+        $videos = [];
+
+        foreach ($items as $item) {
+            $snippet = $item['snippet'] ?? [];
+            $videoId = $snippet['resourceId']['videoId'] ?? null;
+
+            if ($videoId === null) {
+                continue;
+            }
+
+            $videos[] = [
+                'youtube_id'    => $videoId,
+                'title'         => $snippet['title'] ?? '',
+                'thumbnail_url' => $snippet['thumbnails']['high']['url']
+                    ?? $snippet['thumbnails']['default']['url']
+                    ?? null,
+                'channel_name'  => $snippet['videoOwnerChannelTitle'] ?? $snippet['channelTitle'] ?? null,
+                'published_at'  => isset($snippet['publishedAt']) ? substr($snippet['publishedAt'], 0, 10) : null,
+            ];
+        }
+
+        return $videos;
+    }
+
     private static function httpGet(string $url): ?string
     {
         if (function_exists('curl_init')) {

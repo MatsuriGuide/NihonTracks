@@ -3,6 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Core\Database;
+use App\Models\VideoSuggestion;
 
 class DashboardController extends AdminController
 {
@@ -15,7 +16,8 @@ class DashboardController extends AdminController
         )['n'] ?? 0;
 
         $this->render('admin/dashboard', [
-            'pendingReports' => $pendingReports,
+            'pendingReports'     => $pendingReports,
+            'pendingSuggestions' => VideoSuggestion::countPending(),
         ]);
     }
 }

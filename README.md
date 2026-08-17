@@ -27,6 +27,23 @@ Composer (compatible hébergement mutualisé sans SSH).
    Il faudra se déconnecter puis se reconnecter pour que le nouveau rôle soit pris
    en compte dans la session.
 
+## Surveillance des chaînes YouTube
+
+Le fichier `scripts/scan-channels.php` détecte les nouvelles vidéos des chaînes
+liées aux artistes (lien YouTube au format `/channel/UC...`) et les ajoute à
+une file de suggestions (`/admin/suggestions`, modérateur ou admin) — rien
+n'est publié automatiquement, chaque suggestion doit être validée (et
+complétée : type, tags) ou ignorée.
+
+**Import initial** : exécuter la migration `docs/migration-video-suggestions.sql`.
+
+**CRON Hostinger** (hPanel → Avancé → Tâches CRON), exemple toutes les 6h :
+```
+0 */6 * * * php /home/xxx/domains/koshiki.art/public_html/nihontracks/scripts/scan-channels.php
+```
+(remplacer le chemin par le chemin réel sur l'hébergement). Le script n'est
+accessible qu'en ligne de commande — il refuse toute requête web.
+
 ## Débogage
 
 Passer `APP_ENV=local` dans `.env` affiche les erreurs PHP directement dans le
@@ -65,4 +82,5 @@ et du système de rôles/permissions.
 - [x] Liens réseaux sur les fiches artiste (X, Instagram, Facebook, YouTube, TikTok, Spotify, site officiel)
 - [x] Détection automatique de l'artiste à l'ajout d'une vidéo (via lien YouTube /channel/UC... ou nom de chaîne, reste éditable)
 - [x] Création rapide d'un nouvel artiste directement depuis le formulaire d'ajout/édition de vidéo
+- [x] Surveillance des chaînes YouTube liées aux artistes (script CLI + file de suggestions à valider en admin)
 - [x] Recherche par nom dans la liste d'artistes du formulaire vidéo (filtrage JS, dès 8 artistes)

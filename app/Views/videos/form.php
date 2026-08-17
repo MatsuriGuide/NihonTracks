@@ -18,6 +18,9 @@
     <input type="hidden" name="thumbnail_url" value="<?= e($old['thumbnail_url'] ?? '') ?>">
     <input type="hidden" name="channel_name" value="<?= e($old['channel_name'] ?? '') ?>">
     <input type="hidden" name="duration_seconds" value="<?= e((string) ($old['duration_seconds'] ?? '')) ?>">
+    <?php if (!empty($old['suggestion_id'])): ?>
+        <input type="hidden" name="suggestion_id" value="<?= (int) $old['suggestion_id'] ?>">
+    <?php endif; ?>
 
     <p>
         <label for="title"><?= e(t('videos.title_label')) ?></label><br>

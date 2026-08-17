@@ -243,4 +243,12 @@ return [
     'admin.tags.name_ja' => 'Name (Japanese, optional)',
     'admin.tags.add_hint' => 'Languages left blank will fall back to the French name.',
     'admin.tags.submit' => 'Create tag',
+
+    // Surveillance de chaines / suggestions
+    'admin.pending_suggestions' => 'Pending video suggestions:',
+    'admin.suggestions_link' => 'View video suggestions',
+    'admin.suggestions.title' => 'Video suggestions',
+    'admin.suggestions.none' => 'No pending suggestions right now.',
+    'admin.suggestions.publish' => 'Publish',
+    'admin.suggestions.dismiss' => 'Dismiss',
 ];
