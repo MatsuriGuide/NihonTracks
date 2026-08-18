@@ -52,7 +52,7 @@ class VideoSuggestion
              LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = ?
              LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
              WHERE vs.status = "pending"
-             ORDER BY vs.discovered_at DESC',
+             ORDER BY vs.published_at DESC, vs.discovered_at DESC',
             [$lang]
         );
     }
