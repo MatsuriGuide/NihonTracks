@@ -251,6 +251,7 @@ return [
     'admin.suggestions.none' => 'No pending suggestions right now.',
     'admin.suggestions.publish' => 'Publish',
     'admin.suggestions.dismiss' => 'Dismiss',
+    'admin.suggestions.watch' => 'Watch on YouTube',
 
     // Chaines surveillees (admin)
     'admin.watch_link' => 'Watched channels',

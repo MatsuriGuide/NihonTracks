@@ -251,6 +251,7 @@ return [
     'admin.suggestions.none' => 'Aucune suggestion en attente pour le moment.',
     'admin.suggestions.publish' => 'Publier',
     'admin.suggestions.dismiss' => 'Ignorer',
+    'admin.suggestions.watch' => 'Voir sur YouTube',
 
     // Chaînes surveillées (admin)
     'admin.watch_link' => 'Chaînes surveillées',

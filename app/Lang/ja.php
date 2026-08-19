@@ -251,6 +251,7 @@ return [
     'admin.suggestions.none' => '現在、保留中の提案はありません。',
     'admin.suggestions.publish' => '公開する',
     'admin.suggestions.dismiss' => '無視する',
+    'admin.suggestions.watch' => 'YouTubeで見る',
 
     // Chaines surveillees (admin)
     'admin.watch_link' => '監視中のチャンネル',
