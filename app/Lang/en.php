@@ -259,4 +259,14 @@ return [
     'admin.watch.scan_now' => 'Scan now',
     'admin.watch.invalid_format' => 'Unsupported format (no /channel/UC...), can\'t scan.',
     'admin.watch.scan_result' => 'Suggestions found during this scan:',
+
+    // Journal des scans
+    'admin.watch.log_title' => 'Scan history',
+    'admin.watch.log_empty' => 'No scan recorded yet.',
+    'admin.watch.log_blocked' => 'Blocked direct access attempt —',
+    'admin.watch.log_source_cron' => 'Automatic scan (CRON)',
+    'admin.watch.log_source_manual' => 'Manual scan',
+    'admin.watch.log_channels' => 'channel(s)',
+    'admin.watch.log_found' => 'suggestion(s)',
+    'admin.watch.log_errors' => 'error(s)',
 ];

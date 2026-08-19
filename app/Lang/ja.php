@@ -259,4 +259,14 @@ return [
     'admin.watch.scan_now' => '今すぐスキャン',
     'admin.watch.invalid_format' => '対応していない形式です（/channel/UC...ではありません）。スキャンできません。',
     'admin.watch.scan_result' => 'このスキャンで見つかった提案：',
+
+    // Journal des scans
+    'admin.watch.log_title' => 'スキャン履歴',
+    'admin.watch.log_empty' => 'まだ記録されたスキャンはありません。',
+    'admin.watch.log_blocked' => '直接アクセスの試みをブロックしました -',
+    'admin.watch.log_source_cron' => '自動スキャン（CRON）',
+    'admin.watch.log_source_manual' => '手動スキャン',
+    'admin.watch.log_channels' => 'チャンネル',
+    'admin.watch.log_found' => '件の提案',
+    'admin.watch.log_errors' => '件のエラー',
 ];

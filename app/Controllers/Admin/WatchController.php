@@ -4,6 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Core\Database;
 use App\Core\Lang;
+use App\Models\ScanLog;
 use App\Services\ChannelWatcherService;
 use App\Services\YoutubeApiService;
 
@@ -34,6 +35,7 @@ class WatchController extends AdminController
         $this->render('admin/watch/index', [
             'channels'   => $channels,
             'scanResult' => $this->input('found'),
+            'scanLog'    => ScanLog::recent(20),
         ]);
     }
 
@@ -50,16 +52,18 @@ class WatchController extends AdminController
             [$linkId]
         );
 
-        $found = 0;
+        $result = null;
 
         if ($link) {
             $channelId = YoutubeApiService::extractChannelId($link['url']);
 
             if ($channelId !== null) {
-                $found = ChannelWatcherService::scanArtist((int) $link['artist_id'], $channelId, $limit);
+                $result = ChannelWatcherService::scanArtist((int) $link['artist_id'], $channelId, $limit);
             }
         }
 
-        $this->redirect('/admin/watch?found=' . $found);
+        ScanLog::record('manual', $result !== null ? 1 : 0, $result ?? 0, $result === null ? 1 : 0);
+
+        $this->redirect('/admin/watch?found=' . ($result ?? 0));
     }
 }

@@ -22,11 +22,13 @@ class ChannelWatcherService
         string $channelId,
         int $maxResults = 50,
         int $minDurationSeconds = 90
-    ): int {
+    ): ?int {
         $uploadsPlaylistId = YoutubeApiService::fetchUploadsPlaylistId($channelId);
 
         if ($uploadsPlaylistId === null) {
-            return 0;
+            // Échec API (clé absente/invalide, quota atteint, chaîne
+            // introuvable...) — distinct d'un "0 nouvelle vidéo" légitime.
+            return null;
         }
 
         $videos = YoutubeApiService::fetchPlaylistVideos($uploadsPlaylistId, $maxResults);
