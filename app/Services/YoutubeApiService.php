@@ -28,6 +28,7 @@ class YoutubeApiService
      *   youtube_id: string,
      *   title: string,
      *   channel_name: ?string,
+     *   channel_id: ?string,
      *   release_date: ?string,
      *   thumbnail_url: ?string,
      *   duration_seconds: ?int
@@ -248,9 +249,11 @@ class YoutubeApiService
 
     private static function parseDuration(string $iso8601): int
     {
+        // Compatible PHP 7.4+ : "catch (\Exception)" sans variable est une
+        // syntaxe PHP 8.0+ ("catch non capturant"). On garde $e même inutilisé.
         try {
             $interval = new \DateInterval($iso8601);
-        } catch (\Exception) {
+        } catch (\Exception $e) {
             return 0;
         }
 
