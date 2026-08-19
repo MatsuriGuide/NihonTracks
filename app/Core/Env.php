@@ -5,6 +5,10 @@ namespace App\Core;
 /**
  * Chargement minimaliste d'un fichier .env, sans dépendance externe.
  * Remplace vlucas/phpdotenv, inutilisable sans Composer sur l'hébergement mutualisé.
+ *
+ * Compatible PHP 7.4+ : le PHP utilisé en ligne de commande sur certains
+ * hébergements mutualisés (CRON) peut être plus ancien que le PHP qui sert
+ * les pages web, donc pas de str_starts_with()/str_contains() ici (PHP 8.0+).
  */
 class Env
 {
@@ -20,11 +24,11 @@ class Env
             $line = trim($line);
 
             // Ignore les lignes vides et les commentaires
-            if ($line === '' || str_starts_with($line, '#')) {
+            if ($line === '' || substr($line, 0, 1) === '#') {
                 continue;
             }
 
-            if (!str_contains($line, '=')) {
+            if (strpos($line, '=') === false) {
                 continue;
             }
 
