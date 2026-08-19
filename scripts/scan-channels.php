@@ -17,6 +17,13 @@
 
 declare(strict_types=1);
 
+// Force l'affichage des erreurs quels que soient les réglages par défaut du
+// PHP en ligne de commande sur l'hébergement — sans ça, un plantage peut être
+// totalement invisible (ni sortie, ni log).
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 require dirname(__DIR__) . '/autoload.php';
 
 use App\Core\Database;
@@ -25,63 +32,85 @@ use App\Models\ScanLog;
 use App\Services\ChannelWatcherService;
 use App\Services\YoutubeApiService;
 
-Env::load(dirname(__DIR__) . '/.env');
+try {
+    Env::load(dirname(__DIR__) . '/.env');
 
-if (PHP_SAPI !== 'cli') {
-    http_response_code(403);
+    if (PHP_SAPI !== 'cli') {
+        http_response_code(403);
+
+        try {
+            ScanLog::recordBlockedAccess(
+                $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+                $_SERVER['HTTP_USER_AGENT'] ?? null
+            );
+        } catch (\Throwable $e) {
+            // Le 403 doit s'appliquer même si le log échoue (ex: DB indisponible)
+        }
+
+        exit('Ce script ne peut être exécuté qu\'en ligne de commande.');
+    }
+
+    $db = Database::getInstance();
+
+    // Un seul artiste peut avoir plusieurs liens YouTube (cas d'une chaîne
+    // "topic" distincte, cf. artist_links) : on surveille chacun d'eux séparément.
+    $links = $db->fetchAll(
+        'SELECT artist_id, url FROM artist_links WHERE platform = "youtube"'
+    );
+
+    $scanned = 0;
+    $found = 0;
+    $errors = 0;
+    $errorDetails = [];
+
+    foreach ($links as $link) {
+        $channelId = YoutubeApiService::extractChannelId($link['url']);
+
+        if ($channelId === null) {
+            // Lien pas au format /channel/UC..., pas de détection possible pour celui-ci
+            continue;
+        }
+
+        $result = ChannelWatcherService::scanArtist((int) $link['artist_id'], $channelId);
+
+        if ($result === null) {
+            $errors++;
+            $errorDetails[] = ['artist_id' => (int) $link['artist_id'], 'channel_id' => $channelId];
+
+            continue;
+        }
+
+        $scanned++;
+        $found += $result;
+    }
+
+    ScanLog::record('cron', $scanned, $found, $errors, $errorDetails ?: null);
+
+    echo sprintf(
+        "[%s] Scan terminé : %d chaîne(s) analysée(s), %d nouvelle(s) suggestion(s), %d erreur(s).\n",
+        date('Y-m-d H:i:s'),
+        $scanned,
+        $found,
+        $errors
+    );
+} catch (\Throwable $e) {
+    // Filet de sécurité : même une erreur fatale imprévue (PHP incompatible,
+    // classe manquante, connexion DB en échec...) doit être visible ici,
+    // plutôt que de disparaître silencieusement.
+    echo sprintf(
+        "[%s] ERREUR FATALE : %s (dans %s ligne %d)\n",
+        date('Y-m-d H:i:s'),
+        $e->getMessage(),
+        $e->getFile(),
+        $e->getLine()
+    );
 
     try {
-        ScanLog::recordBlockedAccess(
-            $_SERVER['REMOTE_ADDR'] ?? 'unknown',
-            $_SERVER['HTTP_USER_AGENT'] ?? null
-        );
-    } catch (\Throwable $e) {
-        // Le 403 doit s'appliquer même si le log échoue (ex: DB indisponible)
+        ScanLog::record('cron', 0, 0, 1, ['fatal_error' => $e->getMessage()]);
+    } catch (\Throwable $inner) {
+        // Si même le log échoue (ex: table absente), tant pis : le message
+        // ci-dessus, capturé par la redirection CRON, reste notre filet.
     }
 
-    exit('Ce script ne peut être exécuté qu\'en ligne de commande.');
+    exit(1);
 }
-
-$db = Database::getInstance();
-
-// Un seul artiste peut avoir plusieurs liens YouTube (cas d'une chaîne "topic"
-// distincte, cf. artist_links) : on surveille chacun d'eux séparément.
-$links = $db->fetchAll(
-    'SELECT artist_id, url FROM artist_links WHERE platform = "youtube"'
-);
-
-$scanned = 0;
-$found = 0;
-$errors = 0;
-$errorDetails = [];
-
-foreach ($links as $link) {
-    $channelId = YoutubeApiService::extractChannelId($link['url']);
-
-    if ($channelId === null) {
-        // Lien pas au format /channel/UC..., pas de détection possible pour celui-ci
-        continue;
-    }
-
-    $result = ChannelWatcherService::scanArtist((int) $link['artist_id'], $channelId);
-
-    if ($result === null) {
-        $errors++;
-        $errorDetails[] = ['artist_id' => (int) $link['artist_id'], 'channel_id' => $channelId];
-
-        continue;
-    }
-
-    $scanned++;
-    $found += $result;
-}
-
-ScanLog::record('cron', $scanned, $found, $errors, $errorDetails ?: null);
-
-echo sprintf(
-    "[%s] Scan terminé : %d chaîne(s) analysée(s), %d nouvelle(s) suggestion(s), %d erreur(s).\n",
-    date('Y-m-d H:i:s'),
-    $scanned,
-    $found,
-    $errors
-);
