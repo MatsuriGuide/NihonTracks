@@ -270,4 +270,10 @@ return [
     'admin.watch.log_channels' => 'channel(s)',
     'admin.watch.log_found' => 'suggestion(s)',
     'admin.watch.log_errors' => 'error(s)',
+
+    // Mode edition / liens en lot
+    'artists.edit_mode' => 'Edit mode',
+    'artists.view_mode' => 'Exit edit mode',
+    'artists.links.bulk_label' => 'Paste one or more links (one per line, or anywhere in the text)',
+    'artists.links.bulk_hint' => 'The platform (X, Instagram, YouTube...) is detected automatically from the domain. Links already saved are not duplicated.',
 ];

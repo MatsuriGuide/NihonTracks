@@ -16,7 +16,17 @@
     <p><?= nl2br(e($translation['bio'])) ?></p>
 <?php endif; ?>
 
-<?php if (\App\Core\Auth::canEdit((int) $artist['created_by'])): ?>
+<?php if ($canEdit): ?>
+    <p>
+        <?php if ($editMode): ?>
+            <a href="<?= url('/artists/' . $artist['slug']) ?>" class="btn btn-small"><?= e(t('artists.view_mode')) ?></a>
+        <?php else: ?>
+            <a href="<?= url('/artists/' . $artist['slug'] . '?edit=1') ?>" class="btn btn-small"><?= e(t('artists.edit_mode')) ?></a>
+        <?php endif; ?>
+    </p>
+<?php endif; ?>
+
+<?php if ($editMode): ?>
     <p>
         <a href="<?= url('/artists/' . $artist['id'] . '/edit') ?>"><?= e(t('artists.edit')) ?></a>
         &nbsp;
@@ -25,6 +35,24 @@
             <button type="submit"><?= e(t('artists.delete')) ?></button>
         </form>
     </p>
+
+    <?php if (\App\Core\Auth::role() === 'admin'): ?>
+        <div class="admin-translate">
+            <h3><?= e(t('admin.translate.title')) ?></h3>
+            <?php foreach (['en', 'ja'] as $targetLang): ?>
+                <?php $existingTranslation = $allTranslations[$targetLang] ?? null; ?>
+                <form method="post" action="<?= url('/admin/translate/artist/' . $artist['id'] . '/' . $targetLang) ?>" style="display:inline">
+                    <button type="submit">
+                        <?= $existingTranslation ? e(t('admin.translate.retranslate')) : e(t('admin.translate.translate')) ?>
+                        (<?= e(strtoupper($targetLang)) ?>)
+                    </button>
+                </form>
+                <?php if (!empty($existingTranslation['is_auto_translated'])): ?>
+                    <small><?= e(t('admin.translate.auto_flag')) ?></small>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 <?php endif; ?>
 
 <h2><?= e(t('artists.links.title')) ?></h2>
@@ -37,7 +65,7 @@
             <li>
                 <strong><?= e(t('artists.links.platform.' . $link['platform'])) ?></strong> :
                 <a href="<?= e($link['url']) ?>" target="_blank" rel="noopener"><?= e($link['url']) ?></a>
-                <?php if (\App\Core\Auth::canEdit((int) $artist['created_by'])): ?>
+                <?php if ($editMode): ?>
                     <form method="post" action="<?= url('/artists/' . $artist['id'] . '/links/' . $link['id'] . '/delete') ?>"
                           onsubmit="return confirm('<?= e(t('artists.links.remove_confirm')) ?>');" style="display:inline">
                         <button type="submit"><?= e(t('artists.links.remove')) ?></button>
@@ -48,22 +76,16 @@
     </ul>
 <?php endif; ?>
 
-<?php if (\App\Core\Auth::canEdit((int) $artist['created_by'])): ?>
-    <details>
+<?php if ($editMode): ?>
+    <details open>
         <summary><?= e(t('artists.links.add_title')) ?></summary>
-        <form method="post" action="<?= url('/artists/' . $artist['id'] . '/links') ?>">
+        <form method="post" action="<?= url('/artists/' . $artist['id'] . '/links/bulk') ?>">
             <p>
-                <label for="platform"><?= e(t('artists.links.platform_label')) ?></label><br>
-                <select id="platform" name="platform">
-                    <?php foreach (\App\Models\ArtistLink::PLATFORMS as $platform): ?>
-                        <option value="<?= e($platform) ?>"><?= e(t('artists.links.platform.' . $platform)) ?></option>
-                    <?php endforeach; ?>
-                </select>
+                <label for="links_bulk"><?= e(t('artists.links.bulk_label')) ?></label><br>
+                <textarea id="links_bulk" name="links_bulk" rows="6"
+                    placeholder="https://twitter.com/...&#10;https://instagram.com/...&#10;https://youtube.com/channel/..."></textarea>
             </p>
-            <p>
-                <label for="url"><?= e(t('artists.links.url_label')) ?></label><br>
-                <input type="url" id="url" name="url" placeholder="https://..." required>
-            </p>
+            <p><small><?= e(t('artists.links.bulk_hint')) ?></small></p>
             <p><small><?= e(t('artists.links.youtube_hint')) ?></small></p>
             <button type="submit"><?= e(t('artists.links.submit')) ?></button>
         </form>
@@ -74,15 +96,15 @@
 
 <?php
 $relationLabels = [
-    'member_of'        => 'member_of_out',
-    'former_member_of' => 'former_member_of_out',
-    'solo_project_of'  => 'solo_project_of_out',
+    'member_of'         => 'member_of_out',
+    'former_member_of'  => 'former_member_of_out',
+    'solo_project_of'   => 'solo_project_of_out',
     'collaborates_with' => 'collaborates_with',
 ];
 $reverseLabels = [
-    'member_of'        => 'member_of_in',
-    'former_member_of' => 'former_member_of_in',
-    'solo_project_of'  => 'solo_project_of_in',
+    'member_of'         => 'member_of_in',
+    'former_member_of'  => 'former_member_of_in',
+    'solo_project_of'   => 'solo_project_of_in',
     'collaborates_with' => 'collaborates_with',
 ];
 $hasRelations = !empty($outgoingRelations) || !empty($incomingRelations);
@@ -99,7 +121,7 @@ $hasRelations = !empty($outgoingRelations) || !empty($incomingRelations);
                 <?php if (!empty($relation['note'])): ?>
                     — <?= e($relation['note']) ?>
                 <?php endif; ?>
-                <?php if (\App\Core\Auth::canEdit((int) $artist['created_by'])): ?>
+                <?php if ($editMode): ?>
                     <form method="post" action="<?= url('/artists/' . $artist['id'] . '/relations/' . $relation['id'] . '/delete') ?>"
                           onsubmit="return confirm('<?= e(t('artists.relations.remove_confirm')) ?>');" style="display:inline">
                         <button type="submit"><?= e(t('artists.relations.remove')) ?></button>
@@ -114,7 +136,7 @@ $hasRelations = !empty($outgoingRelations) || !empty($incomingRelations);
                 <?php if (!empty($relation['note'])): ?>
                     — <?= e($relation['note']) ?>
                 <?php endif; ?>
-                <?php if (\App\Core\Auth::canEdit((int) $artist['created_by'])): ?>
+                <?php if ($editMode): ?>
                     <form method="post" action="<?= url('/artists/' . $artist['id'] . '/relations/' . $relation['id'] . '/delete') ?>"
                           onsubmit="return confirm('<?= e(t('artists.relations.remove_confirm')) ?>');" style="display:inline">
                         <button type="submit"><?= e(t('artists.relations.remove')) ?></button>
@@ -125,7 +147,7 @@ $hasRelations = !empty($outgoingRelations) || !empty($incomingRelations);
     </ul>
 <?php endif; ?>
 
-<?php if (\App\Core\Auth::canEdit((int) $artist['created_by']) && !empty($otherArtists)): ?>
+<?php if ($editMode && !empty($otherArtists)): ?>
     <details>
         <summary><?= e(t('artists.relations.add_title')) ?></summary>
         <form method="post" action="<?= url('/artists/' . $artist['id'] . '/relations') ?>">
@@ -153,24 +175,6 @@ $hasRelations = !empty($outgoingRelations) || !empty($incomingRelations);
             <button type="submit"><?= e(t('artists.relations.submit')) ?></button>
         </form>
     </details>
-<?php endif; ?>
-
-<?php if (\App\Core\Auth::role() === 'admin'): ?>
-    <div class="admin-translate">
-        <h3><?= e(t('admin.translate.title')) ?></h3>
-        <?php foreach (['en', 'ja'] as $targetLang): ?>
-            <?php $existing = $allTranslations[$targetLang] ?? null; ?>
-            <form method="post" action="<?= url('/admin/translate/artist/' . $artist['id'] . '/' . $targetLang) ?>" style="display:inline">
-                <button type="submit">
-                    <?= $existing ? e(t('admin.translate.retranslate')) : e(t('admin.translate.translate')) ?>
-                    (<?= e(strtoupper($targetLang)) ?>)
-                </button>
-            </form>
-            <?php if (!empty($existing['is_auto_translated'])): ?>
-                <small><?= e(t('admin.translate.auto_flag')) ?></small>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </div>
 <?php endif; ?>
 
 <?php if (\App\Core\Auth::check()): ?>

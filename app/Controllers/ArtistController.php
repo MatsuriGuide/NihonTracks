@@ -28,6 +28,9 @@ class ArtistController extends Controller
             return;
         }
 
+        $canEdit = Auth::canEdit((int) $artist['created_by']);
+        $editMode = $canEdit && $this->input('edit', '0') === '1';
+
         $translations = Artist::translations((int) $artist['id']);
         $lang = \App\Core\Lang::current();
 
@@ -42,6 +45,8 @@ class ArtistController extends Controller
                 Artist::all(),
                 fn (array $a): bool => (int) $a['id'] !== (int) $artist['id']
             )),
+            'canEdit'           => $canEdit,
+            'editMode'          => $editMode,
         ]);
     }
 
@@ -148,7 +153,7 @@ class ArtistController extends Controller
         $this->redirect('/artists');
     }
 
-    public function addLink(int $id): void
+    public function addLinksBulk(int $id): void
     {
         Auth::requireLogin();
 
@@ -161,14 +166,10 @@ class ArtistController extends Controller
             return;
         }
 
-        $platform = (string) $this->input('platform', '');
-        $url = trim((string) $this->input('url', ''));
+        $raw = (string) $this->input('links_bulk', '');
+        ArtistLink::addBulk($id, $raw);
 
-        if (in_array($platform, ArtistLink::PLATFORMS, true) && $url !== '' && filter_var($url, FILTER_VALIDATE_URL)) {
-            ArtistLink::create($id, $platform, $url);
-        }
-
-        $this->redirect('/artists/' . $artist['slug']);
+        $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
     }
 
     public function deleteLink(int $id, int $linkId): void
@@ -190,7 +191,7 @@ class ArtistController extends Controller
             ArtistLink::delete($linkId);
         }
 
-        $this->redirect('/artists/' . $artist['slug']);
+        $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
     }
 
     public function addRelation(int $id): void
@@ -216,7 +217,7 @@ class ArtistController extends Controller
             ArtistRelation::create($id, $relatedId, $type, $note);
         }
 
-        $this->redirect('/artists/' . $artist['slug']);
+        $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
     }
 
     public function deleteRelation(int $id, int $relationId): void
@@ -247,7 +248,7 @@ class ArtistController extends Controller
         ArtistRelation::delete($relationId);
 
         $artist = Artist::findById($id);
-        $this->redirect($artist ? '/artists/' . $artist['slug'] : '/artists');
+        $this->redirect($artist ? '/artists/' . $artist['slug'] . '?edit=1' : '/artists');
     }
 
     /**

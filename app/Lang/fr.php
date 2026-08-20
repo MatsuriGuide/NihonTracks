@@ -270,4 +270,10 @@ return [
     'admin.watch.log_channels' => 'chaîne(s)',
     'admin.watch.log_found' => 'suggestion(s)',
     'admin.watch.log_errors' => 'erreur(s)',
+
+    // Mode edition / liens en lot
+    'artists.edit_mode' => 'Mode édition',
+    'artists.view_mode' => 'Quitter le mode édition',
+    'artists.links.bulk_label' => 'Colle un ou plusieurs liens (un par ligne, ou n\'importe où dans le texte)',
+    'artists.links.bulk_hint' => 'La plateforme (X, Instagram, YouTube...) est détectée automatiquement selon le domaine. Les liens déjà enregistrés ne sont pas dupliqués.',
 ];

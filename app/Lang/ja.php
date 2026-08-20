@@ -270,4 +270,10 @@ return [
     'admin.watch.log_channels' => 'チャンネル',
     'admin.watch.log_found' => '件の提案',
     'admin.watch.log_errors' => '件のエラー',
+
+    // Mode edition / liens en lot
+    'artists.edit_mode' => '編集モード',
+    'artists.view_mode' => '編集モードを終了',
+    'artists.links.bulk_label' => '1つ以上のリンクを貼り付けてください（1行に1つ、またはテキスト内のどこでも可）',
+    'artists.links.bulk_hint' => 'プラットフォーム（X、Instagram、YouTubeなど）はドメインから自動検出されます。既に登録済みのリンクは重複登録されません。',
 ];

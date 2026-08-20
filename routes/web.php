@@ -21,7 +21,7 @@ $router->post('/artists/{id}/edit', 'ArtistController@update');
 $router->post('/artists/{id}/delete', 'ArtistController@delete');
 $router->post('/artists/{id}/relations', 'ArtistController@addRelation');
 $router->post('/artists/{id}/relations/{relationId}/delete', 'ArtistController@deleteRelation');
-$router->post('/artists/{id}/links', 'ArtistController@addLink');
+$router->post('/artists/{id}/links/bulk', 'ArtistController@addLinksBulk');
 $router->post('/artists/{id}/links/{linkId}/delete', 'ArtistController@deleteLink');
 $router->get('/artists/{slug}', 'ArtistController@show');
 
