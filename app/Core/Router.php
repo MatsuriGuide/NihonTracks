@@ -21,7 +21,7 @@ class Router
         $pattern = preg_replace('#\{[a-zA-Z_]+\}#', '([^/]+)', trim($path, '/'));
 
         $this->routes[$method][] = [
-            'pattern' => '#^' . $pattern . '$#',
+            'pattern' => '#^' . $pattern . '$#u',
             'handler' => $handler,
         ];
     }
@@ -29,6 +29,9 @@ class Router
     public function dispatch(string $method, string $uri): void
     {
         $path = trim((string) parse_url($uri, PHP_URL_PATH), '/');
+        // Décode les %XX (essentiel pour les slugs contenant du japonais/etc.,
+        // envoyés encodés par le navigateur) avant toute comparaison de route.
+        $path = urldecode($path);
 
         foreach ($this->routes[$method] ?? [] as $route) {
             if (preg_match($route['pattern'], $path, $matches)) {

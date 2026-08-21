@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Core\Database;
+use App\Services\YoutubeApiService;
 
 class ArtistLink
 {
@@ -64,11 +65,26 @@ class ArtistLink
         foreach ($urls as $url) {
             $url = rtrim($url, '.,;)');
 
+            $platform = self::detectPlatform($url);
+
+            // Un lien YouTube en /@handle n'est pas exploitable par la
+            // surveillance de chaîne (qui exige /channel/UC...) : on tente
+            // de le résoudre vers son URL canonique avant stockage. En cas
+            // d'échec (clé API absente, quota, handle invalide...), on garde
+            // l'URL telle quelle plutôt que de perdre le lien.
+            if ($platform === 'youtube' && strpos($url, '/channel/') === false) {
+                $channelInfo = YoutubeApiService::fetchChannelInfo($url);
+
+                if ($channelInfo !== null) {
+                    $url = $channelInfo['canonical_url'];
+                }
+            }
+
             if (in_array($url, $existing, true)) {
                 continue;
             }
 
-            self::create($artistId, self::detectPlatform($url), $url);
+            self::create($artistId, $platform, $url);
             $existing[] = $url;
             $added++;
         }
