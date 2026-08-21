@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Core\Database;
+use App\Core\Lang;
 
 class Video
 {
@@ -24,7 +25,7 @@ class Video
 
     public static function all(?string $lang = null): array
     {
-        $lang ??= \App\Core\Lang::current();
+        $lang ??= Lang::current();
 
         return Database::getInstance()->fetchAll(
             'SELECT v.id, v.youtube_id, v.thumbnail_url, v.release_date, v.video_type,
@@ -43,9 +44,29 @@ class Video
         );
     }
 
+    /**
+     * Vidéos d'un artiste donné, pour affichage en grille sur sa fiche.
+     */
+    public static function forArtist(int $artistId, ?string $lang = null): array
+    {
+        $lang ??= Lang::current();
+
+        return Database::getInstance()->fetchAll(
+            'SELECT v.id, v.youtube_id, v.thumbnail_url, v.release_date, v.video_type,
+                    COALESCE(vi.title, vi_fr.title) AS title
+             FROM videos v
+             JOIN video_artists va ON va.video_id = v.id AND va.artist_id = ?
+             LEFT JOIN videos_i18n vi ON vi.video_id = v.id AND vi.lang = ?
+             LEFT JOIN videos_i18n vi_fr ON vi_fr.video_id = v.id AND vi_fr.lang = "fr"
+             WHERE v.status = "published"
+             ORDER BY v.release_date DESC, v.id DESC',
+            [$artistId, $lang]
+        );
+    }
+
     public static function artistsFor(int $videoId, ?string $lang = null): array
     {
-        $lang ??= \App\Core\Lang::current();
+        $lang ??= Lang::current();
 
         return Database::getInstance()->fetchAll(
             'SELECT a.id, a.slug, COALESCE(ai.name, ai_fr.name) AS name
@@ -60,7 +81,7 @@ class Video
 
     public static function tagsFor(int $videoId, ?string $lang = null): array
     {
-        $lang ??= \App\Core\Lang::current();
+        $lang ??= Lang::current();
 
         return Database::getInstance()->fetchAll(
             'SELECT t.id, COALESCE(ti.name, ti_fr.name) AS name, tc.slug AS category_slug
@@ -94,7 +115,7 @@ class Video
 
     public static function translation(int $videoId, ?string $lang = null): ?array
     {
-        $lang ??= \App\Core\Lang::current();
+        $lang ??= Lang::current();
 
         $translation = Database::getInstance()->fetchOne(
             'SELECT * FROM videos_i18n WHERE video_id = ? AND lang = ?',

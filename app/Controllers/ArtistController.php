@@ -8,6 +8,7 @@ use App\Core\Slug;
 use App\Models\Artist;
 use App\Models\ArtistLink;
 use App\Models\ArtistRelation;
+use App\Models\Video;
 use App\Services\YoutubeApiService;
 
 class ArtistController extends Controller
@@ -42,6 +43,7 @@ class ArtistController extends Controller
             'outgoingRelations' => ArtistRelation::outgoing((int) $artist['id']),
             'incomingRelations' => ArtistRelation::incoming((int) $artist['id']),
             'links'             => ArtistLink::forArtist((int) $artist['id']),
+            'videos'            => Video::forArtist((int) $artist['id']),
             'otherArtists'      => array_values(array_filter(
                 Artist::all(),
                 fn (array $a): bool => (int) $a['id'] !== (int) $artist['id']

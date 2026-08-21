@@ -309,4 +309,7 @@ return [
     'admin.artist_completion.missing_bio' => 'プロフィール未設定',
     'admin.artist_completion.missing_year' => '活動開始年未設定',
     'admin.artist_completion.edit' => '編集する',
+
+    // Videos sur la fiche artiste
+    'artists.videos_title' => '動画',
 ];

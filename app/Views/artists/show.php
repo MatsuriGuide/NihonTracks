@@ -22,6 +22,34 @@
     <p><?= nl2br(e($translation['bio'])) ?></p>
 <?php endif; ?>
 
+<?php if (!empty($videos)): ?>
+    <h2><?= e(t('artists.videos_title')) ?></h2>
+    <ul class="card-grid">
+        <?php foreach ($videos as $video): ?>
+            <li class="card">
+                <a href="<?= url('/videos/' . $video['id']) ?>">
+                    <?php if (!empty($video['thumbnail_url'])): ?>
+                        <div class="card-thumb" style="background-image:url('<?= e($video['thumbnail_url']) ?>');"></div>
+                    <?php else: ?>
+                        <div class="card-thumb"></div>
+                    <?php endif; ?>
+                </a>
+                <div class="card-body">
+                    <a href="<?= url('/videos/' . $video['id']) ?>" class="card-title">
+                        <?= e($video['title'] ?? $video['youtube_id']) ?>
+                    </a>
+                    <span class="card-meta">
+                        <?= e(t('videos.type.' . $video['video_type'])) ?>
+                        <?php if (!empty($video['release_date'])): ?>
+                            — <?= e($video['release_date']) ?>
+                        <?php endif; ?>
+                    </span>
+                </div>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>
+
 <?php if ($canEdit): ?>
     <p>
         <?php if ($editMode): ?>

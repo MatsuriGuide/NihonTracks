@@ -309,4 +309,7 @@ return [
     'admin.artist_completion.missing_bio' => 'Bio manquante',
     'admin.artist_completion.missing_year' => 'Année de début manquante',
     'admin.artist_completion.edit' => 'Compléter',
+
+    // Videos sur la fiche artiste
+    'artists.videos_title' => 'Vidéos',
 ];
