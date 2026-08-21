@@ -300,4 +300,13 @@ return [
     'artists.quick_create.channel_found' => 'Channel found:',
     'artists.quick_create.confirm' => 'Create artist',
     'artists.quick_create.missing_channel' => 'Missing channel info, start over.',
+
+    // Completion des fiches artistes
+    'admin.pending_incomplete' => 'Incomplete artist pages:',
+    'admin.incomplete_link' => 'Complete artist pages',
+    'admin.artist_completion.title' => 'Artist pages to complete',
+    'admin.artist_completion.none' => 'All approved artist pages are complete!',
+    'admin.artist_completion.missing_bio' => 'Missing bio',
+    'admin.artist_completion.missing_year' => 'Missing start year',
+    'admin.artist_completion.edit' => 'Complete',
 ];

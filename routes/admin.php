@@ -18,6 +18,7 @@ $router->post('/admin/watch/{linkId}/scan', 'Admin\WatchController@scanOne');
 $router->get('/admin/artist-approvals', 'Admin\ArtistApprovalController@index');
 $router->post('/admin/artist-approvals/{id}/approve', 'Admin\ArtistApprovalController@approve');
 $router->post('/admin/artist-approvals/{id}/reject', 'Admin\ArtistApprovalController@reject');
+$router->get('/admin/incomplete-artists', 'Admin\ArtistCompletionController@index');
 
 // À compléter au fur et à mesure :
 // $router->get('/admin/users', 'Admin\UserAdminController@index');

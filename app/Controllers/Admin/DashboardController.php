@@ -20,6 +20,7 @@ class DashboardController extends AdminController
             'pendingReports'     => $pendingReports,
             'pendingSuggestions' => VideoSuggestion::countPending(),
             'pendingArtists'     => Artist::countPending(),
+            'incompleteArtists'  => Artist::countIncomplete(),
         ]);
     }
 }

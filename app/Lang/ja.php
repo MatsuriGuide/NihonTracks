@@ -300,4 +300,13 @@ return [
     'artists.quick_create.channel_found' => '見つかったチャンネル：',
     'artists.quick_create.confirm' => 'アーティストを作成',
     'artists.quick_create.missing_channel' => 'チャンネル情報が不足しています。最初からやり直してください。',
+
+    // Completion des fiches artistes
+    'admin.pending_incomplete' => '未完成のアーティストページ：',
+    'admin.incomplete_link' => 'アーティストページを完成させる',
+    'admin.artist_completion.title' => '未完成のアーティストページ',
+    'admin.artist_completion.none' => '承認済みのページはすべて完成しています！',
+    'admin.artist_completion.missing_bio' => 'プロフィール未設定',
+    'admin.artist_completion.missing_year' => '活動開始年未設定',
+    'admin.artist_completion.edit' => '編集する',
 ];

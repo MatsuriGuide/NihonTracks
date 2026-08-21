@@ -300,4 +300,13 @@ return [
     'artists.quick_create.channel_found' => 'Chaîne trouvée :',
     'artists.quick_create.confirm' => 'Créer l\'artiste',
     'artists.quick_create.missing_channel' => 'Informations de chaîne manquantes, recommence depuis le début.',
+
+    // Completion des fiches artistes
+    'admin.pending_incomplete' => 'Fiches artistes incomplètes :',
+    'admin.incomplete_link' => 'Compléter les fiches artistes',
+    'admin.artist_completion.title' => 'Fiches artistes à compléter',
+    'admin.artist_completion.none' => 'Toutes les fiches approuvées sont complètes !',
+    'admin.artist_completion.missing_bio' => 'Bio manquante',
+    'admin.artist_completion.missing_year' => 'Année de début manquante',
+    'admin.artist_completion.edit' => 'Compléter',
 ];

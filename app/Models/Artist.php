@@ -212,4 +212,37 @@ class Artist
             'SELECT COUNT(*) AS n FROM artists WHERE moderation_status = "pending"'
         )['n'] ?? 0);
     }
+
+    /**
+     * Artistes approuvés à qui il manque une bio et/ou une année de début —
+     * outil de suivi pour compléter progressivement le catalogue.
+     */
+    public static function allIncomplete(?string $lang = null): array
+    {
+        $lang ??= Lang::current();
+
+        return Database::getInstance()->fetchAll(
+            'SELECT a.id, a.slug, a.start_year,
+                    COALESCE(ai.name, ai_fr.name) AS name,
+                    ai_fr.bio AS bio_fr
+             FROM artists a
+             LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = ?
+             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
+             WHERE a.moderation_status = "approved"
+               AND (ai_fr.bio IS NULL OR ai_fr.bio = "" OR a.start_year IS NULL)
+             ORDER BY name',
+            [$lang]
+        );
+    }
+
+    public static function countIncomplete(): int
+    {
+        return (int) (Database::getInstance()->fetchOne(
+            'SELECT COUNT(*) AS n
+             FROM artists a
+             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
+             WHERE a.moderation_status = "approved"
+               AND (ai_fr.bio IS NULL OR ai_fr.bio = "" OR a.start_year IS NULL)'
+        )['n'] ?? 0);
+    }
 }
