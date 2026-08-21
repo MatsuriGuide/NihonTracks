@@ -3,6 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Core\Database;
+use App\Models\Artist;
 use App\Models\VideoSuggestion;
 
 class DashboardController extends AdminController
@@ -18,6 +19,7 @@ class DashboardController extends AdminController
         $this->render('admin/dashboard', [
             'pendingReports'     => $pendingReports,
             'pendingSuggestions' => VideoSuggestion::countPending(),
+            'pendingArtists'     => Artist::countPending(),
         ]);
     }
 }

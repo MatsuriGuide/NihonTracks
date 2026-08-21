@@ -1,6 +1,10 @@
 <h1><?= e(t('artists.title')) ?></h1>
 
-<p><a href="<?= url('/artists/create') ?>" class="btn"><?= e(t('artists.add')) ?></a></p>
+<p>
+    <a href="<?= url('/artists/create') ?>" class="btn"><?= e(t('artists.add')) ?></a>
+    &nbsp;
+    <a href="<?= url('/artists/quick-create') ?>" class="btn btn-small"><?= e(t('artists.quick_create.link')) ?></a>
+</p>
 
 <?php if (empty($artists)): ?>
     <p><?= e(t('artists.empty')) ?></p>

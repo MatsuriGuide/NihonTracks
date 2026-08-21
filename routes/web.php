@@ -10,12 +10,15 @@ $router->get('/login', 'AuthController@loginForm');
 $router->post('/login', 'AuthController@login');
 $router->get('/logout', 'AuthController@logout');
 
-// Attention à l'ordre : les routes fixes (/artists/create) doivent être
-// déclarées AVANT le pattern générique /artists/{slug}, sinon "create"
-// serait interprété comme un slug par le premier pattern qui matche.
+// Attention à l'ordre : les routes fixes (/artists/create, /artists/quick-create...)
+// doivent être déclarées AVANT le pattern générique /artists/{slug}, sinon
+// "create" serait interprété comme un slug par le premier pattern qui matche.
 $router->get('/artists', 'ArtistController@index');
 $router->get('/artists/create', 'ArtistController@create');
 $router->post('/artists/create', 'ArtistController@store');
+$router->get('/artists/quick-create', 'ArtistController@quickCreateForm');
+$router->post('/artists/quick-create/preview', 'ArtistController@quickCreatePreview');
+$router->post('/artists/quick-create/store', 'ArtistController@quickCreateStore');
 $router->get('/artists/{id}/edit', 'ArtistController@edit');
 $router->post('/artists/{id}/edit', 'ArtistController@update');
 $router->post('/artists/{id}/delete', 'ArtistController@delete');

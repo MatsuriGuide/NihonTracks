@@ -94,6 +94,66 @@ class YoutubeApiService
     }
 
     /**
+     * Récupère titre + ID canonique d'une chaîne à partir de n'importe quelle
+     * URL usuelle : /channel/UC..., ou /@handle. Pour /c/NomPersonnalisé et
+     * /user/AncienPseudo (non fiables sans appel supplémentaire), retourne null.
+     *
+     * @return array{channel_id: string, title: string, canonical_url: string}|null
+     */
+    public static function fetchChannelInfo(string $url): ?array
+    {
+        $apiKey = $_ENV['YOUTUBE_API_KEY'] ?? '';
+
+        if ($apiKey === '') {
+            return null;
+        }
+
+        $channelId = self::extractChannelId($url);
+        $queryParam = null;
+
+        if ($channelId !== null) {
+            $queryParam = 'id=' . urlencode($channelId);
+        } elseif (preg_match('#youtube\.com/@([A-Za-z0-9_.-]+)#i', $url, $matches)) {
+            $queryParam = 'forHandle=' . urlencode('@' . $matches[1]);
+        } else {
+            return null;
+        }
+
+        $endpoint = 'https://www.googleapis.com/youtube/v3/channels'
+            . '?part=snippet'
+            . '&' . $queryParam
+            . '&key=' . urlencode($apiKey);
+
+        $response = self::httpGet($endpoint);
+
+        if ($response === null) {
+            return null;
+        }
+
+        $data = json_decode($response, true);
+
+        if (empty($data['items'][0])) {
+            return null;
+        }
+
+        $item = $data['items'][0];
+        $resolvedId = $item['id'] ?? $channelId;
+
+        if ($resolvedId === null) {
+            return null;
+        }
+
+        return [
+            'channel_id'    => $resolvedId,
+            'title'         => $item['snippet']['title'] ?? '',
+            // On stocke toujours l'URL canonique /channel/UC..., quel que soit
+            // le format saisi au départ — c'est le seul format exploitable
+            // par la détection auto et la surveillance de chaîne.
+            'canonical_url' => 'https://www.youtube.com/channel/' . $resolvedId,
+        ];
+    }
+
+    /**
      * Récupère l'ID de la playlist "uploads" d'une chaîne (toutes ses vidéos,
      * dans l'ordre de publication). 1 unité de quota.
      */

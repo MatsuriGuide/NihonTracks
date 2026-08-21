@@ -8,6 +8,7 @@ use App\Core\Slug;
 use App\Models\Artist;
 use App\Models\ArtistLink;
 use App\Models\ArtistRelation;
+use App\Services\YoutubeApiService;
 
 class ArtistController extends Controller
 {
@@ -69,10 +70,122 @@ class ArtistController extends Controller
         }
 
         $data['slug'] = $this->uniqueSlug($data['name']);
+        $moderationStatus = $this->moderationStatusForCurrentUser();
 
-        Artist::create($data, $data['name'], $data['bio'], (int) Auth::id());
+        Artist::create($data, $data['name'], $data['bio'], (int) Auth::id(), $moderationStatus);
 
         $this->redirect('/artists/' . $data['slug']);
+    }
+
+    /**
+     * Étape 1 de l'ajout rapide : on colle une URL de chaîne YouTube.
+     */
+    public function quickCreateForm(): void
+    {
+        Auth::requireLogin();
+        $this->render('artists/quick_create_url', ['error' => null]);
+    }
+
+    /**
+     * Étape 2 : on a résolu la chaîne, on vérifie qu'elle n'est pas déjà
+     * connue, puis on affiche un mini-formulaire pré-rempli (nom + type).
+     */
+    public function quickCreatePreview(): void
+    {
+        Auth::requireLogin();
+
+        $url = trim((string) $this->input('channel_url', ''));
+        $channelInfo = YoutubeApiService::fetchChannelInfo($url);
+
+        if ($channelInfo === null) {
+            $this->render('artists/quick_create_url', [
+                'error' => t('artists.quick_create.bad_url'),
+            ]);
+
+            return;
+        }
+
+        $existing = ArtistLink::findArtistByYoutubeChannelId($channelInfo['channel_id']);
+
+        if ($existing !== null) {
+            $this->render('artists/quick_create_url', [
+                'error' => t('artists.quick_create.already_known') . ' ' . $existing['name'],
+                'existingArtistSlug' => $existing['slug'],
+            ]);
+
+            return;
+        }
+
+        $this->render('artists/quick_create_form', [
+            'errors'       => [],
+            'channelId'    => $channelInfo['channel_id'],
+            'canonicalUrl' => $channelInfo['canonical_url'],
+            'suggestedName' => $channelInfo['title'],
+        ]);
+    }
+
+    public function quickCreateStore(): void
+    {
+        Auth::requireLogin();
+
+        $name = trim((string) $this->input('name', ''));
+        $type = (string) $this->input('type', 'solo');
+        $channelId = (string) $this->input('channel_id', '');
+        $canonicalUrl = (string) $this->input('canonical_url', '');
+
+        if (!in_array($type, ['solo', 'group', 'duo', 'other'], true)) {
+            $type = 'solo';
+        }
+
+        $errors = [];
+
+        if ($name === '') {
+            $errors[] = t('artists.error.name_required');
+        }
+
+        if ($channelId === '' || $canonicalUrl === '') {
+            $errors[] = t('artists.quick_create.missing_channel');
+        }
+
+        if (!empty($errors)) {
+            $this->render('artists/quick_create_form', [
+                'errors'        => $errors,
+                'channelId'     => $channelId,
+                'canonicalUrl'  => $canonicalUrl,
+                'suggestedName' => $name,
+            ]);
+
+            return;
+        }
+
+        // Re-vérifie qu'elle n'a pas été ajoutée entre-temps (double soumission)
+        if (ArtistLink::findArtistByYoutubeChannelId($channelId) !== null) {
+            $this->redirect('/artists/quick-create');
+
+            return;
+        }
+
+        $slug = $this->uniqueSlug($name);
+        $moderationStatus = $this->moderationStatusForCurrentUser();
+
+        $artistId = Artist::create(
+            [
+                'type'       => $type,
+                'status'     => 'active',
+                'start_year' => null,
+                'end_year'   => null,
+                'label'      => null,
+                'slug'       => $slug,
+            ],
+            $name,
+            null,
+            (int) Auth::id(),
+            $moderationStatus
+        );
+
+        ArtistLink::create($artistId, 'youtube', $canonicalUrl);
+
+        $this->redirect('/artists/' . $slug);
     }
 
     public function edit(int $id): void
@@ -249,6 +362,15 @@ class ArtistController extends Controller
 
         $artist = Artist::findById($id);
         $this->redirect($artist ? '/artists/' . $artist['slug'] . '?edit=1' : '/artists');
+    }
+
+    /**
+     * Un modérateur/admin voit son artiste publié immédiatement ; un
+     * utilisateur normal passe systématiquement par la file de validation.
+     */
+    private function moderationStatusForCurrentUser(): string
+    {
+        return in_array(Auth::role(), ['moderator', 'admin'], true) ? 'approved' : 'pending';
     }
 
     /**

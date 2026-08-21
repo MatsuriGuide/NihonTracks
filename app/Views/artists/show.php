@@ -1,5 +1,11 @@
 <h1><span class="catalog-no"><?= e(catalog_no('a', (int) $artist['id'])) ?></span><?= e($translation['name'] ?? $artist['slug']) ?></h1>
 
+<?php if ($artist['moderation_status'] === 'pending'): ?>
+    <p class="hint"><?= e(t('artists.moderation.pending_banner')) ?></p>
+<?php elseif ($artist['moderation_status'] === 'rejected'): ?>
+    <p class="hint"><?= e(t('artists.moderation.rejected_banner')) ?></p>
+<?php endif; ?>
+
 <p>
     <?= e(t('artists.type')) ?> : <?= e(t('artists.type.' . $artist['type'])) ?> —
     <?= e(t('artists.status')) ?> : <?= e(t('artists.status.' . $artist['status'])) ?>

@@ -1,6 +1,8 @@
 <h1><?= e(t('videos.title')) ?></h1>
 
-<p><a href="<?= url('/videos/create') ?>" class="btn"><?= e(t('videos.add')) ?></a></p>
+<?php if (in_array(\App\Core\Auth::role(), ['moderator', 'admin'], true)): ?>
+    <p><a href="<?= url('/videos/create') ?>" class="btn"><?= e(t('videos.add')) ?></a></p>
+<?php endif; ?>
 
 <?php if (empty($videos)): ?>
     <p><?= e(t('videos.empty')) ?></p>

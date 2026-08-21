@@ -10,6 +10,7 @@ use App\Models\ArtistLink;
 use App\Models\Playlist;
 use App\Models\Tag;
 use App\Models\Video;
+use App\Models\VideoSuggestion;
 use App\Services\YoutubeApiService;
 
 class VideoController extends Controller
@@ -43,7 +44,7 @@ class VideoController extends Controller
 
     public function create(): void
     {
-        Auth::requireLogin();
+        Auth::requireRole(['moderator', 'admin']);
         $this->render('videos/create_url', ['error' => null]);
     }
 
@@ -54,7 +55,7 @@ class VideoController extends Controller
      */
     public function preview(): void
     {
-        Auth::requireLogin();
+        Auth::requireRole(['moderator', 'admin']);
 
         $url = trim((string) $this->input('youtube_url', ''));
         $youtubeId = YoutubeApiService::extractVideoId($url);
@@ -116,7 +117,7 @@ class VideoController extends Controller
 
     public function store(): void
     {
-        Auth::requireLogin();
+        Auth::requireRole(['moderator', 'admin']);
 
         [$data, $errors] = $this->validate();
 
@@ -157,7 +158,7 @@ class VideoController extends Controller
         $videoId = Video::create($data, $artistIds, $tagIds, (int) Auth::id());
 
         if ($suggestionId > 0) {
-            \App\Models\VideoSuggestion::markImported($suggestionId, (int) Auth::id());
+            VideoSuggestion::markImported($suggestionId, (int) Auth::id());
         }
 
         $this->redirect('/videos/' . $videoId);
@@ -268,8 +269,9 @@ class VideoController extends Controller
 
     /**
      * Crée un artiste minimal (nom + type) à la volée depuis le formulaire
-     * vidéo, pour éviter de devoir quitter la page. Le reste de la fiche
-     * (bio, liens, relations, traductions) se complète ensuite normalement.
+     * vidéo, pour éviter de devoir quitter la page. Uniquement accessible
+     * aux modérateurs/admins désormais (seuls autorisés à ajouter des
+     * vidéos), donc publié immédiatement (pas de file de validation ici).
      */
     private function createQuickArtist(string $name, string $type): int
     {

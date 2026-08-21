@@ -62,7 +62,6 @@ class ArtistLink
         $added = 0;
 
         foreach ($urls as $url) {
-            // Nettoyage de la ponctuation de fin fréquente lors d'un copier-coller
             $url = rtrim($url, '.,;)');
 
             if (in_array($url, $existing, true)) {
@@ -105,5 +104,41 @@ class ArtistLink
         }
 
         return 'website';
+    }
+
+    /**
+     * Retrouve le ou les artistes APPROUVÉS dont le lien YouTube pointe vers
+     * cet ID de chaîne (URL au format /channel/UC...). Les artistes en
+     * attente de validation ne sont jamais proposés à la détection auto.
+     */
+    public static function findArtistIdsByYoutubeChannelId(string $channelId): array
+    {
+        $rows = Database::getInstance()->fetchAll(
+            'SELECT DISTINCT al.artist_id
+             FROM artist_links al
+             JOIN artists a ON a.id = al.artist_id AND a.moderation_status = "approved"
+             WHERE al.platform = "youtube" AND al.url LIKE ?',
+            ['%' . $channelId . '%']
+        );
+
+        return array_map(static fn (array $r): int => (int) $r['artist_id'], $rows);
+    }
+
+    /**
+     * Un artiste (approuvé ou non) a-t-il déjà cette chaîne YouTube
+     * enregistrée ? Utilisé par l'ajout rapide pour éviter les doublons.
+     */
+    public static function findArtistByYoutubeChannelId(string $channelId): ?array
+    {
+        return Database::getInstance()->fetchOne(
+            'SELECT a.id, a.slug, COALESCE(ai.name, ai_fr.name) AS name, a.moderation_status
+             FROM artist_links al
+             JOIN artists a ON a.id = al.artist_id
+             LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = "fr"
+             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
+             WHERE al.platform = "youtube" AND al.url LIKE ?
+             LIMIT 1',
+            ['%' . $channelId . '%']
+        );
     }
 }

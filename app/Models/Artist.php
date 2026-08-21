@@ -3,12 +3,18 @@
 namespace App\Models;
 
 use App\Core\Database;
+use App\Core\Lang;
 
 class Artist
 {
+    /**
+     * Liste publique : uniquement les artistes approuvés. Utilisé partout
+     * où le contenu doit être visible/sélectionnable (accueil, listing,
+     * formulaires vidéo, relations...).
+     */
     public static function all(?string $lang = null): array
     {
-        $lang ??= \App\Core\Lang::current();
+        $lang ??= Lang::current();
 
         return Database::getInstance()->fetchAll(
             'SELECT a.id, a.slug, a.type, a.status,
@@ -16,25 +22,43 @@ class Artist
              FROM artists a
              LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = ?
              LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
+             WHERE a.moderation_status = "approved"
              ORDER BY name',
+            [$lang]
+        );
+    }
+
+    /**
+     * File d'attente de modération : artistes soumis par un utilisateur
+     * normal, en attente d'approbation par un modérateur/admin.
+     */
+    public static function allPending(?string $lang = null): array
+    {
+        $lang ??= Lang::current();
+
+        return Database::getInstance()->fetchAll(
+            'SELECT a.id, a.slug, a.type,
+                    COALESCE(ai.name, ai_fr.name) AS name,
+                    u.display_name AS submitted_by_name,
+                    a.created_at
+             FROM artists a
+             LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = ?
+             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
+             LEFT JOIN users u ON u.id = a.created_by
+             WHERE a.moderation_status = "pending"
+             ORDER BY a.created_at ASC',
             [$lang]
         );
     }
 
     public static function findById(int $id): ?array
     {
-        return Database::getInstance()->fetchOne(
-            'SELECT * FROM artists WHERE id = ?',
-            [$id]
-        );
+        return Database::getInstance()->fetchOne('SELECT * FROM artists WHERE id = ?', [$id]);
     }
 
     public static function findBySlug(string $slug): ?array
     {
-        return Database::getInstance()->fetchOne(
-            'SELECT * FROM artists WHERE slug = ?',
-            [$slug]
-        );
+        return Database::getInstance()->fetchOne('SELECT * FROM artists WHERE slug = ?', [$slug]);
     }
 
     /**
@@ -56,13 +80,17 @@ class Artist
     }
 
     /**
-     * Repli de détection : artistes dont le nom (langue courante ou français)
-     * correspond exactement au nom de la chaîne YouTube (insensible à la casse).
+     * Repli de détection : artistes approuvés dont le nom (langue courante
+     * ou français) correspond exactement au nom de la chaîne YouTube
+     * (insensible à la casse).
      */
     public static function findIdsByExactName(string $name): array
     {
         $rows = Database::getInstance()->fetchAll(
-            'SELECT DISTINCT artist_id FROM artists_i18n WHERE LOWER(name) = LOWER(?)',
+            'SELECT DISTINCT ai.artist_id
+             FROM artists_i18n ai
+             JOIN artists a ON a.id = ai.artist_id AND a.moderation_status = "approved"
+             WHERE LOWER(ai.name) = LOWER(?)',
             [$name]
         );
 
@@ -85,16 +113,22 @@ class Artist
         return $row !== null;
     }
 
-    public static function create(array $data, string $name, ?string $bio, int $createdBy): int
+    /**
+     * @param string $moderationStatus "approved" ou "pending" — décidé par
+     *   l'appelant selon le rôle de l'utilisateur (mod/admin = approved
+     *   immédiat, utilisateur normal = pending).
+     */
+    public static function create(array $data, string $name, ?string $bio, int $createdBy, string $moderationStatus = 'approved'): int
     {
         $db = Database::getInstance();
 
         $db->query(
-            'INSERT INTO artists (type, status, start_year, end_year, label, slug, created_by)
-             VALUES (?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO artists (type, status, moderation_status, start_year, end_year, label, slug, created_by)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $data['type'],
                 $data['status'],
+                $moderationStatus,
                 $data['start_year'],
                 $data['end_year'],
                 $data['label'],
@@ -152,5 +186,30 @@ class Artist
     public static function delete(int $id): void
     {
         Database::getInstance()->query('DELETE FROM artists WHERE id = ?', [$id]);
+    }
+
+    public static function approve(int $id): void
+    {
+        Database::getInstance()->query(
+            'UPDATE artists SET moderation_status = "approved" WHERE id = ?',
+            [$id]
+        );
+    }
+
+    public static function reject(int $id): void
+    {
+        // Conservé en base (comme les signalements/suggestions rejetés),
+        // simplement caché — pas de suppression définitive.
+        Database::getInstance()->query(
+            'UPDATE artists SET moderation_status = "rejected" WHERE id = ?',
+            [$id]
+        );
+    }
+
+    public static function countPending(): int
+    {
+        return (int) (Database::getInstance()->fetchOne(
+            'SELECT COUNT(*) AS n FROM artists WHERE moderation_status = "pending"'
+        )['n'] ?? 0);
     }
 }
