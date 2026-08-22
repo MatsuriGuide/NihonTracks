@@ -45,6 +45,57 @@ class Video
     }
 
     /**
+     * Liste filtrable par artiste et/ou tags. Plusieurs tags sélectionnés
+     * sont combinés en ET (la vidéo doit avoir TOUS les tags choisis, pas
+     * seulement l'un d'eux) — utile pour croiser genre + langue par exemple.
+     *
+     * @param int[] $tagIds
+     */
+    public static function filtered(?int $artistId, array $tagIds, ?string $lang = null): array
+    {
+        $lang ??= Lang::current();
+        $tagIds = array_values(array_unique(array_map('intval', $tagIds)));
+
+        $sql = 'SELECT v.id, v.youtube_id, v.thumbnail_url, v.release_date, v.video_type,
+                       COALESCE(vi.title, vi_fr.title) AS title,
+                       GROUP_CONCAT(DISTINCT COALESCE(ai.name, ai_fr.name) ORDER BY ai.name SEPARATOR ", ") AS artist_names
+                FROM videos v
+                LEFT JOIN videos_i18n vi ON vi.video_id = v.id AND vi.lang = ?
+                LEFT JOIN videos_i18n vi_fr ON vi_fr.video_id = v.id AND vi_fr.lang = "fr"
+                LEFT JOIN video_artists va ON va.video_id = v.id
+                LEFT JOIN artists_i18n ai ON ai.artist_id = va.artist_id AND ai.lang = ?
+                LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
+                WHERE v.status = "published"';
+        $params = [$lang, $lang];
+
+        if ($artistId !== null) {
+            $sql .= ' AND EXISTS (
+                SELECT 1 FROM video_artists va2
+                WHERE va2.video_id = v.id AND va2.artist_id = ?
+            )';
+            $params[] = $artistId;
+        }
+
+        if (!empty($tagIds)) {
+            $placeholders = implode(',', array_fill(0, count($tagIds), '?'));
+            $sql .= " AND v.id IN (
+                SELECT vt.video_id FROM video_tags vt
+                WHERE vt.tag_id IN ({$placeholders})
+                GROUP BY vt.video_id
+                HAVING COUNT(DISTINCT vt.tag_id) = ?
+            )";
+            foreach ($tagIds as $tagId) {
+                $params[] = $tagId;
+            }
+            $params[] = count($tagIds);
+        }
+
+        $sql .= ' GROUP BY v.id ORDER BY v.release_date DESC, v.id DESC';
+
+        return Database::getInstance()->fetchAll($sql, $params);
+    }
+
+    /**
      * Vidéos d'un artiste donné, pour affichage en grille sur sa fiche.
      */
     public static function forArtist(int $artistId, ?string $lang = null): array

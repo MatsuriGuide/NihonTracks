@@ -312,4 +312,12 @@ return [
 
     // Videos sur la fiche artiste
     'artists.videos_title' => '動画',
+
+    // Filtrage de la liste des videos
+    'videos.filter.title' => '絞り込み',
+    'videos.filter.artist_label' => 'アーティスト',
+    'videos.filter.all_artists' => 'すべてのアーティスト',
+    'videos.filter.apply' => '適用',
+    'videos.filter.reset' => 'リセット',
+    'videos.filter.no_results' => 'この条件に一致する動画はありません。',
 ];

@@ -312,4 +312,12 @@ return [
 
     // Videos sur la fiche artiste
     'artists.videos_title' => 'Vidéos',
+
+    // Filtrage de la liste des videos
+    'videos.filter.title' => 'Filtrer',
+    'videos.filter.artist_label' => 'Artiste',
+    'videos.filter.all_artists' => 'Tous les artistes',
+    'videos.filter.apply' => 'Appliquer',
+    'videos.filter.reset' => 'Réinitialiser',
+    'videos.filter.no_results' => 'Aucune vidéo ne correspond à ces filtres.',
 ];

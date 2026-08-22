@@ -17,8 +17,20 @@ class VideoController extends Controller
 {
     public function index(): void
     {
-        $videos = Video::all();
-        $this->render('videos/index', ['videos' => $videos]);
+        $artistId = (int) $this->input('artist_id', 0);
+        $artistId = $artistId > 0 ? $artistId : null;
+
+        $tagIds = array_map('intval', (array) $this->input('tag_ids', []));
+
+        $videos = Video::filtered($artistId, $tagIds);
+
+        $this->render('videos/index', [
+            'videos'           => $videos,
+            'artists'          => Artist::all(),
+            'tagGroups'        => Tag::selectable(),
+            'selectedArtistId' => $artistId,
+            'selectedTagIds'   => $tagIds,
+        ]);
     }
 
     public function show(int $id): void
