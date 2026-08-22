@@ -38,7 +38,7 @@ class VideoController extends Controller
             'allTranslations' => Video::translations($id),
             'artists'         => Video::artistsFor($id),
             'tags'            => Video::tagsFor($id),
-            'userPlaylists'   => Auth::check() ? Playlist::allByUser((int) Auth::id()) : [],
+            'userPlaylists'   => Auth::check() ? Playlist::allByUserWithVideoStatus((int) Auth::id(), $id) : [],
         ]);
     }
 

@@ -52,4 +52,5 @@ $router->post('/playlists/{id}/edit', 'PlaylistController@update');
 $router->post('/playlists/{id}/delete', 'PlaylistController@delete');
 $router->post('/playlists/{id}/videos', 'PlaylistController@addVideo');
 $router->post('/playlists/{id}/videos/{videoId}/remove', 'PlaylistController@removeVideo');
+$router->post('/playlists/{id}/videos/{videoId}/toggle', 'PlaylistController@toggleVideo');
 $router->get('/playlists/{id}', 'PlaylistController@show');

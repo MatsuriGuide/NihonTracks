@@ -190,6 +190,38 @@ class PlaylistController extends Controller
     }
 
     /**
+     * Endpoint AJAX (JSON) : ajoute la vidéo si elle n'y est pas encore,
+     * la retire sinon. Utilisé par le bouton d'ajout rapide sur la fiche
+     * vidéo, sans rechargement de page.
+     */
+    public function toggleVideo(int $id, int $videoId): void
+    {
+        if (!Auth::check()) {
+            $this->json(['error' => 'unauthorized'], 401);
+
+            return;
+        }
+
+        $playlist = Playlist::findById($id);
+
+        if (!$playlist || !Auth::canEdit((int) $playlist['user_id'])) {
+            $this->json(['error' => 'forbidden'], 403);
+
+            return;
+        }
+
+        if (Playlist::containsVideo($id, $videoId)) {
+            Playlist::removeVideo($id, $videoId);
+            $this->json(['added' => false]);
+
+            return;
+        }
+
+        Playlist::addVideo($id, $videoId);
+        $this->json(['added' => true]);
+    }
+
+    /**
      * @return array{0: array, 1: string[]}
      */
     private function validate(): array

@@ -35,28 +35,48 @@
 <?php endif; ?>
 
 <?php if (\App\Core\Auth::check()): ?>
+    <style>
+        .playlist-toggle-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0 0 1rem;
+        }
+        .playlist-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: transparent;
+            border: 1px solid var(--line, #333);
+            color: var(--ink-dim, #999);
+        }
+        .playlist-toggle-btn .check {
+            display: none;
+        }
+        .playlist-toggle-btn.is-added {
+            border-color: var(--mint, #38d6b4);
+            color: var(--mint, #38d6b4);
+            background: rgba(56, 214, 180, 0.08);
+        }
+        .playlist-toggle-btn.is-added .check {
+            display: inline;
+        }
+    </style>
+
     <h2><?= e(t('videos.add_to_playlist')) ?></h2>
     <?php if (empty($userPlaylists)): ?>
         <p><?= e(t('videos.no_playlist')) ?> <a href="<?= url('/playlists/create') ?>"><?= e(t('videos.create_playlist')) ?></a></p>
     <?php else: ?>
-        <?php foreach ($userPlaylists as $playlist): ?>
-            <form method="post" action="<?= url('/playlists/' . $playlist['id'] . '/videos') ?>" style="display:inline">
-                <input type="hidden" name="video_id" value="<?= (int) $video['id'] ?>">
-                <button type="submit"><?= e($playlist['name']) ?></button>
-            </form>
-        <?php endforeach; ?>
+        <div class="playlist-toggle-list">
+            <?php foreach ($userPlaylists as $playlist): ?>
+                <button type="button" class="playlist-toggle-btn<?= !empty($playlist['has_video']) ? ' is-added' : '' ?>"
+                        data-toggle-url="<?= url('/playlists/' . $playlist['id'] . '/videos/' . $video['id'] . '/toggle') ?>">
+                    <span class="check">✓</span> <?= e($playlist['name']) ?>
+                </button>
+            <?php endforeach; ?>
+        </div>
+        <script src="<?= asset('js/playlist-toggle.js') ?>"></script>
     <?php endif; ?>
-<?php endif; ?>
-
-<?php if (\App\Core\Auth::canEdit((int) $video['added_by'])): ?>
-    <p>
-        <a href="<?= url('/videos/' . $video['id'] . '/edit') ?>"><?= e(t('videos.edit')) ?></a>
-        &nbsp;
-        <form method="post" action="<?= url('/videos/' . $video['id'] . '/delete') ?>"
-              onsubmit="return confirm('<?= e(t('videos.delete_confirm')) ?>');" style="display:inline">
-            <button type="submit"><?= e(t('videos.delete')) ?></button>
-        </form>
-    </p>
 <?php endif; ?>
 
 <?php if (\App\Core\Auth::role() === 'admin'): ?>
@@ -75,6 +95,17 @@
             <?php endif; ?>
         <?php endforeach; ?>
     </div>
+<?php endif; ?>
+
+<?php if (\App\Core\Auth::canEdit((int) $video['added_by'])): ?>
+    <p>
+        <a href="<?= url('/videos/' . $video['id'] . '/edit') ?>"><?= e(t('videos.edit')) ?></a>
+        &nbsp;
+        <form method="post" action="<?= url('/videos/' . $video['id'] . '/delete') ?>"
+              onsubmit="return confirm('<?= e(t('videos.delete_confirm')) ?>');" style="display:inline">
+            <button type="submit"><?= e(t('videos.delete')) ?></button>
+        </form>
+    </p>
 <?php endif; ?>
 
 <?php if (\App\Core\Auth::check()): ?>

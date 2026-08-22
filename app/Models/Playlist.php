@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Core\Database;
+use App\Core\Lang;
 
 class Playlist
 {
@@ -38,6 +39,24 @@ class Playlist
         );
     }
 
+    /**
+     * Playlists de l'utilisateur, avec un indicateur has_video précisant si
+     * la vidéo donnée y figure déjà — utilisé sur la fiche vidéo pour le
+     * bouton d'ajout rapide (état "déjà ajouté" affiché sans requête à part).
+     */
+    public static function allByUserWithVideoStatus(int $userId, int $videoId): array
+    {
+        return Database::getInstance()->fetchAll(
+            'SELECT p.*,
+                    (SELECT COUNT(*) FROM playlist_videos pv WHERE pv.playlist_id = p.id) AS video_count,
+                    (SELECT COUNT(*) FROM playlist_videos pv WHERE pv.playlist_id = p.id AND pv.video_id = ?) AS has_video
+             FROM playlists p
+             WHERE p.user_id = ?
+             ORDER BY p.updated_at DESC',
+            [$videoId, $userId]
+        );
+    }
+
     public static function create(string $name, ?string $description, bool $isPublic, int $userId): int
     {
         $db = Database::getInstance();
@@ -65,7 +84,7 @@ class Playlist
 
     public static function videosFor(int $playlistId, ?string $lang = null): array
     {
-        $lang ??= \App\Core\Lang::current();
+        $lang ??= Lang::current();
 
         return Database::getInstance()->fetchAll(
             'SELECT v.id, v.youtube_id, v.thumbnail_url, v.release_date,
@@ -84,6 +103,14 @@ class Playlist
              ORDER BY pv.position ASC, pv.added_at ASC',
             [$lang, $lang, $playlistId]
         );
+    }
+
+    public static function containsVideo(int $playlistId, int $videoId): bool
+    {
+        return Database::getInstance()->fetchOne(
+            'SELECT 1 FROM playlist_videos WHERE playlist_id = ? AND video_id = ?',
+            [$playlistId, $videoId]
+        ) !== null;
     }
 
     public static function addVideo(int $playlistId, int $videoId): void
