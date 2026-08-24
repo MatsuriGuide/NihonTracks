@@ -320,4 +320,13 @@ return [
     'videos.filter.apply' => 'Appliquer',
     'videos.filter.reset' => 'Réinitialiser',
     'videos.filter.no_results' => 'Aucune vidéo ne correspond à ces filtres.',
+
+    // Photo de profil / recherche artistes
+    'artists.search_placeholder' => 'Rechercher un artiste...',
+    'artists.avatar_label' => 'Photo de profil',
+    'artists.avatar_hint' => 'URL d\'une image (aucun téléversement de fichier, colle simplement un lien). Laisse vide et enregistre pour la retirer.',
+    'artists.avatar_save' => 'Enregistrer',
+
+    // Import avatar YouTube
+    'artists.avatar_import_youtube' => 'Importer depuis YouTube',
 ];

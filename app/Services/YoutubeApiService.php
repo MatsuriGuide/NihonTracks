@@ -94,11 +94,12 @@ class YoutubeApiService
     }
 
     /**
-     * Récupère titre + ID canonique d'une chaîne à partir de n'importe quelle
-     * URL usuelle : /channel/UC..., ou /@handle. Pour /c/NomPersonnalisé et
-     * /user/AncienPseudo (non fiables sans appel supplémentaire), retourne null.
+     * Récupère titre + ID canonique + miniature d'une chaîne à partir de
+     * n'importe quelle URL usuelle : /channel/UC..., ou /@handle. Pour
+     * /c/NomPersonnalisé et /user/AncienPseudo (non fiables sans appel
+     * supplémentaire), retourne null.
      *
-     * @return array{channel_id: string, title: string, canonical_url: string}|null
+     * @return array{channel_id: string, title: string, canonical_url: string, thumbnail_url: ?string}|null
      */
     public static function fetchChannelInfo(string $url): ?array
     {
@@ -150,6 +151,10 @@ class YoutubeApiService
             // le format saisi au départ — c'est le seul format exploitable
             // par la détection auto et la surveillance de chaîne.
             'canonical_url' => 'https://www.youtube.com/channel/' . $resolvedId,
+            'thumbnail_url' => $item['snippet']['thumbnails']['high']['url']
+                ?? $item['snippet']['thumbnails']['medium']['url']
+                ?? $item['snippet']['thumbnails']['default']['url']
+                ?? null,
         ];
     }
 

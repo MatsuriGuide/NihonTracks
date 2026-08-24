@@ -119,10 +119,11 @@ class ArtistController extends Controller
         }
 
         $this->render('artists/quick_create_form', [
-            'errors'       => [],
-            'channelId'    => $channelInfo['channel_id'],
-            'canonicalUrl' => $channelInfo['canonical_url'],
+            'errors'        => [],
+            'channelId'     => $channelInfo['channel_id'],
+            'canonicalUrl'  => $channelInfo['canonical_url'],
             'suggestedName' => $channelInfo['title'],
+            'thumbnailUrl'  => $channelInfo['thumbnail_url'] ?? null,
         ]);
     }
 
@@ -134,6 +135,7 @@ class ArtistController extends Controller
         $type = (string) $this->input('type', 'solo');
         $channelId = (string) $this->input('channel_id', '');
         $canonicalUrl = (string) $this->input('canonical_url', '');
+        $thumbnailUrl = trim((string) $this->input('thumbnail_url', '')) ?: null;
 
         if (!in_array($type, ['solo', 'group', 'duo', 'other'], true)) {
             $type = 'solo';
@@ -155,6 +157,7 @@ class ArtistController extends Controller
                 'channelId'     => $channelId,
                 'canonicalUrl'  => $canonicalUrl,
                 'suggestedName' => $name,
+                'thumbnailUrl'  => $thumbnailUrl,
             ]);
 
             return;
@@ -186,6 +189,10 @@ class ArtistController extends Controller
         );
 
         ArtistLink::create($artistId, 'youtube', $canonicalUrl);
+
+        if ($thumbnailUrl !== null) {
+            Artist::updateAvatar($artistId, $thumbnailUrl);
+        }
 
         $this->redirect('/artists/' . $slug);
     }
@@ -266,6 +273,63 @@ class ArtistController extends Controller
 
         Artist::delete($id);
         $this->redirect('/artists');
+    }
+
+    public function updateAvatar(int $id): void
+    {
+        Auth::requireLogin();
+
+        $artist = Artist::findById($id);
+
+        if (!$artist || !Auth::canEdit((int) $artist['created_by'])) {
+            http_response_code(403);
+            require dirname(__DIR__) . '/Views/errors/403.php';
+
+            return;
+        }
+
+        $url = trim((string) $this->input('avatar_url', ''));
+
+        if ($url === '') {
+            Artist::updateAvatar($id, null);
+        } elseif (filter_var($url, FILTER_VALIDATE_URL)) {
+            Artist::updateAvatar($id, $url);
+        }
+
+        $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
+    }
+
+    public function importAvatarFromYoutube(int $id): void
+    {
+        Auth::requireLogin();
+
+        $artist = Artist::findById($id);
+
+        if (!$artist || !Auth::canEdit((int) $artist['created_by'])) {
+            http_response_code(403);
+            require dirname(__DIR__) . '/Views/errors/403.php';
+
+            return;
+        }
+
+        $youtubeUrl = null;
+        foreach (ArtistLink::forArtist($id) as $link) {
+            if ($link['platform'] === 'youtube') {
+                $youtubeUrl = $link['url'];
+
+                break;
+            }
+        }
+
+        if ($youtubeUrl !== null) {
+            $channelInfo = YoutubeApiService::fetchChannelInfo($youtubeUrl);
+
+            if ($channelInfo !== null && !empty($channelInfo['thumbnail_url'])) {
+                Artist::updateAvatar($id, $channelInfo['thumbnail_url']);
+            }
+        }
+
+        $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
     }
 
     public function addLinksBulk(int $id): void

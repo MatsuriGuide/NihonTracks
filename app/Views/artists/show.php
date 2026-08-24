@@ -1,5 +1,9 @@
 <h1><span class="catalog-no"><?= e(catalog_no('a', (int) $artist['id'])) ?></span><?= e($translation['name'] ?? $artist['slug']) ?></h1>
 
+<?php if (!empty($artist['avatar_path'])): ?>
+    <img src="<?= e($artist['avatar_path']) ?>" alt="" style="max-width: 200px; border-radius: 3px; display: block; margin-bottom: 1rem;">
+<?php endif; ?>
+
 <?php if ($artist['moderation_status'] === 'pending'): ?>
     <p class="hint"><?= e(t('artists.moderation.pending_banner')) ?></p>
 <?php elseif ($artist['moderation_status'] === 'rejected'): ?>
@@ -69,6 +73,32 @@
             <button type="submit"><?= e(t('artists.delete')) ?></button>
         </form>
     </p>
+
+    <details>
+        <summary><?= e(t('artists.avatar_label')) ?></summary>
+        <form method="post" action="<?= url('/artists/' . $artist['id'] . '/avatar') ?>">
+            <p>
+                <input type="url" name="avatar_url" placeholder="https://..."
+                       value="<?= e($artist['avatar_path'] ?? '') ?>" style="width: 100%; max-width: 500px;">
+            </p>
+            <p><small><?= e(t('artists.avatar_hint')) ?></small></p>
+            <button type="submit"><?= e(t('artists.avatar_save')) ?></button>
+        </form>
+        <?php
+        $hasYoutubeLink = false;
+        foreach ($links as $link) {
+            if ($link['platform'] === 'youtube') {
+                $hasYoutubeLink = true;
+                break;
+            }
+        }
+        ?>
+        <?php if ($hasYoutubeLink): ?>
+            <form method="post" action="<?= url('/artists/' . $artist['id'] . '/avatar/import-youtube') ?>" style="margin-top: 0.5rem;">
+                <button type="submit"><?= e(t('artists.avatar_import_youtube')) ?></button>
+            </form>
+        <?php endif; ?>
+    </details>
 
     <?php if (\App\Core\Auth::role() === 'admin'): ?>
         <div class="admin-translate">

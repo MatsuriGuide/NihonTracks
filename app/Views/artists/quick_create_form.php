@@ -10,9 +10,14 @@
 
 <p class="hint hint-success"><?= e(t('artists.quick_create.channel_found')) ?> <code><?= e($canonicalUrl) ?></code></p>
 
+<?php if (!empty($thumbnailUrl)): ?>
+    <img src="<?= e($thumbnailUrl) ?>" alt="" style="max-width: 120px; border-radius: 3px; display: block; margin-bottom: 1rem;">
+<?php endif; ?>
+
 <form method="post" action="<?= url('/artists/quick-create/store') ?>">
     <input type="hidden" name="channel_id" value="<?= e($channelId) ?>">
     <input type="hidden" name="canonical_url" value="<?= e($canonicalUrl) ?>">
+    <input type="hidden" name="thumbnail_url" value="<?= e($thumbnailUrl ?? '') ?>">
 
     <p>
         <label for="name"><?= e(t('artists.name')) ?></label><br>

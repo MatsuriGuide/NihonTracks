@@ -320,4 +320,13 @@ return [
     'videos.filter.apply' => '適用',
     'videos.filter.reset' => 'リセット',
     'videos.filter.no_results' => 'この条件に一致する動画はありません。',
+
+    // Photo de profil / recherche artistes
+    'artists.search_placeholder' => 'アーティストを検索...',
+    'artists.avatar_label' => 'プロフィール写真',
+    'artists.avatar_hint' => '画像のURL（ファイルアップロードではなく、リンクを貼り付けてください）。空欄にして保存すると削除されます。',
+    'artists.avatar_save' => '保存',
+
+    // Import avatar YouTube
+    'artists.avatar_import_youtube' => 'YouTubeからインポート',
 ];
