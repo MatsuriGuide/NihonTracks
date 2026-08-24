@@ -52,7 +52,11 @@
     </main>
 
     <footer class="site-footer">
-        <p>&copy; <?= date('Y') ?> NihonTracks — <span class="mono">nihontracks.koshiki.art</span></p>
+        <p>
+            &copy; <?= date('Y') ?> NihonTracks — <span class="mono">nihontracks.koshiki.art</span>
+            &nbsp;·&nbsp;
+            <a href="<?= url('/about') ?>">À propos</a>
+        </p>
     </footer>
 </body>
 </html>
