@@ -17,7 +17,7 @@ class Artist
         $lang ??= Lang::current();
 
         return Database::getInstance()->fetchAll(
-            'SELECT a.id, a.slug, a.type, a.status,
+            'SELECT a.id, a.slug, a.type, a.status, a.avatar_path,
                     COALESCE(ai.name, ai_fr.name) AS name
              FROM artists a
              LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = ?
@@ -181,6 +181,14 @@ class Artist
                 [$id, $name, $bio]
             );
         }
+    }
+
+    public static function updateAvatar(int $id, ?string $avatarUrl): void
+    {
+        Database::getInstance()->query(
+            'UPDATE artists SET avatar_path = ? WHERE id = ?',
+            [$avatarUrl, $id]
+        );
     }
 
     public static function delete(int $id): void
