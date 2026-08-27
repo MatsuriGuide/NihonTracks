@@ -4,6 +4,10 @@
     <img src="<?= e($artist['avatar_path']) ?>" alt="" style="max-width: 200px; border-radius: 3px; display: block; margin-bottom: 1rem;">
 <?php endif; ?>
 
+<?php if (!empty($artist['subscriber_count'])): ?>
+    <p class="card-meta"><?= e(number_format((int) $artist['subscriber_count'], 0, ',', ' ')) ?> <?= e(t('artists.subscriber_count')) ?></p>
+<?php endif; ?>
+
 <?php if ($artist['moderation_status'] === 'pending'): ?>
     <p class="hint"><?= e(t('artists.moderation.pending_banner')) ?></p>
 <?php elseif ($artist['moderation_status'] === 'rejected'): ?>

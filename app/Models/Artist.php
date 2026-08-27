@@ -191,6 +191,14 @@ class Artist
         );
     }
 
+    public static function updateSubscriberCount(int $id, ?int $count): void
+    {
+        Database::getInstance()->query(
+            'UPDATE artists SET subscriber_count = ? WHERE id = ?',
+            [$count, $id]
+        );
+    }
+
     public static function delete(int $id): void
     {
         Database::getInstance()->query('DELETE FROM artists WHERE id = ?', [$id]);

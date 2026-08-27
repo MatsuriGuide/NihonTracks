@@ -329,4 +329,7 @@ return [
 
     // Import avatar YouTube
     'artists.avatar_import_youtube' => 'YouTubeからインポート',
+
+    // Nombre d'abonnes
+    'artists.subscriber_count' => '登録者',
 ];

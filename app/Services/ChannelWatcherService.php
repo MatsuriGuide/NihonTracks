@@ -2,15 +2,16 @@
 
 namespace App\Services;
 
+use App\Models\Artist;
 use App\Models\VideoSuggestion;
 
 class ChannelWatcherService
 {
     /**
      * Scanne la chaîne d'un artiste et enregistre les nouvelles suggestions.
-     * Retourne le nombre de nouvelles vidéos détectées (0 en cas d'échec API).
+     * Retourne le nombre de nouvelles vidéos détectées (null en cas d'échec API).
      *
-     * @param int $maxResults Nombre de vidéos récentes examinées par scan (max 50)
+     * @param int $maxResults Nombre de vidéos récentes examinées par scan (max 50 par page)
      * @param int $minDurationSeconds Filtre heuristique anti-Shorts : les vidéos
      *   plus courtes que ce seuil sont ignorées. Imparfait — YouTube autorise
      *   des Shorts jusqu'à 3 min depuis 2024, donc certains passeront quand
@@ -23,15 +24,23 @@ class ChannelWatcherService
         int $maxResults = 50,
         int $minDurationSeconds = 90
     ): ?int {
-        $uploadsPlaylistId = YoutubeApiService::fetchUploadsPlaylistId($channelId);
+        $channelDetails = YoutubeApiService::fetchChannelDetailsById($channelId);
 
-        if ($uploadsPlaylistId === null) {
-            // Échec API (clé absente/invalide, quota atteint, chaîne
-            // introuvable...) — distinct d'un "0 nouvelle vidéo" légitime.
+        if ($channelDetails === null || empty($channelDetails['uploads_playlist_id'])) {
             return null;
         }
 
-        $videos = YoutubeApiService::fetchPlaylistVideos($uploadsPlaylistId, $maxResults);
+        // Effet de bord "gratuit" : la photo et le nombre d'abonnés viennent
+        // du même appel API que celui qui sert à trouver les nouvelles
+        // vidéos, donc les tenir à jour à chaque scan ne coûte rien de plus.
+        // La photo n'est écrasée que si l'API en renvoie bien une (on ne
+        // veut pas effacer une photo existante à cause d'un aléa temporaire).
+        if (!empty($channelDetails['thumbnail_url'])) {
+            Artist::updateAvatar($artistId, $channelDetails['thumbnail_url']);
+        }
+        Artist::updateSubscriberCount($artistId, $channelDetails['subscriber_count']);
+
+        $videos = YoutubeApiService::fetchPlaylistVideos($channelDetails['uploads_playlist_id'], $maxResults);
 
         if (empty($videos)) {
             return 0;

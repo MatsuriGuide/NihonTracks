@@ -119,11 +119,12 @@ class ArtistController extends Controller
         }
 
         $this->render('artists/quick_create_form', [
-            'errors'        => [],
-            'channelId'     => $channelInfo['channel_id'],
-            'canonicalUrl'  => $channelInfo['canonical_url'],
-            'suggestedName' => $channelInfo['title'],
-            'thumbnailUrl'  => $channelInfo['thumbnail_url'] ?? null,
+            'errors'          => [],
+            'channelId'       => $channelInfo['channel_id'],
+            'canonicalUrl'    => $channelInfo['canonical_url'],
+            'suggestedName'   => $channelInfo['title'],
+            'thumbnailUrl'    => $channelInfo['thumbnail_url'] ?? null,
+            'subscriberCount' => $channelInfo['subscriber_count'] ?? null,
         ]);
     }
 
@@ -136,6 +137,8 @@ class ArtistController extends Controller
         $channelId = (string) $this->input('channel_id', '');
         $canonicalUrl = (string) $this->input('canonical_url', '');
         $thumbnailUrl = trim((string) $this->input('thumbnail_url', '')) ?: null;
+        $subscriberCountInput = trim((string) $this->input('subscriber_count', ''));
+        $subscriberCount = $subscriberCountInput !== '' ? (int) $subscriberCountInput : null;
 
         if (!in_array($type, ['solo', 'group', 'duo', 'other'], true)) {
             $type = 'solo';
@@ -153,11 +156,12 @@ class ArtistController extends Controller
 
         if (!empty($errors)) {
             $this->render('artists/quick_create_form', [
-                'errors'        => $errors,
-                'channelId'     => $channelId,
-                'canonicalUrl'  => $canonicalUrl,
-                'suggestedName' => $name,
-                'thumbnailUrl'  => $thumbnailUrl,
+                'errors'          => $errors,
+                'channelId'       => $channelId,
+                'canonicalUrl'    => $canonicalUrl,
+                'suggestedName'   => $name,
+                'thumbnailUrl'    => $thumbnailUrl,
+                'subscriberCount' => $subscriberCount,
             ]);
 
             return;
@@ -192,6 +196,10 @@ class ArtistController extends Controller
 
         if ($thumbnailUrl !== null) {
             Artist::updateAvatar($artistId, $thumbnailUrl);
+        }
+
+        if ($subscriberCount !== null) {
+            Artist::updateSubscriberCount($artistId, $subscriberCount);
         }
 
         $this->redirect('/artists/' . $slug);
@@ -324,8 +332,12 @@ class ArtistController extends Controller
         if ($youtubeUrl !== null) {
             $channelInfo = YoutubeApiService::fetchChannelInfo($youtubeUrl);
 
-            if ($channelInfo !== null && !empty($channelInfo['thumbnail_url'])) {
-                Artist::updateAvatar($id, $channelInfo['thumbnail_url']);
+            if ($channelInfo !== null) {
+                if (!empty($channelInfo['thumbnail_url'])) {
+                    Artist::updateAvatar($id, $channelInfo['thumbnail_url']);
+                }
+
+                Artist::updateSubscriberCount($id, $channelInfo['subscriber_count']);
             }
         }
 

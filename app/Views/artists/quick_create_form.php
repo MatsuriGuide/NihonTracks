@@ -14,10 +14,15 @@
     <img src="<?= e($thumbnailUrl) ?>" alt="" style="max-width: 120px; border-radius: 3px; display: block; margin-bottom: 1rem;">
 <?php endif; ?>
 
+<?php if (!empty($subscriberCount)): ?>
+    <p><?= e(number_format($subscriberCount, 0, ',', ' ')) ?> <?= e(t('artists.subscriber_count')) ?></p>
+<?php endif; ?>
+
 <form method="post" action="<?= url('/artists/quick-create/store') ?>">
     <input type="hidden" name="channel_id" value="<?= e($channelId) ?>">
     <input type="hidden" name="canonical_url" value="<?= e($canonicalUrl) ?>">
     <input type="hidden" name="thumbnail_url" value="<?= e($thumbnailUrl ?? '') ?>">
+    <input type="hidden" name="subscriber_count" value="<?= e((string) ($subscriberCount ?? '')) ?>">
 
     <p>
         <label for="name"><?= e(t('artists.name')) ?></label><br>

@@ -329,4 +329,7 @@ return [
 
     // Import avatar YouTube
     'artists.avatar_import_youtube' => 'Importer depuis YouTube',
+
+    // Nombre d'abonnes
+    'artists.subscriber_count' => 'abonnés',
 ];

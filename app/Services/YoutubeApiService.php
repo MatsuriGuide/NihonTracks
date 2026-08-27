@@ -94,14 +94,43 @@ class YoutubeApiService
     }
 
     /**
-     * Récupère titre + ID canonique + miniature d'une chaîne à partir de
-     * n'importe quelle URL usuelle : /channel/UC..., ou /@handle. Pour
-     * /c/NomPersonnalisé et /user/AncienPseudo (non fiables sans appel
-     * supplémentaire), retourne null.
+     * Récupère titre + ID canonique + miniature + nombre d'abonnés + ID de
+     * playlist "uploads" d'une chaîne, à partir de n'importe quelle URL
+     * usuelle : /channel/UC..., ou /@handle. Pour /c/NomPersonnalisé et
+     * /user/AncienPseudo (non fiables sans appel supplémentaire), retourne
+     * null. Un seul appel API (1 unité de quota), tous les "part" demandés
+     * en même temps — les combiner ne coûte rien de plus qu'un seul.
      *
-     * @return array{channel_id: string, title: string, canonical_url: string, thumbnail_url: ?string}|null
+     * @return array{channel_id: string, title: string, canonical_url: string, thumbnail_url: ?string, subscriber_count: ?int, uploads_playlist_id: ?string}|null
      */
     public static function fetchChannelInfo(string $url): ?array
+    {
+        $channelId = self::extractChannelId($url);
+
+        if ($channelId !== null) {
+            return self::fetchChannelData('id=' . urlencode($channelId));
+        }
+
+        if (preg_match('#youtube\.com/@([A-Za-z0-9_.-]+)#i', $url, $matches)) {
+            return self::fetchChannelData('forHandle=' . urlencode('@' . $matches[1]));
+        }
+
+        return null;
+    }
+
+    /**
+     * Même chose que fetchChannelInfo(), mais quand on a déjà l'ID de
+     * chaîne (UC...) sous la main — cas de la surveillance de chaîne, qui
+     * connaît déjà l'ID extrait du lien enregistré sur la fiche artiste.
+     *
+     * @return array{channel_id: string, title: string, canonical_url: string, thumbnail_url: ?string, subscriber_count: ?int, uploads_playlist_id: ?string}|null
+     */
+    public static function fetchChannelDetailsById(string $channelId): ?array
+    {
+        return self::fetchChannelData('id=' . urlencode($channelId));
+    }
+
+    private static function fetchChannelData(string $queryParam): ?array
     {
         $apiKey = $_ENV['YOUTUBE_API_KEY'] ?? '';
 
@@ -109,19 +138,8 @@ class YoutubeApiService
             return null;
         }
 
-        $channelId = self::extractChannelId($url);
-        $queryParam = null;
-
-        if ($channelId !== null) {
-            $queryParam = 'id=' . urlencode($channelId);
-        } elseif (preg_match('#youtube\.com/@([A-Za-z0-9_.-]+)#i', $url, $matches)) {
-            $queryParam = 'forHandle=' . urlencode('@' . $matches[1]);
-        } else {
-            return null;
-        }
-
         $endpoint = 'https://www.googleapis.com/youtube/v3/channels'
-            . '?part=snippet'
+            . '?part=snippet,contentDetails,statistics'
             . '&' . $queryParam
             . '&key=' . urlencode($apiKey);
 
@@ -138,11 +156,14 @@ class YoutubeApiService
         }
 
         $item = $data['items'][0];
-        $resolvedId = $item['id'] ?? $channelId;
+        $resolvedId = $item['id'] ?? null;
 
         if ($resolvedId === null) {
             return null;
         }
+
+        $statistics = $item['statistics'] ?? [];
+        $hiddenSubscribers = (bool) ($statistics['hiddenSubscriberCount'] ?? false);
 
         return [
             'channel_id'    => $resolvedId,
@@ -155,12 +176,18 @@ class YoutubeApiService
                 ?? $item['snippet']['thumbnails']['medium']['url']
                 ?? $item['snippet']['thumbnails']['default']['url']
                 ?? null,
+            // null si la chaîne masque volontairement son nombre d'abonnés
+            'subscriber_count'    => (!$hiddenSubscribers && isset($statistics['subscriberCount']))
+                ? (int) $statistics['subscriberCount']
+                : null,
+            'uploads_playlist_id' => $item['contentDetails']['relatedPlaylists']['uploads'] ?? null,
         ];
     }
 
     /**
-     * Récupère l'ID de la playlist "uploads" d'une chaîne (toutes ses vidéos,
-     * dans l'ordre de publication). 1 unité de quota.
+     * @deprecated Conservée pour compatibilité — fetchChannelDetailsById()
+     * fait la même chose en un seul appel, avec en plus photo/abonnés.
+     * Récupère l'ID de la playlist "uploads" d'une chaîne. 1 unité de quota.
      */
     public static function fetchUploadsPlaylistId(string $channelId): ?string
     {
