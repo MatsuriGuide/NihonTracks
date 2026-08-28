@@ -339,4 +339,8 @@ return [
     'artists.suggest_info' => 'Suggest via AI (formation, label, bio)',
     'artists.suggest_info_loading' => 'Searching...',
     'artists.suggest_info_hint' => 'Only fills the empty fields below. Always double-check before saving: AI can be wrong.',
+
+    // Compteurs footer
+    'footer.videos_count' => 'videos',
+    'footer.artists_count' => 'artists',
 ];

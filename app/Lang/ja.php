@@ -339,4 +339,8 @@ return [
     'artists.suggest_info' => 'AIで提案（結成年・レーベル・プロフィール）',
     'artists.suggest_info_loading' => '検索中...',
     'artists.suggest_info_hint' => '空欄の項目のみ入力されます。保存前に必ず内容を確認してください：AIは間違えることがあります。',
+
+    // Compteurs footer
+    'footer.videos_count' => '本の動画',
+    'footer.artists_count' => '組のアーティスト',
 ];

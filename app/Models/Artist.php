@@ -229,6 +229,13 @@ class Artist
         )['n'] ?? 0);
     }
 
+    public static function countApproved(): int
+    {
+        return (int) (Database::getInstance()->fetchOne(
+            'SELECT COUNT(*) AS n FROM artists WHERE moderation_status = "approved"'
+        )['n'] ?? 0);
+    }
+
     /**
      * Artistes approuvés à qui il manque une bio et/ou une année de début —
      * outil de suivi pour compléter progressivement le catalogue.

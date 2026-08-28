@@ -57,6 +57,11 @@
             &nbsp;·&nbsp;
             <a href="<?= url('/about') ?>">À propos</a>
         </p>
+        <p class="mono">
+            <?= (int) \App\Models\Video::countPublished() ?> <?= e(t('footer.videos_count')) ?>
+            &nbsp;·&nbsp;
+            <?= (int) \App\Models\Artist::countApproved() ?> <?= e(t('footer.artists_count')) ?>
+        </p>
     </footer>
 </body>
 </html>

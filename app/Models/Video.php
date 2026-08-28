@@ -269,6 +269,13 @@ class Video
         }
     }
 
+    public static function countPublished(): int
+    {
+        return (int) (Database::getInstance()->fetchOne(
+            'SELECT COUNT(*) AS n FROM videos WHERE status = "published"'
+        )['n'] ?? 0);
+    }
+
     public static function delete(int $id): void
     {
         Database::getInstance()->query('DELETE FROM videos WHERE id = ?', [$id]);
