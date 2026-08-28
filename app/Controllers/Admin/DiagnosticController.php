@@ -80,7 +80,7 @@ class DiagnosticController extends AdminController
                 ['role' => 'system', 'content' => 'Tu réponds uniquement en JSON valide, sans texte autour.'],
                 ['role' => 'user', 'content' => 'Réponds avec exactement : {"ok": true}'],
             ],
-            'temperature' => 0.2,
+            'max_completion_tokens' => 1000,
         ];
 
         $ch = curl_init('https://api.openai.com/v1/chat/completions');

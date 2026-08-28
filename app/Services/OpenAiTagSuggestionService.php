@@ -51,6 +51,12 @@ class OpenAiTagSuggestionService
             ],
             // Pas de "temperature" : gpt-5-nano n'accepte que sa valeur par
             // défaut (1) et rejette toute autre valeur avec une erreur 400.
+            // max_completion_tokens (pas max_tokens, obsolète pour ce modèle) :
+            // gpt-5-nano est un modèle "raisonneur" qui consomme une partie de
+            // ce budget en réflexion interne avant d'écrire la réponse visible
+            // — trop bas, la réponse finale peut être vide (budget épuisé
+            // avant d'avoir pu l'écrire).
+            'max_completion_tokens' => 1000,
         ];
 
         $response = self::httpPost('https://api.openai.com/v1/chat/completions', $payload, $apiKey);
