@@ -56,7 +56,7 @@ class OpenAiTagSuggestionService
             // ce budget en réflexion interne avant d'écrire la réponse visible
             // — trop bas, la réponse finale peut être vide (budget épuisé
             // avant d'avoir pu l'écrire).
-            'max_completion_tokens' => 1000,
+            'max_completion_tokens' => 2000,
         ];
 
         $response = self::httpPost('https://api.openai.com/v1/chat/completions', $payload, $apiKey);
