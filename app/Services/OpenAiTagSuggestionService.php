@@ -49,7 +49,8 @@ class OpenAiTagSuggestionService
                 ],
                 ['role' => 'user', 'content' => $prompt],
             ],
-            'temperature' => 0.2,
+            // Pas de "temperature" : gpt-5-nano n'accepte que sa valeur par
+            // défaut (1) et rejette toute autre valeur avec une erreur 400.
         ];
 
         $response = self::httpPost('https://api.openai.com/v1/chat/completions', $payload, $apiKey);
