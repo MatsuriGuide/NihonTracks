@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Core\Database;
+use App\Core\Lang;
 
 class Tag
 {
@@ -12,7 +13,7 @@ class Tag
      */
     public static function selectable(?string $lang = null): array
     {
-        $lang ??= \App\Core\Lang::current();
+        $lang ??= Lang::current();
 
         $rows = Database::getInstance()->fetchAll(
             'SELECT t.id, t.slug, tc.slug AS category_slug,
@@ -32,5 +33,30 @@ class Tag
         }
 
         return $grouped;
+    }
+
+    /**
+     * Libellés français des tags "genre", indexés par tag_id — utilisé
+     * comme référentiel fixe pour la suggestion de tags par IA (le
+     * français sert de langue pivot, toujours renseignée par défaut).
+     *
+     * @return array<int, string>
+     */
+    public static function genreLabelsFr(): array
+    {
+        $rows = Database::getInstance()->fetchAll(
+            'SELECT t.id, ti_fr.name
+             FROM tags t
+             JOIN tag_categories tc ON tc.id = t.category_id AND tc.slug = "genre"
+             LEFT JOIN tags_i18n ti_fr ON ti_fr.tag_id = t.id AND ti_fr.lang = "fr"
+             WHERE ti_fr.name IS NOT NULL'
+        );
+
+        $labels = [];
+        foreach ($rows as $row) {
+            $labels[(int) $row['id']] = $row['name'];
+        }
+
+        return $labels;
     }
 }

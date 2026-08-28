@@ -9,6 +9,7 @@ use App\Models\Artist;
 use App\Models\ArtistLink;
 use App\Models\ArtistRelation;
 use App\Models\Video;
+use App\Services\OpenAiArtistInfoService;
 use App\Services\YoutubeApiService;
 
 class ArtistController extends Controller
@@ -229,6 +230,42 @@ class ArtistController extends Controller
             'mode'     => 'edit',
             'artistId' => $id,
         ]);
+    }
+
+    /**
+     * Endpoint AJAX (JSON) : suggère année de formation, label et bio via
+     * IA — remplit le formulaire côté client pour relecture, n'enregistre
+     * jamais directement. Réservé aux admins (coût API + risque
+     * d'hallucination sur des informations factuelles).
+     */
+    public function suggestInfo(int $id): void
+    {
+        if (Auth::role() !== 'admin') {
+            $this->json(['error' => 'forbidden'], 403);
+
+            return;
+        }
+
+        $artist = Artist::findById($id);
+
+        if (!$artist) {
+            $this->json(['error' => 'not_found'], 404);
+
+            return;
+        }
+
+        $translations = Artist::translations($id);
+        $name = $translations['fr']['name'] ?? $translations['en']['name'] ?? $artist['slug'];
+
+        $suggestion = OpenAiArtistInfoService::suggestInfo($name);
+
+        if ($suggestion === null) {
+            $this->json(['error' => 'api_failed'], 502);
+
+            return;
+        }
+
+        $this->json($suggestion);
     }
 
     public function update(int $id): void

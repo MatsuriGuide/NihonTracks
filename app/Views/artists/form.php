@@ -8,6 +8,17 @@
     </ul>
 <?php endif; ?>
 
+<?php if ($mode === 'edit' && \App\Core\Auth::role() === 'admin'): ?>
+    <p>
+        <button type="button" id="suggest-artist-info-btn"
+                data-url="<?= url('/artists/' . $artistId . '/suggest-info') ?>"
+                data-loading-label="<?= e(t('artists.suggest_info_loading')) ?>">
+            <?= e(t('artists.suggest_info')) ?>
+        </button>
+    </p>
+    <p><small><?= e(t('artists.suggest_info_hint')) ?></small></p>
+<?php endif; ?>
+
 <form method="post" action="<?= $mode === 'edit' ? url('/artists/' . $artistId . '/edit') : url('/artists/create') ?>">
     <p>
         <label for="name"><?= e(t('artists.name')) ?></label><br>
@@ -58,3 +69,7 @@
 
     <button type="submit"><?= $mode === 'edit' ? e(t('artists.submit_edit')) : e(t('artists.submit_create')) ?></button>
 </form>
+
+<?php if ($mode === 'edit' && \App\Core\Auth::role() === 'admin'): ?>
+    <script src="<?= asset('js/artist-info-suggest.js') ?>"></script>
+<?php endif; ?>

@@ -22,6 +22,7 @@ $router->post('/artists/quick-create/preview', 'ArtistController@quickCreatePrev
 $router->post('/artists/quick-create/store', 'ArtistController@quickCreateStore');
 $router->get('/artists/{id}/edit', 'ArtistController@edit');
 $router->post('/artists/{id}/edit', 'ArtistController@update');
+$router->post('/artists/{id}/suggest-info', 'ArtistController@suggestInfo');
 $router->post('/artists/{id}/delete', 'ArtistController@delete');
 $router->post('/artists/{id}/relations', 'ArtistController@addRelation');
 $router->post('/artists/{id}/relations/{relationId}/delete', 'ArtistController@deleteRelation');
@@ -35,6 +36,7 @@ $router->get('/artists/{slug}', 'ArtistController@show');
 $router->get('/videos', 'VideoController@index');
 $router->get('/videos/create', 'VideoController@create');
 $router->post('/videos/preview', 'VideoController@preview');
+$router->post('/videos/suggest-tags', 'VideoController@suggestTags');
 $router->post('/videos/store', 'VideoController@store');
 $router->get('/videos/{id}/edit', 'VideoController@edit');
 $router->post('/videos/{id}/edit', 'VideoController@update');

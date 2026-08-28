@@ -11,6 +11,7 @@ use App\Models\Playlist;
 use App\Models\Tag;
 use App\Models\Video;
 use App\Models\VideoSuggestion;
+use App\Services\OpenAiTagSuggestionService;
 use App\Services\YoutubeApiService;
 
 class VideoController extends Controller
@@ -277,6 +278,29 @@ class VideoController extends Controller
 
         Video::delete($id);
         $this->redirect('/videos');
+    }
+
+    /**
+     * Endpoint AJAX (JSON) : suggère des tags "genre" via IA à partir du
+     * titre et des artistes déjà sélectionnés dans le formulaire — utilisé
+     * sur le formulaire vidéo, y compris lors de la validation d'une
+     * suggestion de chaîne surveillée. Réservé aux modérateurs/admins
+     * (seuls autorisés à ajouter des vidéos).
+     */
+    public function suggestTags(): void
+    {
+        if (!in_array(Auth::role(), ['moderator', 'admin'], true)) {
+            $this->json(['error' => 'forbidden'], 403);
+
+            return;
+        }
+
+        $title = trim((string) $this->input('title', ''));
+        $artistNames = trim((string) $this->input('artist_names', '')) ?: null;
+
+        $tagIds = OpenAiTagSuggestionService::suggestGenreTagIds($title, $artistNames);
+
+        $this->json(['tag_ids' => $tagIds]);
     }
 
     /**

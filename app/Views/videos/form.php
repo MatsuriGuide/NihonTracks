@@ -86,6 +86,16 @@
         </details>
     </fieldset>
 
+    <?php if (in_array(\App\Core\Auth::role(), ['moderator', 'admin'], true)): ?>
+        <p>
+            <button type="button" id="suggest-tags-btn"
+                    data-url="<?= url('/videos/suggest-tags') ?>"
+                    data-loading-label="<?= e(t('videos.tags_suggest_loading')) ?>">
+                <?= e(t('videos.tags_suggest')) ?>
+            </button>
+        </p>
+    <?php endif; ?>
+
     <?php foreach ($tagGroups as $categorySlug => $tags): ?>
         <fieldset>
             <legend><?= e(t('videos.tags_label')) ?> — <?= e(ucfirst($categorySlug)) ?></legend>
@@ -103,3 +113,4 @@
 </form>
 
 <script src="<?= asset('js/artist-filter.js') ?>"></script>
+<script src="<?= asset('js/tag-suggest.js') ?>"></script>

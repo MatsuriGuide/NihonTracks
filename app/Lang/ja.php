@@ -332,4 +332,11 @@ return [
 
     // Nombre d'abonnes
     'artists.subscriber_count' => '登録者',
+
+    // Suggestions IA (tags video, infos artiste)
+    'videos.tags_suggest' => 'タグを提案（AI）',
+    'videos.tags_suggest_loading' => '分析中...',
+    'artists.suggest_info' => 'AIで提案（結成年・レーベル・プロフィール）',
+    'artists.suggest_info_loading' => '検索中...',
+    'artists.suggest_info_hint' => '空欄の項目のみ入力されます。保存前に必ず内容を確認してください：AIは間違えることがあります。',
 ];

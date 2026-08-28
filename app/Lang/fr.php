@@ -332,4 +332,11 @@ return [
 
     // Nombre d'abonnes
     'artists.subscriber_count' => 'abonnés',
+
+    // Suggestions IA (tags video, infos artiste)
+    'videos.tags_suggest' => 'Suggérer les tags (IA)',
+    'videos.tags_suggest_loading' => 'Analyse en cours...',
+    'artists.suggest_info' => 'Suggérer via IA (formation, label, bio)',
+    'artists.suggest_info_loading' => 'Recherche en cours...',
+    'artists.suggest_info_hint' => 'Remplit uniquement les champs vides ci-dessous. Vérifie toujours les informations avant d\'enregistrer : une IA peut se tromper.',
 ];
