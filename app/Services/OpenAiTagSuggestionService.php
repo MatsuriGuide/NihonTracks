@@ -39,7 +39,7 @@ class OpenAiTagSuggestionService
             . 'sans aucun texte autour. Exemple : ["J-Pop", "City Pop"]';
 
         $payload = [
-            'model'       => 'gpt-4o-mini',
+            'model'       => 'gpt-5-nano',
             'messages'    => [
                 [
                     'role'    => 'system',
