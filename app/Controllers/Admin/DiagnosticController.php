@@ -59,4 +59,55 @@ class DiagnosticController extends AdminController
         echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         exit;
     }
+
+    /**
+     * Teste un vrai appel chat/completions avec le payload utilisé par la
+     * suggestion de tags, pour voir la réponse brute (succès ou erreur).
+     */
+    public function openaiChat(): void
+    {
+        $apiKey = $_ENV['OPENAI_API_KEY'] ?? '';
+
+        if ($apiKey === '') {
+            header('Content-Type: text/plain; charset=utf-8');
+            echo json_encode(['error' => 'no_key']);
+            exit;
+        }
+
+        $payload = [
+            'model'       => 'gpt-5-nano',
+            'messages'    => [
+                ['role' => 'system', 'content' => 'Tu réponds uniquement en JSON valide, sans texte autour.'],
+                ['role' => 'user', 'content' => 'Réponds avec exactement : {"ok": true}'],
+            ],
+            'temperature' => 0.2,
+        ];
+
+        $ch = curl_init('https://api.openai.com/v1/chat/completions');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $apiKey,
+        ]);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        header('Content-Type: text/plain; charset=utf-8');
+        echo json_encode(
+            [
+                'payload_sent' => $payload,
+                'http_code'    => $httpCode,
+                'curl_error'   => $curlError ?: null,
+                'response'     => $response !== false ? json_decode($response, true) : null,
+            ],
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+        );
+        exit;
+    }
 }

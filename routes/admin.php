@@ -4,6 +4,7 @@
 
 $router->get('/admin', 'Admin\DashboardController@index');
 $router->get('/admin/diagnostic/openai', 'Admin\DiagnosticController@openai');
+$router->get('/admin/diagnostic/openai-chat', 'Admin\DiagnosticController@openaiChat');
 $router->get('/admin/tags', 'Admin\TagAdminController@index');
 $router->post('/admin/tags', 'Admin\TagAdminController@store');
 $router->post('/admin/tags/{id}/delete', 'Admin\TagAdminController@delete');
