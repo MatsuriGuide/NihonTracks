@@ -76,18 +76,36 @@ $notice = $noticeLabels[\App\Core\Lang::current()] ?? null;
     <li>À l'inscription : adresse email, mot de passe (haché, jamais stocké en clair), nom affiché, langue préférée</li>
     <li>Contenu que vous créez : fiches artistes, vidéos ajoutées, tags, playlists, signalements</li>
     <li>Journal technique : en cas de tentative d'accès direct non autorisée à certains scripts internes, l'adresse IP est brièvement journalisée à des fins de sécurité</li>
-    <li>Cookie de session : strictement nécessaire au fonctionnement (maintien de la connexion), aucun traceur publicitaire ou analytique tiers</li>
+    <li>Cookie de session : strictement nécessaire au fonctionnement (maintien de la connexion)</li>
+    <li>Mesure d'audience : un cookie Matomo peut être déposé pour distinguer les visites d'une session à l'autre (voir « Mesure d'audience » ci-dessous)</li>
 </ul>
+
+<h3>Mesure d'audience</h3>
+<p>
+    Ce site utilise Matomo, un outil de mesure d'audience que l'éditeur héberge lui-même
+    (<span class="mono">stats.matsuri-guide.fr</span>), pour analyser la fréquentation générale du site
+    (nombre de visites, pages consultées, provenance). Aucune donnée n'est partagée avec des régies
+    publicitaires ni revendue à des tiers, et les adresses IP des visiteurs sont anonymisées. Ces
+    statistiques ne sont pas croisées avec votre compte utilisateur.
+</p>
+<p>
+    Configuré ainsi (outil auto-hébergé, aucune donnée transmise à un tiers, adresses IP anonymisées),
+    cet outil de mesure d'audience entre dans le cadre de l'exemption de consentement prévue par la CNIL
+    pour les solutions d'analyse strictement limitées à la mesure d'audience du site — aucun bandeau de
+    consentement cookies n'est donc affiché pour cet usage.
+</p>
 
 <h3>Finalités</h3>
 <p>
     Ces données servent uniquement à faire fonctionner le site : création et gestion de votre compte,
-    attribution de vos contributions, modération, et personnalisation de la langue d'affichage.
+    attribution de vos contributions, modération, personnalisation de la langue d'affichage, et
+    compréhension générale de la fréquentation du site.
 </p>
 
 <h3>Destinataires et sous-traitants</h3>
 <ul>
     <li><strong>Hostinger</strong> (hébergement) : hébergement technique des données</li>
+    <li><strong>Matomo</strong> (auto-hébergé par l'éditeur, stats.matsuri-guide.fr) : mesure d'audience, aucune donnée transmise à un tiers externe</li>
     <li><strong>YouTube Data API (Google)</strong> : requêtes envoyées pour récupérer des métadonnées de vidéos et chaînes publiques (titres, miniatures, dates) — aucune donnée personnelle de compte n'est transmise à Google dans ce cadre</li>
     <li><strong>OpenAI</strong> : lorsqu'un administrateur déclenche une traduction automatique, le contenu textuel de la fiche concernée (nom, bio, titre) est envoyé à l'API OpenAI pour traduction — aucune donnée de compte utilisateur n'y est transmise</li>
 </ul>
