@@ -3,13 +3,19 @@
 namespace App\Services;
 
 use App\Models\Artist;
-use App\Models\VideoSuggestion;
+use App\Models\Video;
 
 class ChannelWatcherService
 {
     /**
-     * Scanne la chaîne d'un artiste et enregistre les nouvelles suggestions.
-     * Retourne le nombre de nouvelles vidéos détectées (null en cas d'échec API).
+     * Scanne la chaîne d'un artiste et publie directement les nouvelles
+     * vidéos trouvées (plus de file d'attente à valider). Chaque vidéo
+     * hérite des tags actuels de l'artiste au moment de sa création — une
+     * "photo" indépendante ensuite, pas un lien permanent. Le type de vidéo
+     * par défaut ("mv") et les tags restent à corriger si besoin via
+     * l'écran de relecture /admin/video-review.
+     *
+     * Retourne le nombre de nouvelles vidéos publiées (null en cas d'échec API).
      *
      * @param int $maxResults Nombre de vidéos récentes examinées par scan (max 50 par page)
      * @param int $minDurationSeconds Filtre heuristique anti-Shorts : les vidéos
@@ -33,8 +39,6 @@ class ChannelWatcherService
         // Effet de bord "gratuit" : la photo et le nombre d'abonnés viennent
         // du même appel API que celui qui sert à trouver les nouvelles
         // vidéos, donc les tenir à jour à chaque scan ne coûte rien de plus.
-        // La photo n'est écrasée que si l'API en renvoie bien une (on ne
-        // veut pas effacer une photo existante à cause d'un aléa temporaire).
         if (!empty($channelDetails['thumbnail_url'])) {
             Artist::updateAvatar($artistId, $channelDetails['thumbnail_url']);
         }
@@ -46,9 +50,18 @@ class ChannelWatcherService
             return 0;
         }
 
+        $artist = Artist::findById($artistId);
+
+        if ($artist === null) {
+            return null;
+        }
+
+        $tagIds = Artist::tagIdsFor($artistId);
+        $addedBy = (int) $artist['created_by'];
+
         $durations = YoutubeApiService::fetchVideosDurations(array_column($videos, 'youtube_id'));
 
-        $found = 0;
+        $published = 0;
 
         foreach ($videos as $video) {
             $duration = $durations[$video['youtube_id']] ?? null;
@@ -57,22 +70,30 @@ class ChannelWatcherService
                 continue;
             }
 
-            if (VideoSuggestion::youtubeIdKnown($video['youtube_id'])) {
+            if (Video::findByYoutubeId($video['youtube_id']) !== null) {
                 continue;
             }
 
-            VideoSuggestion::create(
-                $artistId,
-                $video['youtube_id'],
-                $video['title'],
-                $video['thumbnail_url'],
-                $video['channel_name'],
-                $video['published_at']
+            Video::create(
+                [
+                    'youtube_id'       => $video['youtube_id'],
+                    'youtube_url'      => 'https://www.youtube.com/watch?v=' . $video['youtube_id'],
+                    'title'            => $video['title'],
+                    'release_date'     => $video['published_at'],
+                    'video_type'       => 'mv',
+                    'thumbnail_url'    => $video['thumbnail_url'],
+                    'channel_name'     => $video['channel_name'],
+                    'duration_seconds' => $duration,
+                ],
+                [$artistId],
+                $tagIds,
+                $addedBy,
+                'auto_scan'
             );
 
-            $found++;
+            $published++;
         }
 
-        return $found;
+        return $published;
     }
 }

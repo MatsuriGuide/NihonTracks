@@ -183,13 +183,13 @@ class Video
         );
     }
 
-    public static function create(array $data, array $artistIds, array $tagIds, int $addedBy): int
+    public static function create(array $data, array $artistIds, array $tagIds, int $addedBy, string $source = 'manual'): int
     {
         $db = Database::getInstance();
 
         $db->query(
-            'INSERT INTO videos (youtube_id, youtube_url, release_date, video_type, thumbnail_url, channel_name, duration_seconds, added_by)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO videos (youtube_id, youtube_url, release_date, video_type, thumbnail_url, channel_name, duration_seconds, added_by, source)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $data['youtube_id'],
                 $data['youtube_url'],
@@ -199,6 +199,7 @@ class Video
                 $data['channel_name'],
                 $data['duration_seconds'],
                 $addedBy,
+                $source,
             ]
         );
 
@@ -230,8 +231,10 @@ class Video
     {
         $db = Database::getInstance();
 
+        // Éditer une vidéo auto-publiée vaut relecture implicite — inutile
+        // de la faire réapparaître dans la file "à relire" après coup.
         $db->query(
-            'UPDATE videos SET release_date = ?, video_type = ? WHERE id = ?',
+            'UPDATE videos SET release_date = ?, video_type = ?, reviewed_at = COALESCE(reviewed_at, NOW()) WHERE id = ?',
             [$data['release_date'], $data['video_type'], $id]
         );
 
@@ -279,5 +282,46 @@ class Video
     public static function delete(int $id): void
     {
         Database::getInstance()->query('DELETE FROM videos WHERE id = ?', [$id]);
+    }
+
+    /**
+     * Vidéos publiées automatiquement par le scan de chaîne, pas encore
+     * relues par un modérateur/admin (type vidéo par défaut, tags copiés
+     * de l'artiste au moment de l'ajout — à vérifier/corriger après coup).
+     */
+    public static function allNeedingReview(?string $lang = null): array
+    {
+        $lang ??= Lang::current();
+
+        return Database::getInstance()->fetchAll(
+            'SELECT v.id, v.youtube_id, v.thumbnail_url, v.release_date, v.video_type,
+                    COALESCE(vi.title, vi_fr.title) AS title,
+                    GROUP_CONCAT(DISTINCT COALESCE(ai.name, ai_fr.name) ORDER BY ai.name SEPARATOR ", ") AS artist_names
+             FROM videos v
+             LEFT JOIN videos_i18n vi ON vi.video_id = v.id AND vi.lang = ?
+             LEFT JOIN videos_i18n vi_fr ON vi_fr.video_id = v.id AND vi_fr.lang = "fr"
+             LEFT JOIN video_artists va ON va.video_id = v.id
+             LEFT JOIN artists_i18n ai ON ai.artist_id = va.artist_id AND ai.lang = ?
+             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
+             WHERE v.source = "auto_scan" AND v.reviewed_at IS NULL
+             GROUP BY v.id
+             ORDER BY v.created_at DESC',
+            [$lang, $lang]
+        );
+    }
+
+    public static function countNeedingReview(): int
+    {
+        return (int) (Database::getInstance()->fetchOne(
+            'SELECT COUNT(*) AS n FROM videos WHERE source = "auto_scan" AND reviewed_at IS NULL'
+        )['n'] ?? 0);
+    }
+
+    public static function markReviewed(int $id): void
+    {
+        Database::getInstance()->query(
+            'UPDATE videos SET reviewed_at = NOW() WHERE id = ?',
+            [$id]
+        );
     }
 }

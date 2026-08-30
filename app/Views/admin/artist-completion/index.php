@@ -14,7 +14,10 @@
                 <?php if (empty($artist['start_year'])): ?>
                     <span class="tag"><?= e(t('admin.artist_completion.missing_year')) ?></span>
                 <?php endif; ?>
-                <a href="<?= url('/artists/' . $artist['id'] . '/edit') ?>"><?= e(t('admin.artist_completion.edit')) ?></a>
+                <?php if (empty($artist['tag_count'])): ?>
+                    <span class="tag"><?= e(t('admin.artist_completion.missing_tags')) ?></span>
+                <?php endif; ?>
+                <a href="<?= url('/artists/' . $artist['slug'] . '?edit=1') ?>"><?= e(t('admin.artist_completion.edit')) ?></a>
             </li>
         <?php endforeach; ?>
     </ul>

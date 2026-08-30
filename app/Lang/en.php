@@ -343,4 +343,19 @@ return [
     // Compteurs footer
     'footer.videos_count' => 'videos',
     'footer.artists_count' => 'artists',
+
+    // Tags artiste / relecture videos
+    'admin.videos_needing_review' => 'Auto-published videos to review:',
+    'admin.video_review_link' => 'Review auto-published videos',
+    'admin.video_review.title' => 'Videos to review',
+    'admin.video_review.hint' => 'These videos were auto-published by channel watching (default type, tags inherited from the artist). Check/fix if needed, then mark as reviewed.',
+    'admin.video_review.none' => 'No videos pending review.',
+    'admin.video_review.edit' => 'Edit',
+    'admin.video_review.mark_reviewed' => 'Mark as reviewed',
+    'admin.artist_completion.missing_tags' => 'Missing tags',
+    'artists.tags_label' => 'Tags',
+    'artists.tags_none' => 'No tags set.',
+    'artists.tags_edit' => 'Edit tags',
+    'artists.tags_hint' => 'These tags will be automatically copied to new videos from this artist (editable independently afterward on each video).',
+    'artists.tags_save' => 'Save',
 ];

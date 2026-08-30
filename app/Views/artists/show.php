@@ -123,6 +123,40 @@
     <?php endif; ?>
 <?php endif; ?>
 
+<h2><?= e(t('artists.tags_label')) ?></h2>
+
+<?php if (empty($artistTags)): ?>
+    <p><?= e(t('artists.tags_none')) ?></p>
+<?php else: ?>
+    <p>
+        <?php foreach ($artistTags as $tag): ?>
+            <span class="tag"><?= e($tag['name'] ?? '') ?></span>
+        <?php endforeach; ?>
+    </p>
+<?php endif; ?>
+
+<?php if ($editMode): ?>
+    <details>
+        <summary><?= e(t('artists.tags_edit')) ?></summary>
+        <form method="post" action="<?= url('/artists/' . $artist['id'] . '/tags') ?>">
+            <?php foreach ($tagGroups as $categorySlug => $tags): ?>
+                <fieldset>
+                    <legend><?= e(ucfirst($categorySlug)) ?></legend>
+                    <?php foreach ($tags as $tag): ?>
+                        <label>
+                            <input type="checkbox" name="tag_ids[]" value="<?= (int) $tag['id'] ?>"
+                                <?= in_array((int) $tag['id'], $artistTagIds, true) ? 'checked' : '' ?>>
+                            <?= e($tag['name'] ?? $tag['slug']) ?>
+                        </label><br>
+                    <?php endforeach; ?>
+                </fieldset>
+            <?php endforeach; ?>
+            <p><small><?= e(t('artists.tags_hint')) ?></small></p>
+            <button type="submit"><?= e(t('artists.tags_save')) ?></button>
+        </form>
+    </details>
+<?php endif; ?>
+
 <h2><?= e(t('artists.links.title')) ?></h2>
 
 <?php if (empty($links)): ?>

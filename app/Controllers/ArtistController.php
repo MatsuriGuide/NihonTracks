@@ -8,6 +8,7 @@ use App\Core\Slug;
 use App\Models\Artist;
 use App\Models\ArtistLink;
 use App\Models\ArtistRelation;
+use App\Models\Tag;
 use App\Models\Video;
 use App\Services\OpenAiArtistInfoService;
 use App\Services\YoutubeApiService;
@@ -45,6 +46,9 @@ class ArtistController extends Controller
             'incomingRelations' => ArtistRelation::incoming((int) $artist['id']),
             'links'             => ArtistLink::forArtist((int) $artist['id']),
             'videos'            => Video::forArtist((int) $artist['id']),
+            'artistTags'        => Artist::tagsFor((int) $artist['id']),
+            'artistTagIds'      => Artist::tagIdsFor((int) $artist['id']),
+            'tagGroups'         => Tag::selectable(),
             'otherArtists'      => array_values(array_filter(
                 Artist::all(),
                 fn (array $a): bool => (int) $a['id'] !== (int) $artist['id']
@@ -377,6 +381,25 @@ class ArtistController extends Controller
                 Artist::updateSubscriberCount($id, $channelInfo['subscriber_count']);
             }
         }
+
+        $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
+    }
+
+    public function updateTags(int $id): void
+    {
+        Auth::requireLogin();
+
+        $artist = Artist::findById($id);
+
+        if (!$artist || !Auth::canEdit((int) $artist['created_by'])) {
+            http_response_code(403);
+            require dirname(__DIR__) . '/Views/errors/403.php';
+
+            return;
+        }
+
+        $tagIds = array_map('intval', (array) $this->input('tag_ids', []));
+        Artist::setTags($id, $tagIds);
 
         $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
     }

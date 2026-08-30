@@ -343,4 +343,19 @@ return [
     // Compteurs footer
     'footer.videos_count' => '本の動画',
     'footer.artists_count' => '組のアーティスト',
+
+    // Tags artiste / relecture videos
+    'admin.videos_needing_review' => '確認待ちの自動公開動画：',
+    'admin.video_review_link' => '自動公開された動画を確認',
+    'admin.video_review.title' => '確認待ちの動画',
+    'admin.video_review.hint' => 'これらの動画はチャンネル監視により自動公開されました（デフォルトのタイプ、アーティストから引き継いだタグ）。必要に応じて確認・修正し、確認済みにしてください。',
+    'admin.video_review.none' => '確認待ちの動画はありません。',
+    'admin.video_review.edit' => '編集',
+    'admin.video_review.mark_reviewed' => '確認済みにする',
+    'admin.artist_completion.missing_tags' => 'タグ未設定',
+    'artists.tags_label' => 'タグ',
+    'artists.tags_none' => 'タグが設定されていません。',
+    'artists.tags_edit' => 'タグを編集',
+    'artists.tags_hint' => 'このタグはこのアーティストの新しい動画に自動的にコピーされます（各動画で個別に編集可能）。',
+    'artists.tags_save' => '保存',
 ];

@@ -247,12 +247,16 @@ class Artist
         return Database::getInstance()->fetchAll(
             'SELECT a.id, a.slug, a.start_year,
                     COALESCE(ai.name, ai_fr.name) AS name,
-                    ai_fr.bio AS bio_fr
+                    ai_fr.bio AS bio_fr,
+                    (SELECT COUNT(*) FROM artist_tags at2 WHERE at2.artist_id = a.id) AS tag_count
              FROM artists a
              LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = ?
              LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
              WHERE a.moderation_status = "approved"
-               AND (ai_fr.bio IS NULL OR ai_fr.bio = "" OR a.start_year IS NULL)
+               AND (
+                   ai_fr.bio IS NULL OR ai_fr.bio = "" OR a.start_year IS NULL
+                   OR NOT EXISTS (SELECT 1 FROM artist_tags at1 WHERE at1.artist_id = a.id)
+               )
              ORDER BY name',
             [$lang]
         );
@@ -265,7 +269,64 @@ class Artist
              FROM artists a
              LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
              WHERE a.moderation_status = "approved"
-               AND (ai_fr.bio IS NULL OR ai_fr.bio = "" OR a.start_year IS NULL)'
+               AND (
+                   ai_fr.bio IS NULL OR ai_fr.bio = "" OR a.start_year IS NULL
+                   OR NOT EXISTS (SELECT 1 FROM artist_tags at1 WHERE at1.artist_id = a.id)
+               )'
         )['n'] ?? 0);
+    }
+
+    /**
+     * Tags (genre/langue) attribués à un artiste, pour affichage.
+     */
+    public static function tagsFor(int $artistId, ?string $lang = null): array
+    {
+        $lang ??= Lang::current();
+
+        return Database::getInstance()->fetchAll(
+            'SELECT t.id, COALESCE(ti.name, ti_fr.name) AS name, tc.slug AS category_slug
+             FROM artist_tags at
+             JOIN tags t ON t.id = at.tag_id
+             LEFT JOIN tags_i18n ti ON ti.tag_id = t.id AND ti.lang = ?
+             LEFT JOIN tags_i18n ti_fr ON ti_fr.tag_id = t.id AND ti_fr.lang = "fr"
+             LEFT JOIN tag_categories tc ON tc.id = t.category_id
+             WHERE at.artist_id = ?',
+            [$lang, $artistId]
+        );
+    }
+
+    /**
+     * Simples IDs de tags d'un artiste — utilisé pour les copier sur une
+     * vidéo à sa création (photo prise à l'instant T, pas un lien permanent).
+     *
+     * @return int[]
+     */
+    public static function tagIdsFor(int $artistId): array
+    {
+        $rows = Database::getInstance()->fetchAll(
+            'SELECT tag_id FROM artist_tags WHERE artist_id = ?',
+            [$artistId]
+        );
+
+        return array_map(static fn (array $r): int => (int) $r['tag_id'], $rows);
+    }
+
+    /**
+     * Remplace l'ensemble des tags d'un artiste par la liste donnée.
+     *
+     * @param int[] $tagIds
+     */
+    public static function setTags(int $artistId, array $tagIds): void
+    {
+        $db = Database::getInstance();
+
+        $db->query('DELETE FROM artist_tags WHERE artist_id = ?', [$artistId]);
+
+        foreach (array_unique(array_map('intval', $tagIds)) as $tagId) {
+            $db->query(
+                'INSERT IGNORE INTO artist_tags (artist_id, tag_id) VALUES (?, ?)',
+                [$artistId, $tagId]
+            );
+        }
     }
 }

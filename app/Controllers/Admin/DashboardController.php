@@ -4,7 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Core\Database;
 use App\Models\Artist;
-use App\Models\VideoSuggestion;
+use App\Models\Video;
 
 class DashboardController extends AdminController
 {
@@ -17,10 +17,10 @@ class DashboardController extends AdminController
         )['n'] ?? 0;
 
         $this->render('admin/dashboard', [
-            'pendingReports'     => $pendingReports,
-            'pendingSuggestions' => VideoSuggestion::countPending(),
-            'pendingArtists'     => Artist::countPending(),
-            'incompleteArtists'  => Artist::countIncomplete(),
+            'pendingReports'      => $pendingReports,
+            'videosNeedingReview' => Video::countNeedingReview(),
+            'pendingArtists'      => Artist::countPending(),
+            'incompleteArtists'   => Artist::countIncomplete(),
         ]);
     }
 }

@@ -114,6 +114,14 @@ class VideoController extends Controller
             $detectedArtistIds = Artist::findIdsByExactName($prefill['channel_name']);
         }
 
+        // Tags hérités des artistes détectés — simple pré-remplissage,
+        // pleinement modifiable avant validation du formulaire.
+        $detectedTagIds = [];
+        foreach ($detectedArtistIds as $detectedArtistId) {
+            $detectedTagIds = array_merge($detectedTagIds, Artist::tagIdsFor($detectedArtistId));
+        }
+        $detectedTagIds = array_values(array_unique($detectedTagIds));
+
         $this->render('videos/form', [
             'errors'            => $metadata === null
                 ? [t('videos.api_fallback')]
@@ -123,7 +131,7 @@ class VideoController extends Controller
             'artists'           => Artist::all(),
             'tagGroups'         => Tag::selectable(),
             'selectedArtistIds' => $detectedArtistIds,
-            'selectedTagIds'    => [],
+            'selectedTagIds'    => $detectedTagIds,
             'autoDetected'      => !empty($detectedArtistIds),
         ]);
     }

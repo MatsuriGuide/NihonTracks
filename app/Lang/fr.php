@@ -343,4 +343,19 @@ return [
     // Compteurs footer
     'footer.videos_count' => 'vidéos',
     'footer.artists_count' => 'artistes',
+
+    // Tags artiste / relecture videos
+    'admin.videos_needing_review' => 'Vidéos publiées automatiquement à relire :',
+    'admin.video_review_link' => 'Relire les vidéos auto-publiées',
+    'admin.video_review.title' => 'Vidéos à relire',
+    'admin.video_review.hint' => 'Ces videos ont été publiées automatiquement par la surveillance de chaîne (type par defaut, tags hérités de l\'artiste). Vérifie/corrige si besoin, puis marque comme vérifié.',
+    'admin.video_review.none' => 'Aucune vidéo en attente de relecture.',
+    'admin.video_review.edit' => 'Modifier',
+    'admin.video_review.mark_reviewed' => 'Marquer comme vérifié',
+    'admin.artist_completion.missing_tags' => 'Tags manquants',
+    'artists.tags_label' => 'Tags',
+    'artists.tags_none' => 'Aucun tag renseigné.',
+    'artists.tags_edit' => 'Modifier les tags',
+    'artists.tags_hint' => 'Ces tags seront copiés automatiquement sur les nouvelles vidéos de cet artiste (modifiables ensuite indépendamment sur chaque vidéo).',
+    'artists.tags_save' => 'Enregistrer',
 ];
