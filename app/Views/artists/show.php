@@ -139,10 +139,10 @@
     <details>
         <summary><?= e(t('artists.tags_edit')) ?></summary>
         <form method="post" action="<?= url('/artists/' . $artist['id'] . '/tags') ?>">
-            <?php foreach ($tagGroups as $categorySlug => $tags): ?>
+            <?php foreach ($tagGroups as $group): ?>
                 <fieldset>
-                    <legend><?= e(ucfirst($categorySlug)) ?></legend>
-                    <?php foreach ($tags as $tag): ?>
+                    <legend><?= e($group['label']) ?></legend>
+                    <?php foreach ($group['tags'] as $tag): ?>
                         <label>
                             <input type="checkbox" name="tag_ids[]" value="<?= (int) $tag['id'] ?>"
                                 <?= in_array((int) $tag['id'], $artistTagIds, true) ? 'checked' : '' ?>>
