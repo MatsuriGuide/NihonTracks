@@ -358,4 +358,15 @@ return [
     'artists.tags_edit' => 'Edit tags',
     'artists.tags_hint' => 'These tags will be automatically copied to new videos from this artist (editable independently afterward on each video).',
     'artists.tags_save' => 'Save',
+
+    // Official audio / validation type / remplissage JSON
+    'videos.type.official_audio' => 'Official Audio',
+    'admin.video_review.validate' => 'Validate',
+    'artists.json_fill_toggle' => 'Fill from JSON',
+    'artists.json_fill_label' => 'Paste a JSON with the fields to fill',
+    'artists.json_fill_hint' => 'Recognized fields: start_year, end_year, label, bio. Overwrites the current values of these fields (unlike the AI suggestion, which only fills empty fields).',
+    'artists.json_fill_submit' => 'Fill fields',
+    'artists.json_fill_invalid' => 'Invalid JSON.',
+    'artists.json_fill_success' => 'Fields filled.',
+    'artists.json_fill_empty' => 'No recognized field in this JSON.',
 ];

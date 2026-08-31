@@ -8,30 +8,43 @@
     <ul class="card-grid">
         <?php foreach ($videos as $video): ?>
             <li class="card">
-                <?php if (!empty($video['thumbnail_url'])): ?>
-                    <div class="card-thumb" style="background-image:url('<?= e($video['thumbnail_url']) ?>');"></div>
-                <?php else: ?>
-                    <div class="card-thumb"></div>
-                <?php endif; ?>
+                <a href="<?= url('/videos/' . $video['id']) ?>" target="_blank">
+                    <?php if (!empty($video['thumbnail_url'])): ?>
+                        <div class="card-thumb" style="background-image:url('<?= e($video['thumbnail_url']) ?>');"></div>
+                    <?php else: ?>
+                        <div class="card-thumb"></div>
+                    <?php endif; ?>
+                </a>
                 <div class="card-body">
-                    <span class="card-title"><?= e($video['title'] ?? $video['youtube_id']) ?></span>
+                    <a href="<?= url('/videos/' . $video['id']) ?>" target="_blank" class="card-title">
+                        <?= e($video['title'] ?? $video['youtube_id']) ?>
+                    </a>
                     <span class="card-meta">
                         <?php if (!empty($video['artist_names'])): ?>
                             <?= e($video['artist_names']) ?>
                         <?php endif; ?>
-                        — <?= e(t('videos.type.' . $video['video_type'])) ?>
                         <?php if (!empty($video['release_date'])): ?>
                             — <?= e($video['release_date']) ?>
                         <?php endif; ?>
                     </span>
-                    <p>
-                        <a href="<?= url('/videos/' . $video['id'] . '/edit') ?>" class="btn btn-small">
-                            <?= e(t('admin.video_review.edit')) ?>
-                        </a>
-                        <form method="post" action="<?= url('/admin/video-review/' . $video['id'] . '/mark-reviewed') ?>" style="display:inline">
-                            <button type="submit" class="btn-small"><?= e(t('admin.video_review.mark_reviewed')) ?></button>
-                        </form>
-                    </p>
+
+                    <form method="post" action="<?= url('/admin/video-review/' . $video['id'] . '/validate') ?>">
+                        <p>
+                            <select name="video_type">
+                                <?php foreach ($videoTypes as $typeValue): ?>
+                                    <option value="<?= e($typeValue) ?>" <?= $video['video_type'] === $typeValue ? 'selected' : '' ?>>
+                                        <?= e(t('videos.type.' . $typeValue)) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </p>
+                        <p>
+                            <button type="submit" class="btn-small"><?= e(t('admin.video_review.validate')) ?></button>
+                            <a href="<?= url('/videos/' . $video['id'] . '/edit') ?>" class="btn-small">
+                                <?= e(t('admin.video_review.edit')) ?>
+                            </a>
+                        </p>
+                    </form>
                 </div>
             </li>
         <?php endforeach; ?>

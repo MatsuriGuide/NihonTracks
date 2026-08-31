@@ -358,4 +358,15 @@ return [
     'artists.tags_edit' => 'Modifier les tags',
     'artists.tags_hint' => 'Ces tags seront copiés automatiquement sur les nouvelles vidéos de cet artiste (modifiables ensuite indépendamment sur chaque vidéo).',
     'artists.tags_save' => 'Enregistrer',
+
+    // Official audio / validation type / remplissage JSON
+    'videos.type.official_audio' => 'Official Audio',
+    'admin.video_review.validate' => 'Valider',
+    'artists.json_fill_toggle' => 'Remplir depuis un JSON',
+    'artists.json_fill_label' => 'Colle un JSON avec les champs à remplir',
+    'artists.json_fill_hint' => 'Champs reconnus : start_year, end_year, label, bio. Écrase les valeurs actuelles de ces champs (contrairement à la suggestion IA qui ne remplit que les champs vides).',
+    'artists.json_fill_submit' => 'Remplir les champs',
+    'artists.json_fill_invalid' => 'JSON invalide.',
+    'artists.json_fill_success' => 'Champs remplis.',
+    'artists.json_fill_empty' => 'Aucun champ reconnu dans ce JSON.',
 ];

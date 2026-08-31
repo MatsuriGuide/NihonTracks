@@ -373,7 +373,7 @@ class VideoController extends Controller
             $errors[] = t('videos.error.title_required');
         }
 
-        $validTypes = ['mv', 'lyric_video', 'live', 'performance', 'cover', 'teaser', 'other'];
+        $validTypes = ['mv', 'lyric_video', 'live', 'performance', 'cover', 'teaser', 'official_audio', 'other'];
         if (!in_array($data['video_type'], $validTypes, true)) {
             $errors[] = t('videos.error.type_invalid');
         }

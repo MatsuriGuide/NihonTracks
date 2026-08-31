@@ -36,7 +36,7 @@
     <p>
         <label for="video_type"><?= e(t('videos.type')) ?></label><br>
         <select id="video_type" name="video_type">
-            <?php foreach (['mv', 'lyric_video', 'live', 'performance', 'cover', 'teaser', 'other'] as $value): ?>
+            <?php foreach (['mv', 'lyric_video', 'live', 'performance', 'cover', 'teaser', 'official_audio', 'other'] as $value): ?>
                 <option value="<?= e($value) ?>" <?= ($old['video_type'] ?? 'mv') === $value ? 'selected' : '' ?>>
                     <?= e(t('videos.type.' . $value)) ?>
                 </option>

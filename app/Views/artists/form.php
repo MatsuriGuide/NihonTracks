@@ -17,6 +17,26 @@
         </button>
     </p>
     <p><small><?= e(t('artists.suggest_info_hint')) ?></small></p>
+
+    <details>
+        <summary><?= e(t('artists.json_fill_toggle')) ?></summary>
+        <p>
+            <label for="json_fill_input"><?= e(t('artists.json_fill_label')) ?></label><br>
+            <textarea id="json_fill_input" rows="6"
+                      placeholder='{"start_year": 2015, "end_year": null, "label": "...", "bio": "..."}'
+                      style="width: 100%; max-width: 500px;"></textarea>
+        </p>
+        <p><small><?= e(t('artists.json_fill_hint')) ?></small></p>
+        <p>
+            <button type="button" id="json-fill-btn"
+                    data-invalid-label="<?= e(t('artists.json_fill_invalid')) ?>"
+                    data-success-label="<?= e(t('artists.json_fill_success')) ?>"
+                    data-empty-label="<?= e(t('artists.json_fill_empty')) ?>">
+                <?= e(t('artists.json_fill_submit')) ?>
+            </button>
+            <span id="json-fill-status"></span>
+        </p>
+    </details>
 <?php endif; ?>
 
 <form method="post" action="<?= $mode === 'edit' ? url('/artists/' . $artistId . '/edit') : url('/artists/create') ?>">
@@ -72,4 +92,5 @@
 
 <?php if ($mode === 'edit' && \App\Core\Auth::role() === 'admin'): ?>
     <script src="<?= asset('js/artist-info-suggest.js') ?>"></script>
+    <script src="<?= asset('js/artist-json-fill.js') ?>"></script>
 <?php endif; ?>

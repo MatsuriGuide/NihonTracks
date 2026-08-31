@@ -317,6 +317,14 @@ class Video
         )['n'] ?? 0);
     }
 
+    public static function updateType(int $id, string $videoType): void
+    {
+        Database::getInstance()->query(
+            'UPDATE videos SET video_type = ? WHERE id = ?',
+            [$videoType, $id]
+        );
+    }
+
     public static function markReviewed(int $id): void
     {
         Database::getInstance()->query(

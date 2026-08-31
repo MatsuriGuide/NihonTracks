@@ -358,4 +358,15 @@ return [
     'artists.tags_edit' => 'タグを編集',
     'artists.tags_hint' => 'このタグはこのアーティストの新しい動画に自動的にコピーされます（各動画で個別に編集可能）。',
     'artists.tags_save' => '保存',
+
+    // Official audio / validation type / remplissage JSON
+    'videos.type.official_audio' => 'オフィシャルオーディオ',
+    'admin.video_review.validate' => '確定',
+    'artists.json_fill_toggle' => 'JSONから入力',
+    'artists.json_fill_label' => '入力したいフィールドを含むJSONを貼り付けてください',
+    'artists.json_fill_hint' => '対応フィールド：start_year、end_year、label、bio。現在の値を上書きします（空欄のみ埋めるAI提案とは異なります）。',
+    'artists.json_fill_submit' => 'フィールドに入力',
+    'artists.json_fill_invalid' => '無効なJSONです。',
+    'artists.json_fill_success' => 'フィールドに入力しました。',
+    'artists.json_fill_empty' => 'このJSONに対応するフィールドがありません。',
 ];
