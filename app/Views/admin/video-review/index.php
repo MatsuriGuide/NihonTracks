@@ -51,4 +51,19 @@
     </ul>
 <?php endif; ?>
 
+<?php if ($totalPages > 1): ?>
+    <style>
+        .pagination { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
+    </style>
+    <nav class="pagination">
+        <?php if ($page > 1): ?>
+            <a href="<?= url('/admin/video-review?page=' . ($page - 1)) ?>"><?= e(t('pagination.previous')) ?></a>
+        <?php endif; ?>
+        <span class="mono"><?= e(t('pagination.page_of')) ?> <?= (int) $page ?> / <?= (int) $totalPages ?></span>
+        <?php if ($page < $totalPages): ?>
+            <a href="<?= url('/admin/video-review?page=' . ($page + 1)) ?>"><?= e(t('pagination.next')) ?></a>
+        <?php endif; ?>
+    </nav>
+<?php endif; ?>
+
 <p><a href="<?= url('/admin') ?>"><?= e(t('admin.back_to_dashboard')) ?></a></p>

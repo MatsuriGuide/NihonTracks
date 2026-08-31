@@ -369,4 +369,9 @@ return [
     'artists.json_fill_invalid' => '無効なJSONです。',
     'artists.json_fill_success' => 'フィールドに入力しました。',
     'artists.json_fill_empty' => 'このJSONに対応するフィールドがありません。',
+
+    // Pagination generique
+    'pagination.previous' => '← 前へ',
+    'pagination.next' => '次へ →',
+    'pagination.page_of' => 'ページ',
 ];

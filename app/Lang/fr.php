@@ -369,4 +369,9 @@ return [
     'artists.json_fill_invalid' => 'JSON invalide.',
     'artists.json_fill_success' => 'Champs remplis.',
     'artists.json_fill_empty' => 'Aucun champ reconnu dans ce JSON.',
+
+    // Pagination generique
+    'pagination.previous' => '← Précédent',
+    'pagination.next' => 'Suivant →',
+    'pagination.page_of' => 'Page',
 ];
