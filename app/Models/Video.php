@@ -345,7 +345,7 @@ class Video
              LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
              WHERE v.source = "auto_scan" AND v.reviewed_at IS NULL
              GROUP BY v.id
-             ORDER BY v.created_at DESC
+             ORDER BY v.release_date DESC
              LIMIT ' . $limit . ' OFFSET ' . $offset,
             [$lang, $lang]
         );
