@@ -10,27 +10,65 @@ use App\Models\ArtistLink;
 use App\Models\Playlist;
 use App\Models\Tag;
 use App\Models\Video;
+use App\Models\VideoFilterPreset;
 use App\Models\VideoSuggestion;
 use App\Services\OpenAiTagSuggestionService;
 use App\Services\YoutubeApiService;
 
 class VideoController extends Controller
 {
+    private const PER_PAGE = 24;
+    private const VIDEO_TYPES = ['mv', 'lyric_video', 'live', 'performance', 'cover', 'teaser', 'official_audio', 'other'];
+
     public function index(): void
     {
-        $artistId = (int) $this->input('artist_id', 0);
-        $artistId = $artistId > 0 ? $artistId : null;
+        // Requête "vierge" (aucun filtre dans l'URL) : on applique le
+        // préréglage par défaut de l'utilisateur connecté, s'il en a un.
+        $hasExplicitFilter = $this->input('artist_id') !== null
+            || $this->input('tag_ids') !== null
+            || $this->input('video_type') !== null;
 
-        $tagIds = array_map('intval', (array) $this->input('tag_ids', []));
+        $defaultPreset = (!$hasExplicitFilter && Auth::check())
+            ? VideoFilterPreset::defaultForUser((int) Auth::id())
+            : null;
 
-        $videos = Video::filtered($artistId, $tagIds);
+        if ($defaultPreset !== null) {
+            $artistId = $defaultPreset['artist_id'] !== null ? (int) $defaultPreset['artist_id'] : null;
+            $videoType = $defaultPreset['video_type'];
+            $tagIds = VideoFilterPreset::tagIds($defaultPreset);
+        } else {
+            $artistId = (int) $this->input('artist_id', 0);
+            $artistId = $artistId > 0 ? $artistId : null;
+
+            $videoType = (string) $this->input('video_type', '') ?: null;
+
+            $tagIds = array_map('intval', (array) $this->input('tag_ids', []));
+        }
+
+        $hasActiveFilter = $artistId !== null || $videoType !== null || !empty($tagIds);
+
+        $total = Video::countFiltered($artistId, $tagIds, $videoType);
+        $totalPages = max(1, (int) ceil($total / self::PER_PAGE));
+        $page = max(1, (int) $this->input('page', 1));
+        $page = min($page, $totalPages);
+        $offset = ($page - 1) * self::PER_PAGE;
+
+        $videos = Video::filtered($artistId, $tagIds, $videoType, null, self::PER_PAGE, $offset);
+
+        $savedPresets = Auth::check() ? VideoFilterPreset::allForUser((int) Auth::id()) : [];
 
         $this->render('videos/index', [
             'videos'           => $videos,
             'artists'          => Artist::all(),
             'tagGroups'        => Tag::selectable(),
+            'videoTypes'       => self::VIDEO_TYPES,
             'selectedArtistId' => $artistId,
             'selectedTagIds'   => $tagIds,
+            'selectedType'     => $videoType,
+            'hasActiveFilter'  => $hasActiveFilter,
+            'page'             => $page,
+            'totalPages'       => $totalPages,
+            'savedPresets'     => $savedPresets,
         ]);
     }
 
@@ -311,6 +349,65 @@ class VideoController extends Controller
         $this->json(['tag_ids' => $tagIds]);
     }
 
+    public function savePreset(): void
+    {
+        Auth::requireLogin();
+
+        $name = trim((string) $this->input('name', ''));
+
+        if ($name === '') {
+            $this->redirect('/videos');
+
+            return;
+        }
+
+        $artistId = (int) $this->input('artist_id', 0);
+        $artistId = $artistId > 0 ? $artistId : null;
+
+        $videoType = (string) $this->input('video_type', '') ?: null;
+        $tagIds = array_map('intval', (array) $this->input('tag_ids', []));
+        $isDefault = $this->input('is_default') !== null;
+
+        VideoFilterPreset::create((int) Auth::id(), $name, $artistId, $videoType, $tagIds, $isDefault);
+
+        $this->redirect('/videos');
+    }
+
+    public function deletePreset(int $id): void
+    {
+        Auth::requireLogin();
+
+        $preset = VideoFilterPreset::findById($id);
+
+        if ($preset && (int) $preset['user_id'] === (int) Auth::id()) {
+            VideoFilterPreset::delete($id);
+        }
+
+        $this->redirect('/videos');
+    }
+
+    public function setDefaultPreset(int $id): void
+    {
+        Auth::requireLogin();
+
+        $preset = VideoFilterPreset::findById($id);
+
+        if ($preset && (int) $preset['user_id'] === (int) Auth::id()) {
+            VideoFilterPreset::setDefault((int) Auth::id(), $id);
+        }
+
+        $this->redirect('/videos');
+    }
+
+    public function clearDefaultPreset(): void
+    {
+        Auth::requireLogin();
+
+        VideoFilterPreset::clearDefault((int) Auth::id());
+
+        $this->redirect('/videos');
+    }
+
     /**
      * Crée un artiste minimal (nom + type) à la volée depuis le formulaire
      * vidéo, pour éviter de devoir quitter la page. Uniquement accessible
@@ -373,7 +470,7 @@ class VideoController extends Controller
             $errors[] = t('videos.error.title_required');
         }
 
-        $validTypes = ['mv', 'lyric_video', 'live', 'performance', 'cover', 'teaser', 'official_audio', 'other'];
+        $validTypes = self::VIDEO_TYPES;
         if (!in_array($data['video_type'], $validTypes, true)) {
             $errors[] = t('videos.error.type_invalid');
         }

@@ -374,4 +374,18 @@ return [
     'pagination.previous' => '← 前へ',
     'pagination.next' => '次へ →',
     'pagination.page_of' => 'ページ',
+
+    // Filtres video : type + presets
+    'videos.filter.type_label' => 'タイプ',
+    'videos.filter.all_types' => 'すべてのタイプ',
+    'videos.filter.presets_title' => '保存済みフィルター：',
+    'videos.filter.is_default' => 'デフォルト',
+    'videos.filter.set_default' => 'デフォルトに設定',
+    'videos.filter.unset_default' => 'デフォルト解除',
+    'videos.filter.delete_preset' => '削除',
+    'videos.filter.delete_preset_confirm' => 'この保存済みフィルターを削除しますか？',
+    'videos.filter.save_as' => 'このフィルターを次の名前で保存：',
+    'videos.filter.preset_name_placeholder' => 'フィルター名',
+    'videos.filter.make_default' => 'これをデフォルトフィルターにする',
+    'videos.filter.save_preset' => '保存',
 ];

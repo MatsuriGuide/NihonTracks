@@ -30,6 +30,37 @@
     <p><?= nl2br(e($translation['bio'])) ?></p>
 <?php endif; ?>
 
+<?php if (!empty($artistTags)): ?>
+    <p>
+        <?= e(t('artists.tags_label')) ?> :
+        <?php foreach ($artistTags as $tag): ?>
+            <span class="tag"><?= e($tag['name'] ?? '') ?></span>
+        <?php endforeach; ?>
+    </p>
+<?php endif; ?>
+
+<?php if ($editMode): ?>
+    <details>
+        <summary><?= e(t('artists.tags_edit')) ?></summary>
+        <form method="post" action="<?= url('/artists/' . $artist['id'] . '/tags') ?>">
+            <?php foreach ($tagGroups as $group): ?>
+                <fieldset>
+                    <legend><?= e($group['label']) ?></legend>
+                    <?php foreach ($group['tags'] as $tag): ?>
+                        <label>
+                            <input type="checkbox" name="tag_ids[]" value="<?= (int) $tag['id'] ?>"
+                                <?= in_array((int) $tag['id'], $artistTagIds, true) ? 'checked' : '' ?>>
+                            <?= e($tag['name'] ?? $tag['slug']) ?>
+                        </label><br>
+                    <?php endforeach; ?>
+                </fieldset>
+            <?php endforeach; ?>
+            <p><small><?= e(t('artists.tags_hint')) ?></small></p>
+            <button type="submit"><?= e(t('artists.tags_save')) ?></button>
+        </form>
+    </details>
+<?php endif; ?>
+
 <?php if (!empty($videos)): ?>
     <h2><?= e(t('artists.videos_title')) ?></h2>
     <ul class="card-grid">
@@ -121,40 +152,6 @@
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-<?php endif; ?>
-
-<h2><?= e(t('artists.tags_label')) ?></h2>
-
-<?php if (empty($artistTags)): ?>
-    <p><?= e(t('artists.tags_none')) ?></p>
-<?php else: ?>
-    <p>
-        <?php foreach ($artistTags as $tag): ?>
-            <span class="tag"><?= e($tag['name'] ?? '') ?></span>
-        <?php endforeach; ?>
-    </p>
-<?php endif; ?>
-
-<?php if ($editMode): ?>
-    <details>
-        <summary><?= e(t('artists.tags_edit')) ?></summary>
-        <form method="post" action="<?= url('/artists/' . $artist['id'] . '/tags') ?>">
-            <?php foreach ($tagGroups as $group): ?>
-                <fieldset>
-                    <legend><?= e($group['label']) ?></legend>
-                    <?php foreach ($group['tags'] as $tag): ?>
-                        <label>
-                            <input type="checkbox" name="tag_ids[]" value="<?= (int) $tag['id'] ?>"
-                                <?= in_array((int) $tag['id'], $artistTagIds, true) ? 'checked' : '' ?>>
-                            <?= e($tag['name'] ?? $tag['slug']) ?>
-                        </label><br>
-                    <?php endforeach; ?>
-                </fieldset>
-            <?php endforeach; ?>
-            <p><small><?= e(t('artists.tags_hint')) ?></small></p>
-            <button type="submit"><?= e(t('artists.tags_save')) ?></button>
-        </form>
-    </details>
 <?php endif; ?>
 
 <h2><?= e(t('artists.links.title')) ?></h2>

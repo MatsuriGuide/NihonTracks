@@ -374,4 +374,18 @@ return [
     'pagination.previous' => '← Previous',
     'pagination.next' => 'Next →',
     'pagination.page_of' => 'Page',
+
+    // Filtres video : type + presets
+    'videos.filter.type_label' => 'Type',
+    'videos.filter.all_types' => 'All types',
+    'videos.filter.presets_title' => 'My saved filters:',
+    'videos.filter.is_default' => 'Default',
+    'videos.filter.set_default' => 'Set as default',
+    'videos.filter.unset_default' => 'Unset default',
+    'videos.filter.delete_preset' => 'Delete',
+    'videos.filter.delete_preset_confirm' => 'Delete this saved filter?',
+    'videos.filter.save_as' => 'Save this filter as:',
+    'videos.filter.preset_name_placeholder' => 'Filter name',
+    'videos.filter.make_default' => 'Make this my default filter',
+    'videos.filter.save_preset' => 'Save',
 ];

@@ -51,10 +51,20 @@ class Video
      *
      * @param int[] $tagIds
      */
-    public static function filtered(?int $artistId, array $tagIds, ?string $lang = null): array
-    {
+    public static function filtered(
+        ?int $artistId,
+        array $tagIds,
+        ?string $videoType = null,
+        ?string $lang = null,
+        int $limit = 24,
+        int $offset = 0
+    ): array {
         $lang ??= Lang::current();
         $tagIds = array_values(array_unique(array_map('intval', $tagIds)));
+        $limit = max(1, min(100, $limit));
+        $offset = max(0, $offset);
+
+        [$where, $params] = self::buildFilterClause($artistId, $tagIds, $videoType);
 
         $sql = 'SELECT v.id, v.youtube_id, v.thumbnail_url, v.release_date, v.video_type,
                        COALESCE(vi.title, vi_fr.title) AS title,
@@ -65,11 +75,36 @@ class Video
                 LEFT JOIN video_artists va ON va.video_id = v.id
                 LEFT JOIN artists_i18n ai ON ai.artist_id = va.artist_id AND ai.lang = ?
                 LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
-                WHERE v.status = "published"';
-        $params = [$lang, $lang];
+                WHERE ' . $where . '
+                GROUP BY v.id
+                ORDER BY v.release_date DESC, v.id DESC
+                LIMIT ' . $limit . ' OFFSET ' . $offset;
+
+        return Database::getInstance()->fetchAll($sql, array_merge([$lang, $lang], $params));
+    }
+
+    public static function countFiltered(?int $artistId, array $tagIds, ?string $videoType = null): int
+    {
+        $tagIds = array_values(array_unique(array_map('intval', $tagIds)));
+
+        [$where, $params] = self::buildFilterClause($artistId, $tagIds, $videoType);
+
+        $sql = 'SELECT COUNT(DISTINCT v.id) AS n FROM videos v WHERE ' . $where;
+
+        return (int) (Database::getInstance()->fetchOne($sql, $params)['n'] ?? 0);
+    }
+
+    /**
+     * @param int[] $tagIds
+     * @return array{0: string, 1: array}
+     */
+    private static function buildFilterClause(?int $artistId, array $tagIds, ?string $videoType): array
+    {
+        $where = 'v.status = "published"';
+        $params = [];
 
         if ($artistId !== null) {
-            $sql .= ' AND EXISTS (
+            $where .= ' AND EXISTS (
                 SELECT 1 FROM video_artists va2
                 WHERE va2.video_id = v.id AND va2.artist_id = ?
             )';
@@ -78,7 +113,7 @@ class Video
 
         if (!empty($tagIds)) {
             $placeholders = implode(',', array_fill(0, count($tagIds), '?'));
-            $sql .= " AND v.id IN (
+            $where .= " AND v.id IN (
                 SELECT vt.video_id FROM video_tags vt
                 WHERE vt.tag_id IN ({$placeholders})
                 GROUP BY vt.video_id
@@ -90,9 +125,12 @@ class Video
             $params[] = count($tagIds);
         }
 
-        $sql .= ' GROUP BY v.id ORDER BY v.release_date DESC, v.id DESC';
+        if ($videoType !== null && $videoType !== '') {
+            $where .= ' AND v.video_type = ?';
+            $params[] = $videoType;
+        }
 
-        return Database::getInstance()->fetchAll($sql, $params);
+        return [$where, $params];
     }
 
     /**

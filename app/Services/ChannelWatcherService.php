@@ -12,7 +12,8 @@ class ChannelWatcherService
      * vidéos trouvées (plus de file d'attente à valider). Chaque vidéo
      * hérite des tags actuels de l'artiste au moment de sa création — une
      * "photo" indépendante ensuite, pas un lien permanent. Le type de vidéo
-     * par défaut ("mv") et les tags restent à corriger si besoin via
+     * par défaut ("other" — volontairement neutre, à corriger via l'écran
+     * de relecture) et les tags restent à corriger si besoin via
      * l'écran de relecture /admin/video-review.
      *
      * Retourne le nombre de nouvelles vidéos publiées (null en cas d'échec API).
@@ -80,7 +81,7 @@ class ChannelWatcherService
                     'youtube_url'      => 'https://www.youtube.com/watch?v=' . $video['youtube_id'],
                     'title'            => $video['title'],
                     'release_date'     => $video['published_at'],
-                    'video_type'       => 'mv',
+                    'video_type'       => 'other',
                     'thumbnail_url'    => $video['thumbnail_url'],
                     'channel_name'     => $video['channel_name'],
                     'duration_seconds' => $duration,
