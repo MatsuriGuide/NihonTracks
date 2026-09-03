@@ -89,6 +89,25 @@
         <textarea id="bio" name="bio" rows="6"><?= e($old['bio'] ?? '') ?></textarea>
     </p>
 
+    <?php if ($mode === 'edit'): ?>
+        <fieldset id="artist-tags-fieldset">
+            <legend><?= e(t('artists.tags_label')) ?></legend>
+            <?php foreach ($tagGroups as $group): ?>
+                <fieldset>
+                    <legend><?= e($group['label']) ?></legend>
+                    <?php foreach ($group['tags'] as $tag): ?>
+                        <label>
+                            <input type="checkbox" name="tag_ids[]" value="<?= (int) $tag['id'] ?>"
+                                   data-tag-name="<?= e(mb_strtolower($tag['name'] ?? $tag['slug'])) ?>"
+                                <?= in_array((int) $tag['id'], $selectedTagIds, true) ? 'checked' : '' ?>>
+                            <?= e($tag['name'] ?? $tag['slug']) ?>
+                        </label><br>
+                    <?php endforeach; ?>
+                </fieldset>
+            <?php endforeach; ?>
+        </fieldset>
+    <?php endif; ?>
+
     <button type="submit"><?= $mode === 'edit' ? e(t('artists.submit_edit')) : e(t('artists.submit_create')) ?></button>
 </form>
 

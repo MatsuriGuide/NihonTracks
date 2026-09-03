@@ -229,10 +229,12 @@ class ArtistController extends Controller
         $old = array_merge($artist, ['name' => $fr['name'], 'bio' => $fr['bio']]);
 
         $this->render('artists/form', [
-            'errors'   => [],
-            'old'      => $old,
-            'mode'     => 'edit',
-            'artistId' => $id,
+            'errors'         => [],
+            'old'            => $old,
+            'mode'           => 'edit',
+            'artistId'       => $id,
+            'tagGroups'      => Tag::selectable(),
+            'selectedTagIds' => Artist::tagIdsFor($id),
         ]);
     }
 
@@ -253,10 +255,12 @@ class ArtistController extends Controller
 
         if (!empty($errors)) {
             $this->render('artists/form', [
-                'errors'   => $errors,
-                'old'      => $data,
-                'mode'     => 'edit',
-                'artistId' => $id,
+                'errors'         => $errors,
+                'old'            => $data,
+                'mode'           => 'edit',
+                'artistId'       => $id,
+                'tagGroups'      => Tag::selectable(),
+                'selectedTagIds' => array_map('intval', (array) $this->input('tag_ids', [])),
             ]);
 
             return;
@@ -267,6 +271,7 @@ class ArtistController extends Controller
             : $this->uniqueSlug($data['name'], $id);
 
         Artist::update($id, $data, $data['name'], $data['bio']);
+        Artist::setTags($id, array_map('intval', (array) $this->input('tag_ids', [])));
 
         $this->redirect('/artists/' . $data['slug']);
     }
@@ -500,13 +505,11 @@ class ArtistController extends Controller
     }
 
     /**
-     * Endpoint AJAX (JSON) : suggère année de formation, label, bio ET tags
-     * via IA. Les champs texte remplissent le formulaire côté client pour
-     * relecture (jamais enregistrés directement). Les tags, en revanche,
-     * sont appliqués automatiquement — mais SEULEMENT si l'artiste n'en a
-     * encore aucun, pour ne jamais écraser une sélection déjà faite.
-     * Réservé aux admins (coût API + risque d'hallucination sur des
-     * informations factuelles).
+     * Endpoint AJAX (JSON) : suggère année de formation, label, bio et tags
+     * via IA. Tout — y compris les tags — remplit le formulaire côté client
+     * pour relecture ; rien n'est enregistré tant que l'utilisateur ne
+     * valide pas le formulaire lui-même. Réservé aux admins (coût API +
+     * risque d'hallucination sur des informations factuelles).
      */
     public function suggestInfo(int $id): void
     {
@@ -535,22 +538,15 @@ class ArtistController extends Controller
             return;
         }
 
-        $appliedTagNames = [];
-
-        if (!empty($suggestion['tags']) && empty(Artist::tagIdsFor($id))) {
-            $resolvedIds = Tag::resolveIdsByNames($suggestion['tags']);
-
-            if (!empty($resolvedIds)) {
-                Artist::setTags($id, $resolvedIds);
-                $appliedTagNames = $suggestion['tags'];
-            }
-        }
-
+        // Les tags ne sont plus enregistrés directement ici : on les
+        // renvoie pour que le JS coche les cases correspondantes sur cette
+        // même page, visibles et modifiables avant l'enregistrement — comme
+        // les autres champs suggérés (bio, année, label).
         $this->json([
-            'start_year'        => $suggestion['start_year'],
-            'label'             => $suggestion['label'],
-            'bio'               => $suggestion['bio'],
-            'applied_tag_names' => $appliedTagNames,
+            'start_year' => $suggestion['start_year'],
+            'label'      => $suggestion['label'],
+            'bio'        => $suggestion['bio'],
+            'tags'       => $suggestion['tags'],
         ]);
     }
 

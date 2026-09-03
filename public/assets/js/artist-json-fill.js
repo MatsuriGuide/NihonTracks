@@ -21,6 +21,29 @@
         }
     }
 
+    // Coche les cases de tags dont le libellé (en minuscule) correspond à
+    // l'un des noms fournis — additif, ne décoche jamais une case déjà
+    // cochée par ailleurs.
+    function checkTagsByName(names) {
+        if (!Array.isArray(names) || names.length === 0) {
+            return 0;
+        }
+
+        var lowerNames = names.map(function (n) { return String(n).trim().toLowerCase(); });
+        var checkboxes = document.querySelectorAll('#artist-tags-fieldset input[type="checkbox"]');
+        var matched = 0;
+
+        checkboxes.forEach(function (cb) {
+            var name = cb.getAttribute('data-tag-name');
+            if (name && lowerNames.indexOf(name) !== -1) {
+                cb.checked = true;
+                matched++;
+            }
+        });
+
+        return matched;
+    }
+
     btn.addEventListener('click', function () {
         var input = document.getElementById('json_fill_input');
         var raw = input ? input.value.trim() : '';
@@ -50,34 +73,17 @@
             }
         });
 
-        var baseStatus = filled > 0
+        var matchedTags = checkTagsByName(data.tags);
+
+        var baseStatus = (filled > 0 || matchedTags > 0)
             ? (btn.getAttribute('data-success-label') || 'Champs remplis.')
             : (btn.getAttribute('data-empty-label') || 'Aucun champ reconnu dans ce JSON.');
 
-        // Les tags (noms textuels) sont résolus et ajoutés côté serveur —
-        // fusionnés avec ceux déjà présents, jamais un remplacement.
-        var tagsUrl = btn.getAttribute('data-tags-url');
-        if (tagsUrl && Array.isArray(data.tags) && data.tags.length > 0) {
-            setStatus(baseStatus);
-
-            var formData = new FormData();
-            data.tags.forEach(function (name) {
-                formData.append('tag_names[]', name);
-            });
-
-            fetch(tagsUrl, { method: 'POST', body: formData })
-                .then(function (response) { return response.json(); })
-                .then(function (result) {
-                    if (result.applied_tag_ids && result.applied_tag_ids.length > 0) {
-                        var tagsLabel = btn.getAttribute('data-tags-applied-label') || 'Tags ajoutés :';
-                        setStatus(baseStatus + ' ' + tagsLabel + ' ' + result.applied_tag_ids.length);
-                    }
-                })
-                .catch(function () {
-                    // Échec silencieux sur la partie tags — les autres champs restent remplis
-                });
-        } else {
-            setStatus(baseStatus);
+        if (matchedTags > 0) {
+            var tagsLabel = btn.getAttribute('data-tags-applied-label') || 'Tags cochés :';
+            baseStatus += ' ' + tagsLabel + ' ' + matchedTags;
         }
+
+        setStatus(baseStatus);
     });
 })();

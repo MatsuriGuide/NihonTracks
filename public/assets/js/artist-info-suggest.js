@@ -7,6 +7,26 @@
         return;
     }
 
+    function checkTagsByName(names) {
+        if (!Array.isArray(names) || names.length === 0) {
+            return 0;
+        }
+
+        var lowerNames = names.map(function (n) { return String(n).trim().toLowerCase(); });
+        var checkboxes = document.querySelectorAll('#artist-tags-fieldset input[type="checkbox"]');
+        var matched = 0;
+
+        checkboxes.forEach(function (cb) {
+            var name = cb.getAttribute('data-tag-name');
+            if (name && lowerNames.indexOf(name) !== -1) {
+                cb.checked = true;
+                matched++;
+            }
+        });
+
+        return matched;
+    }
+
     btn.addEventListener('click', function () {
         var originalText = btn.textContent;
         btn.disabled = true;
@@ -35,12 +55,7 @@
                     bioField.value = data.bio;
                 }
 
-                if (data.applied_tag_names && data.applied_tag_names.length > 0) {
-                    btn.insertAdjacentHTML(
-                        'afterend',
-                        '<span style="margin-left:0.5rem;">' + data.applied_tag_names.join(', ') + '</span>'
-                    );
-                }
+                checkTagsByName(data.tags);
             })
             .catch(function () {
                 // Échec silencieux : les champs restent à compléter manuellement
