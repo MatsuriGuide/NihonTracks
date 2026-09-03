@@ -198,9 +198,11 @@ class Artist
      * Supprime un artiste. Les vidéos pour lesquelles il était le SEUL
      * artiste sont masquées (pas supprimées en dur — cohérent avec
      * Video::hide(), pour qu'elles ne reviennent pas au prochain scan de
-     * chaîne si elles existent toujours sur YouTube). Les associations
-     * video_artists sont nettoyées explicitement plutôt que de compter sur
-     * un éventuel ON DELETE CASCADE en base.
+     * chaîne si elles existent toujours sur YouTube). Toutes les tables
+     * qui référencent un artiste sont nettoyées explicitement, dans
+     * l'ordre, avant de supprimer la ligne elle-même — plutôt que de
+     * compter sur un éventuel ON DELETE CASCADE en base (dont la
+     * configuration réelle, table par table, n'est pas garantie).
      *
      * @return int Nombre de vidéos masquées suite à cette suppression
      */
@@ -215,6 +217,15 @@ class Artist
         }
 
         $db->query('DELETE FROM video_artists WHERE artist_id = ?', [$id]);
+        // Un artiste peut être des deux côtés d'une relation (membre de,
+        // collabore avec...), d'où les deux colonnes à nettoyer.
+        $db->query('DELETE FROM artist_relations WHERE artist_id = ? OR related_artist_id = ?', [$id, $id]);
+        $db->query('DELETE FROM artist_tags WHERE artist_id = ?', [$id]);
+        $db->query('DELETE FROM artist_links WHERE artist_id = ?', [$id]);
+        $db->query('DELETE FROM artists_i18n WHERE artist_id = ?', [$id]);
+        // Ancien système de suggestions (plus alimenté, mais d'anciennes
+        // lignes peuvent encore exister et référencer cet artiste).
+        $db->query('DELETE FROM video_suggestions WHERE artist_id = ?', [$id]);
         $db->query('DELETE FROM artists WHERE id = ?', [$id]);
 
         return count($orphanVideoIds);
