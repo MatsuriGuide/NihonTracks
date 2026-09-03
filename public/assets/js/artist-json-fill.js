@@ -50,10 +50,34 @@
             }
         });
 
-        setStatus(
-            filled > 0
-                ? (btn.getAttribute('data-success-label') || 'Champs remplis.')
-                : (btn.getAttribute('data-empty-label') || 'Aucun champ reconnu dans ce JSON.')
-        );
+        var baseStatus = filled > 0
+            ? (btn.getAttribute('data-success-label') || 'Champs remplis.')
+            : (btn.getAttribute('data-empty-label') || 'Aucun champ reconnu dans ce JSON.');
+
+        // Les tags (noms textuels) sont résolus et ajoutés côté serveur —
+        // fusionnés avec ceux déjà présents, jamais un remplacement.
+        var tagsUrl = btn.getAttribute('data-tags-url');
+        if (tagsUrl && Array.isArray(data.tags) && data.tags.length > 0) {
+            setStatus(baseStatus);
+
+            var formData = new FormData();
+            data.tags.forEach(function (name) {
+                formData.append('tag_names[]', name);
+            });
+
+            fetch(tagsUrl, { method: 'POST', body: formData })
+                .then(function (response) { return response.json(); })
+                .then(function (result) {
+                    if (result.applied_tag_ids && result.applied_tag_ids.length > 0) {
+                        var tagsLabel = btn.getAttribute('data-tags-applied-label') || 'Tags ajoutés :';
+                        setStatus(baseStatus + ' ' + tagsLabel + ' ' + result.applied_tag_ids.length);
+                    }
+                })
+                .catch(function () {
+                    // Échec silencieux sur la partie tags — les autres champs restent remplis
+                });
+        } else {
+            setStatus(baseStatus);
+        }
     });
 })();

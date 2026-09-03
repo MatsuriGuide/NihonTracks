@@ -236,42 +236,6 @@ class ArtistController extends Controller
         ]);
     }
 
-    /**
-     * Endpoint AJAX (JSON) : suggère année de formation, label et bio via
-     * IA — remplit le formulaire côté client pour relecture, n'enregistre
-     * jamais directement. Réservé aux admins (coût API + risque
-     * d'hallucination sur des informations factuelles).
-     */
-    public function suggestInfo(int $id): void
-    {
-        if (Auth::role() !== 'admin') {
-            $this->json(['error' => 'forbidden'], 403);
-
-            return;
-        }
-
-        $artist = Artist::findById($id);
-
-        if (!$artist) {
-            $this->json(['error' => 'not_found'], 404);
-
-            return;
-        }
-
-        $translations = Artist::translations($id);
-        $name = $translations['fr']['name'] ?? $translations['en']['name'] ?? $artist['slug'];
-
-        $suggestion = OpenAiArtistInfoService::suggestInfo($name);
-
-        if ($suggestion === null) {
-            $this->json(['error' => 'api_failed'], 502);
-
-            return;
-        }
-
-        $this->json($suggestion);
-    }
-
     public function update(int $id): void
     {
         Auth::requireLogin();
@@ -404,6 +368,39 @@ class ArtistController extends Controller
         $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
     }
 
+    /**
+     * Endpoint AJAX (JSON) : résout une liste de NOMS de tags (venant du
+     * remplissage JSON collé) vers leurs IDs et les AJOUTE aux tags déjà
+     * présents (fusion, jamais de remplacement — pour ne pas effacer une
+     * sélection déjà faite manuellement par ailleurs).
+     */
+    public function addTagsByName(int $id): void
+    {
+        if (!Auth::check()) {
+            $this->json(['error' => 'unauthorized'], 401);
+
+            return;
+        }
+
+        $artist = Artist::findById($id);
+
+        if (!$artist || !Auth::canEdit((int) $artist['created_by'])) {
+            $this->json(['error' => 'forbidden'], 403);
+
+            return;
+        }
+
+        $names = (array) $this->input('tag_names', []);
+        $resolvedIds = Tag::resolveIdsByNames($names);
+
+        if (!empty($resolvedIds)) {
+            $existing = Artist::tagIdsFor($id);
+            Artist::setTags($id, array_unique(array_merge($existing, $resolvedIds)));
+        }
+
+        $this->json(['applied_tag_ids' => $resolvedIds]);
+    }
+
     public function addLinksBulk(int $id): void
     {
         Auth::requireLogin();
@@ -500,6 +497,61 @@ class ArtistController extends Controller
 
         $artist = Artist::findById($id);
         $this->redirect($artist ? '/artists/' . $artist['slug'] . '?edit=1' : '/artists');
+    }
+
+    /**
+     * Endpoint AJAX (JSON) : suggère année de formation, label, bio ET tags
+     * via IA. Les champs texte remplissent le formulaire côté client pour
+     * relecture (jamais enregistrés directement). Les tags, en revanche,
+     * sont appliqués automatiquement — mais SEULEMENT si l'artiste n'en a
+     * encore aucun, pour ne jamais écraser une sélection déjà faite.
+     * Réservé aux admins (coût API + risque d'hallucination sur des
+     * informations factuelles).
+     */
+    public function suggestInfo(int $id): void
+    {
+        if (Auth::role() !== 'admin') {
+            $this->json(['error' => 'forbidden'], 403);
+
+            return;
+        }
+
+        $artist = Artist::findById($id);
+
+        if (!$artist) {
+            $this->json(['error' => 'not_found'], 404);
+
+            return;
+        }
+
+        $translations = Artist::translations($id);
+        $name = $translations['fr']['name'] ?? $translations['en']['name'] ?? $artist['slug'];
+
+        $suggestion = OpenAiArtistInfoService::suggestInfo($name);
+
+        if ($suggestion === null) {
+            $this->json(['error' => 'api_failed'], 502);
+
+            return;
+        }
+
+        $appliedTagNames = [];
+
+        if (!empty($suggestion['tags']) && empty(Artist::tagIdsFor($id))) {
+            $resolvedIds = Tag::resolveIdsByNames($suggestion['tags']);
+
+            if (!empty($resolvedIds)) {
+                Artist::setTags($id, $resolvedIds);
+                $appliedTagNames = $suggestion['tags'];
+            }
+        }
+
+        $this->json([
+            'start_year'        => $suggestion['start_year'],
+            'label'             => $suggestion['label'],
+            'bio'               => $suggestion['bio'],
+            'applied_tag_names' => $appliedTagNames,
+        ]);
     }
 
     /**

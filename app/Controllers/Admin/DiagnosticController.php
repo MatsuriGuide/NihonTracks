@@ -8,9 +8,6 @@ class DiagnosticController extends AdminController
 {
     public function __construct()
     {
-        // Réservé aux admins, même si AdminController autorise déjà
-        // modérateur+admin par défaut — diagnostic sensible (expose un
-        // aperçu de la clé API).
         Auth::requireRole('admin');
     }
 
@@ -25,34 +22,21 @@ class DiagnosticController extends AdminController
         ];
 
         if ($apiKey !== '') {
-            if (function_exists('curl_init')) {
-                $ch = curl_init('https://api.openai.com/v1/models');
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $apiKey]);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-                $response = curl_exec($ch);
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                $curlErrno = curl_errno($ch);
-                $curlError = curl_error($ch);
-                curl_close($ch);
+            $ch = curl_init('https://api.openai.com/v1/models');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $apiKey]);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlErrno = curl_errno($ch);
+            $curlError = curl_error($ch);
+            curl_close($ch);
 
-                $result['method']           = 'curl';
-                $result['http_code']        = $httpCode;
-                $result['curl_errno']       = $curlErrno ?: null;
-                $result['curl_error']       = $curlError ?: null;
-                $result['response_snippet'] = $response !== false ? substr((string) $response, 0, 800) : null;
-            } else {
-                $context = stream_context_create([
-                    'http' => ['header' => 'Authorization: Bearer ' . $apiKey, 'timeout' => 15, 'ignore_errors' => true],
-                ]);
-                $response = @file_get_contents('https://api.openai.com/v1/models', false, $context);
-
-                $result['method']           = 'file_get_contents';
-                $result['http_response_header'] = $http_response_header ?? null;
-                $result['response_snippet'] = $response !== false ? substr((string) $response, 0, 800) : null;
-                $result['last_error']       = error_get_last();
-            }
+            $result['http_code']        = $httpCode;
+            $result['curl_errno']       = $curlErrno ?: null;
+            $result['curl_error']       = $curlError ?: null;
+            $result['response_snippet'] = $response !== false ? substr((string) $response, 0, 800) : null;
         }
 
         header('Content-Type: text/plain; charset=utf-8');
@@ -60,10 +44,6 @@ class DiagnosticController extends AdminController
         exit;
     }
 
-    /**
-     * Teste un vrai appel chat/completions avec le payload utilisé par la
-     * suggestion de tags, pour voir la réponse brute (succès ou erreur).
-     */
     public function openaiChat(): void
     {
         $apiKey = $_ENV['OPENAI_API_KEY'] ?? '';

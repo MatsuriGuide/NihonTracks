@@ -22,27 +22,28 @@ $router->post('/artists/quick-create/preview', 'ArtistController@quickCreatePrev
 $router->post('/artists/quick-create/store', 'ArtistController@quickCreateStore');
 $router->get('/artists/{id}/edit', 'ArtistController@edit');
 $router->post('/artists/{id}/edit', 'ArtistController@update');
-$router->post('/artists/{id}/suggest-info', 'ArtistController@suggestInfo');
 $router->post('/artists/{id}/delete', 'ArtistController@delete');
 $router->post('/artists/{id}/relations', 'ArtistController@addRelation');
 $router->post('/artists/{id}/relations/{relationId}/delete', 'ArtistController@deleteRelation');
 $router->post('/artists/{id}/links/bulk', 'ArtistController@addLinksBulk');
+$router->post('/artists/{id}/links/{linkId}/delete', 'ArtistController@deleteLink');
 $router->post('/artists/{id}/avatar', 'ArtistController@updateAvatar');
 $router->post('/artists/{id}/avatar/import-youtube', 'ArtistController@importAvatarFromYoutube');
 $router->post('/artists/{id}/tags', 'ArtistController@updateTags');
-$router->post('/artists/{id}/links/{linkId}/delete', 'ArtistController@deleteLink');
+$router->post('/artists/{id}/tags-by-name', 'ArtistController@addTagsByName');
+$router->post('/artists/{id}/suggest-info', 'ArtistController@suggestInfo');
 $router->get('/artists/{slug}', 'ArtistController@show');
 
 // Idem : les routes fixes doivent précéder le pattern générique /videos/{id}
 $router->get('/videos', 'VideoController@index');
 $router->get('/videos/create', 'VideoController@create');
 $router->post('/videos/preview', 'VideoController@preview');
+$router->post('/videos/store', 'VideoController@store');
 $router->post('/videos/suggest-tags', 'VideoController@suggestTags');
 $router->post('/videos/filter-presets', 'VideoController@savePreset');
 $router->post('/videos/filter-presets/{id}/delete', 'VideoController@deletePreset');
 $router->post('/videos/filter-presets/{id}/set-default', 'VideoController@setDefaultPreset');
 $router->post('/videos/filter-presets/clear-default', 'VideoController@clearDefaultPreset');
-$router->post('/videos/store', 'VideoController@store');
 $router->get('/videos/{id}/edit', 'VideoController@edit');
 $router->post('/videos/{id}/edit', 'VideoController@update');
 $router->post('/videos/{id}/delete', 'VideoController@delete');

@@ -21,8 +21,6 @@
                     return;
                 }
 
-                // Ne remplit que les champs encore vides : ne jamais écraser
-                // ce que l'utilisateur a déjà saisi.
                 var yearField = document.getElementById('start_year');
                 var labelField = document.getElementById('label');
                 var bioField = document.getElementById('bio');
@@ -35,6 +33,13 @@
                 }
                 if (bioField && data.bio && !bioField.value) {
                     bioField.value = data.bio;
+                }
+
+                if (data.applied_tag_names && data.applied_tag_names.length > 0) {
+                    btn.insertAdjacentHTML(
+                        'afterend',
+                        '<span style="margin-left:0.5rem;">' + data.applied_tag_names.join(', ') + '</span>'
+                    );
                 }
             })
             .catch(function () {

@@ -23,15 +23,17 @@
         <p>
             <label for="json_fill_input"><?= e(t('artists.json_fill_label')) ?></label><br>
             <textarea id="json_fill_input" rows="6"
-                      placeholder='{"start_year": 2015, "end_year": null, "label": "...", "bio": "..."}'
+                      placeholder='{"start_year": 2015, "end_year": null, "label": "...", "bio": "...", "tags": ["J-Pop", "Chanteuse"]}'
                       style="width: 100%; max-width: 500px;"></textarea>
         </p>
         <p><small><?= e(t('artists.json_fill_hint')) ?></small></p>
         <p>
             <button type="button" id="json-fill-btn"
+                    data-tags-url="<?= url('/artists/' . $artistId . '/tags-by-name') ?>"
                     data-invalid-label="<?= e(t('artists.json_fill_invalid')) ?>"
                     data-success-label="<?= e(t('artists.json_fill_success')) ?>"
-                    data-empty-label="<?= e(t('artists.json_fill_empty')) ?>">
+                    data-empty-label="<?= e(t('artists.json_fill_empty')) ?>"
+                    data-tags-applied-label="<?= e(t('artists.json_fill_tags_applied')) ?>">
                 <?= e(t('artists.json_fill_submit')) ?>
             </button>
             <span id="json-fill-status"></span>

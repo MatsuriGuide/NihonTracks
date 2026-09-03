@@ -51,8 +51,6 @@ class Tag
      * Libellés français des tags "genre", indexés par tag_id — utilisé
      * comme référentiel fixe pour la suggestion de tags par IA (le
      * français sert de langue pivot, toujours renseignée par défaut).
-     *
-     * @return array<int, string>
      */
     public static function genreLabelsFr(): array
     {
@@ -70,5 +68,37 @@ class Tag
         }
 
         return $labels;
+    }
+
+    /**
+     * Résout une liste de noms de tags (peu importe la langue exacte —
+     * comparaison insensible à la casse sur toutes les traductions) vers
+     * leurs IDs. Utilisé par le remplissage JSON et la suggestion IA
+     * d'infos artiste : ces deux sources produisent des noms de tags en
+     * texte, pas des IDs internes. Les noms qui ne correspondent à rien
+     * sont silencieusement ignorés (mieux vaut un tag manquant qu'une erreur).
+     *
+     * @param string[] $names
+     * @return int[]
+     */
+    public static function resolveIdsByNames(array $names): array
+    {
+        $names = array_values(array_filter(array_map(
+            static fn ($n): string => mb_strtolower(trim((string) $n)),
+            $names
+        )));
+
+        if (empty($names)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($names), '?'));
+
+        $rows = Database::getInstance()->fetchAll(
+            "SELECT DISTINCT tag_id FROM tags_i18n WHERE LOWER(name) IN ({$placeholders})",
+            $names
+        );
+
+        return array_map(static fn (array $r): int => (int) $r['tag_id'], $rows);
     }
 }

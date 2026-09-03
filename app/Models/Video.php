@@ -44,13 +44,6 @@ class Video
         );
     }
 
-    /**
-     * Liste filtrable par artiste et/ou tags. Plusieurs tags sélectionnés
-     * sont combinés en ET (la vidéo doit avoir TOUS les tags choisis, pas
-     * seulement l'un d'eux) — utile pour croiser genre + langue par exemple.
-     *
-     * @param int[] $tagIds
-     */
     public static function filtered(
         ?int $artistId,
         array $tagIds,
@@ -184,9 +177,6 @@ class Video
         );
     }
 
-    /**
-     * Retourne les traductions existantes d'une vidéo, indexées par langue.
-     */
     public static function translations(int $videoId): array
     {
         $rows = Database::getInstance()->fetchAll(
@@ -310,6 +300,11 @@ class Video
         }
     }
 
+    public static function delete(int $id): void
+    {
+        Database::getInstance()->query('DELETE FROM videos WHERE id = ?', [$id]);
+    }
+
     public static function countPublished(): int
     {
         return (int) (Database::getInstance()->fetchOne(
@@ -317,15 +312,10 @@ class Video
         )['n'] ?? 0);
     }
 
-    public static function delete(int $id): void
-    {
-        Database::getInstance()->query('DELETE FROM videos WHERE id = ?', [$id]);
-    }
-
     /**
      * Vidéos publiées automatiquement par le scan de chaîne, pas encore
-     * relues par un modérateur/admin (type vidéo par défaut, tags copiés
-     * de l'artiste au moment de l'ajout — à vérifier/corriger après coup).
+     * relues par un modérateur/admin — triées de la plus récente à la plus
+     * ancienne (date de sortie), pas par ordre d'ajout.
      */
     public static function allNeedingReview(?string $lang = null, int $limit = 24, int $offset = 0): array
     {
@@ -345,7 +335,7 @@ class Video
              LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
              WHERE v.source = "auto_scan" AND v.reviewed_at IS NULL
              GROUP BY v.id
-             ORDER BY v.release_date DESC
+             ORDER BY v.release_date DESC, v.id DESC
              LIMIT ' . $limit . ' OFFSET ' . $offset,
             [$lang, $lang]
         );
@@ -371,6 +361,34 @@ class Video
         Database::getInstance()->query(
             'UPDATE videos SET reviewed_at = NOW() WHERE id = ?',
             [$id]
+        );
+    }
+
+    /**
+     * Vidéos de type "MV officiel" ajoutées au catalogue depuis une date
+     * donnée — utilisé par l'export CSV. Basé sur created_at (date d'ajout
+     * au site) plutôt que release_date (date de sortie YouTube, qui ne
+     * contient pas d'heure dans notre schéma) : c'est ce qui correspond à
+     * "nouveau depuis mon dernier export".
+     */
+    public static function officialMvSince(string $since, ?string $lang = null): array
+    {
+        $lang ??= Lang::current();
+
+        return Database::getInstance()->fetchAll(
+            'SELECT v.id, v.youtube_url, v.created_at,
+                    COALESCE(vi.title, vi_fr.title) AS title,
+                    GROUP_CONCAT(DISTINCT COALESCE(ai.name, ai_fr.name) ORDER BY ai.name SEPARATOR ", ") AS artist_names
+             FROM videos v
+             LEFT JOIN videos_i18n vi ON vi.video_id = v.id AND vi.lang = ?
+             LEFT JOIN videos_i18n vi_fr ON vi_fr.video_id = v.id AND vi_fr.lang = "fr"
+             LEFT JOIN video_artists va ON va.video_id = v.id
+             LEFT JOIN artists_i18n ai ON ai.artist_id = va.artist_id AND ai.lang = ?
+             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
+             WHERE v.status = "published" AND v.video_type = "mv" AND v.created_at >= ?
+             GROUP BY v.id
+             ORDER BY v.created_at ASC',
+            [$lang, $lang, $since]
         );
     }
 }
