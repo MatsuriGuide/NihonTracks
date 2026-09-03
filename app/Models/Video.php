@@ -427,6 +427,43 @@ class Video
         return Database::getInstance()->fetchAll($sql, $params);
     }
 
+    /**
+     * IDs des vidéos qui n'ont encore aucun tag — utilisé pour le
+     * rattrapage en masse (attribution des tags de l'artiste aux anciennes
+     * vidéos qui n'en ont pas).
+     *
+     * @return int[]
+     */
+    public static function idsWithoutTags(): array
+    {
+        $rows = Database::getInstance()->fetchAll(
+            'SELECT v.id FROM videos v
+             WHERE NOT EXISTS (SELECT 1 FROM video_tags vt WHERE vt.video_id = v.id)'
+        );
+
+        return array_map(static fn (array $r): int => (int) $r['id'], $rows);
+    }
+
+    /**
+     * Ajoute des tags à une vidéo SANS toucher à ceux déjà présents
+     * (contrairement à create()/update() qui remplacent tout) — utilisé
+     * pour le rattrapage en masse, où l'on ne cible que des vidéos qui
+     * n'en ont justement aucun.
+     *
+     * @param int[] $tagIds
+     */
+    public static function addTags(int $videoId, array $tagIds): void
+    {
+        $db = Database::getInstance();
+
+        foreach (array_unique(array_map('intval', $tagIds)) as $tagId) {
+            $db->query(
+                'INSERT IGNORE INTO video_tags (video_id, tag_id) VALUES (?, ?)',
+                [$videoId, $tagId]
+            );
+        }
+    }
+
     public static function officialMvSince(string $since, ?string $lang = null): array
     {
         $lang ??= Lang::current();

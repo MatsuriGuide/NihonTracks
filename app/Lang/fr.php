@@ -408,4 +408,15 @@ return [
     'playlists.add_video_search_label' => 'Rechercher une vidéo par titre',
     'playlists.add_video_search_placeholder' => 'Tape au moins 2 caractères...',
     'playlists.add_video_button' => 'Ajouter',
+
+    // Rattrapage tags videos manquants
+    'admin.tag_backfill_link' => 'Rattraper les tags manquants',
+    'admin.tag_backfill.title' => 'Rattrapage des tags manquants',
+    'admin.tag_backfill.hint' => 'Attribue aux vidéos qui n\'ont encore AUCUN tag les tags de leur(s) artiste(s). Ne touche jamais une vidéo qui a déjà au moins un tag.',
+    'admin.tag_backfill.remaining' => 'Vidéos sans tag restant à traiter :',
+    'admin.tag_backfill.run' => 'Lancer le rattrapage',
+    'admin.tag_backfill.batch_hint' => 'Traite jusqu\'à 500 vidéos par clic. Reclique si le compteur n\'est pas encore à zéro.',
+    'admin.tag_backfill.result_processed' => 'Vidéos examinées :',
+    'admin.tag_backfill.result_updated' => 'Vidéos mises à jour :',
+    'admin.tag_backfill.none' => 'Aucune vidéo sans tag à traiter.',
 ];

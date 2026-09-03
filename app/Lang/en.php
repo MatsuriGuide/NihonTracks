@@ -407,4 +407,15 @@ return [
     'playlists.add_video_search_label' => 'Search for a video by title',
     'playlists.add_video_search_placeholder' => 'Type at least 2 characters...',
     'playlists.add_video_button' => 'Add',
+
+    // Missing video tags backfill
+    'admin.tag_backfill_link' => 'Backfill missing tags',
+    'admin.tag_backfill.title' => 'Missing tags backfill',
+    'admin.tag_backfill.hint' => 'Assigns the tags of their artist(s) to videos that have NO tags yet. Never touches a video that already has at least one tag.',
+    'admin.tag_backfill.remaining' => 'Untagged videos left to process:',
+    'admin.tag_backfill.run' => 'Run backfill',
+    'admin.tag_backfill.batch_hint' => 'Processes up to 500 videos per click. Click again if the counter is not yet at zero.',
+    'admin.tag_backfill.result_processed' => 'Videos examined:',
+    'admin.tag_backfill.result_updated' => 'Videos updated:',
+    'admin.tag_backfill.none' => 'No untagged videos to process.',
 ];

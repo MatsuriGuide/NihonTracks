@@ -22,6 +22,8 @@ $router->get('/admin/watch', 'Admin\WatchController@index');
 $router->post('/admin/watch/{linkId}/scan', 'Admin\WatchController@scanOne');
 $router->get('/admin/csv-export', 'Admin\CsvExportController@index');
 $router->post('/admin/csv-export/generate', 'Admin\CsvExportController@generate');
+$router->get('/admin/video-tag-backfill', 'Admin\VideoTagBackfillController@index');
+$router->post('/admin/video-tag-backfill/run', 'Admin\VideoTagBackfillController@run');
 
 // À compléter au fur et à mesure :
 // $router->get('/admin/users', 'Admin\UserAdminController@index');

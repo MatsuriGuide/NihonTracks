@@ -409,4 +409,14 @@ return [
     'playlists.add_video_search_placeholder' => '2文字以上入力してください...',
     'playlists.add_video_button' => '追加',
 
+    // タグ未設定動画の一括補完
+    'admin.tag_backfill_link' => '未設定タグを一括補完',
+    'admin.tag_backfill.title' => 'タグ未設定動画の一括補完',
+    'admin.tag_backfill.hint' => 'まだタグが1つも設定されていない動画に、そのアーティストのタグを付与します。既に1つでもタグがある動画には触れません。',
+    'admin.tag_backfill.remaining' => '未処理の未タグ動画数：',
+    'admin.tag_backfill.run' => '補完を実行',
+    'admin.tag_backfill.batch_hint' => '1クリックで最大500件処理します。カウントが0でなければ再度クリックしてください。',
+    'admin.tag_backfill.result_processed' => '確認した動画数：',
+    'admin.tag_backfill.result_updated' => '更新した動画数：',
+    'admin.tag_backfill.none' => '処理対象の未タグ動画はありません。',
 ];
