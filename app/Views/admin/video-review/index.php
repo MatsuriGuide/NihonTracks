@@ -1,5 +1,21 @@
 <h1><?= e(t('admin.video_review.title')) ?></h1>
 
+<?php
+$formatDuration = static function (int $seconds): string {
+    $minutes = intdiv($seconds, 60);
+    $secs = $seconds % 60;
+
+    if ($minutes >= 60) {
+        $hours = intdiv($minutes, 60);
+        $minutes %= 60;
+
+        return sprintf('%d:%02d:%02d', $hours, $minutes, $secs);
+    }
+
+    return sprintf('%d:%02d', $minutes, $secs);
+};
+?>
+
 <p><small><?= e(t('admin.video_review.hint')) ?></small></p>
 
 <?php if (empty($videos)): ?>
@@ -20,6 +36,9 @@
                         <?= e($video['title'] ?? $video['youtube_id']) ?>
                     </a>
                     <span class="card-meta">
+                        <?php if (!empty($video['duration_seconds'])): ?>
+                            <strong><?= e($formatDuration((int) $video['duration_seconds'])) ?></strong> —
+                        <?php endif; ?>
                         <?php if (!empty($video['artist_names'])): ?>
                             <?= e($video['artist_names']) ?>
                         <?php endif; ?>
