@@ -36,9 +36,21 @@ function url(string $path = ''): string
 }
 
 /**
- * Construit une URL vers un asset statique (public/assets/...).
+ * Construit une URL vers un asset statique (public/assets/...), avec un
+ * paramètre de version basé sur la date de modification du fichier sur le
+ * serveur. Sans ça, un navigateur qui a mis un .js/.css en cache continue
+ * de le servir indéfiniment après un déploiement, même si le fichier a
+ * changé côté serveur — l'URL ne changeant jamais, rien ne force le
+ * navigateur à retélécharger. En ajoutant ?v=<date de modification>,
+ * l'URL change automatiquement à chaque modification du fichier, ce qui
+ * invalide le cache sans jamais avoir à y penser ni à vider son cache
+ * manuellement.
  */
 function asset(string $path): string
 {
-    return url('assets/' . ltrim($path, '/'));
+    $relativePath = ltrim($path, '/');
+    $fullPath = dirname(__DIR__, 2) . '/public/assets/' . $relativePath;
+    $version = is_file($fullPath) ? filemtime($fullPath) : time();
+
+    return url('assets/' . $relativePath) . '?v=' . $version;
 }
