@@ -419,4 +419,14 @@ return [
     'admin.tag_backfill.result_processed' => '確認した動画数：',
     'admin.tag_backfill.result_updated' => '更新した動画数：',
     'admin.tag_backfill.none' => '処理対象の未タグ動画はありません。',
+
+    // アーティスト削除ブロック（動画が孤立するため）
+    'artists.delete_blocked.title' => '削除できません',
+    'artists.delete_blocked.message_1' => 'このアーティストは',
+    'artists.delete_blocked.message_2' => '件の動画の唯一のアーティストです。削除するとアーティスト不在になってしまいます。',
+    'artists.delete_blocked.hint' => 'このフィールドを削除する前に、それらの動画を非表示・削除するか、別のアーティストを追加してください。',
+    'artists.delete_blocked.back_to_artist' => 'アーティストページに戻る',
+    // アーティスト削除通知（連鎖処理）
+    'artists.delete_notice_1' => 'アーティストを削除しました。',
+    'artists.delete_notice_2' => '件の動画がアーティスト不在となったため非表示にしました。',
 ];

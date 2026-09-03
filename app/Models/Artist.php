@@ -8,9 +8,7 @@ use App\Core\Lang;
 class Artist
 {
     /**
-     * Liste publique : uniquement les artistes approuvés. Utilisé partout
-     * où le contenu doit être visible/sélectionnable (accueil, listing,
-     * formulaires vidéo, relations...).
+     * Liste publique : uniquement les artistes approuvés.
      */
     public static function all(?string $lang = null): array
     {
@@ -61,9 +59,6 @@ class Artist
         return Database::getInstance()->fetchOne('SELECT * FROM artists WHERE slug = ?', [$slug]);
     }
 
-    /**
-     * Retourne les traductions existantes d'un artiste, indexées par langue.
-     */
     public static function translations(int $artistId): array
     {
         $rows = Database::getInstance()->fetchAll(
@@ -81,8 +76,7 @@ class Artist
 
     /**
      * Repli de détection : artistes approuvés dont le nom (langue courante
-     * ou français) correspond exactement au nom de la chaîne YouTube
-     * (insensible à la casse).
+     * ou français) correspond exactement au nom de la chaîne YouTube.
      */
     public static function findIdsByExactName(string $name): array
     {
@@ -113,11 +107,6 @@ class Artist
         return $row !== null;
     }
 
-    /**
-     * @param string $moderationStatus "approved" ou "pending" — décidé par
-     *   l'appelant selon le rôle de l'utilisateur (mod/admin = approved
-     *   immédiat, utilisateur normal = pending).
-     */
     public static function create(array $data, string $name, ?string $bio, int $createdBy, string $moderationStatus = 'approved'): int
     {
         $db = Database::getInstance();
@@ -183,25 +172,52 @@ class Artist
         }
     }
 
-    public static function updateAvatar(int $id, ?string $avatarUrl): void
+    /**
+     * IDs des vidéos pour lesquelles cet artiste est le SEUL artiste
+     * associé — les supprimer laisserait ces vidéos sans aucun artiste.
+     * Utilisé pour bloquer la suppression d'un artiste tant que ces
+     * vidéos n'ont pas été traitées (masquées, ou un autre artiste
+     * ajouté dessus).
+     *
+     * @return int[]
+     */
+    public static function videoIdsWhereOnlyArtist(int $artistId): array
     {
-        Database::getInstance()->query(
-            'UPDATE artists SET avatar_path = ? WHERE id = ?',
-            [$avatarUrl, $id]
+        $rows = Database::getInstance()->fetchAll(
+            'SELECT va.video_id
+             FROM video_artists va
+             WHERE va.artist_id = ?
+               AND (SELECT COUNT(*) FROM video_artists va2 WHERE va2.video_id = va.video_id) = 1',
+            [$artistId]
         );
+
+        return array_map(static fn (array $r): int => (int) $r['video_id'], $rows);
     }
 
-    public static function updateSubscriberCount(int $id, ?int $count): void
+    /**
+     * Supprime un artiste. Les vidéos pour lesquelles il était le SEUL
+     * artiste sont masquées (pas supprimées en dur — cohérent avec
+     * Video::hide(), pour qu'elles ne reviennent pas au prochain scan de
+     * chaîne si elles existent toujours sur YouTube). Les associations
+     * video_artists sont nettoyées explicitement plutôt que de compter sur
+     * un éventuel ON DELETE CASCADE en base.
+     *
+     * @return int Nombre de vidéos masquées suite à cette suppression
+     */
+    public static function delete(int $id): int
     {
-        Database::getInstance()->query(
-            'UPDATE artists SET subscriber_count = ? WHERE id = ?',
-            [$count, $id]
-        );
-    }
+        $db = Database::getInstance();
 
-    public static function delete(int $id): void
-    {
-        Database::getInstance()->query('DELETE FROM artists WHERE id = ?', [$id]);
+        $orphanVideoIds = self::videoIdsWhereOnlyArtist($id);
+
+        foreach ($orphanVideoIds as $videoId) {
+            Video::hide($videoId);
+        }
+
+        $db->query('DELETE FROM video_artists WHERE artist_id = ?', [$id]);
+        $db->query('DELETE FROM artists WHERE id = ?', [$id]);
+
+        return count($orphanVideoIds);
     }
 
     public static function approve(int $id): void
@@ -214,8 +230,6 @@ class Artist
 
     public static function reject(int $id): void
     {
-        // Conservé en base (comme les signalements/suggestions rejetés),
-        // simplement caché — pas de suppression définitive.
         Database::getInstance()->query(
             'UPDATE artists SET moderation_status = "rejected" WHERE id = ?',
             [$id]
@@ -236,10 +250,6 @@ class Artist
         )['n'] ?? 0);
     }
 
-    /**
-     * Artistes approuvés à qui il manque une bio et/ou une année de début —
-     * outil de suivi pour compléter progressivement le catalogue.
-     */
     public static function allIncomplete(?string $lang = null): array
     {
         $lang ??= Lang::current();
@@ -276,9 +286,6 @@ class Artist
         )['n'] ?? 0);
     }
 
-    /**
-     * Tags (genre/langue) attribués à un artiste, pour affichage.
-     */
     public static function tagsFor(int $artistId, ?string $lang = null): array
     {
         $lang ??= Lang::current();
@@ -296,9 +303,6 @@ class Artist
     }
 
     /**
-     * Simples IDs de tags d'un artiste — utilisé pour les copier sur une
-     * vidéo à sa création (photo prise à l'instant T, pas un lien permanent).
-     *
      * @return int[]
      */
     public static function tagIdsFor(int $artistId): array
@@ -312,8 +316,6 @@ class Artist
     }
 
     /**
-     * Remplace l'ensemble des tags d'un artiste par la liste donnée.
-     *
      * @param int[] $tagIds
      */
     public static function setTags(int $artistId, array $tagIds): void
@@ -328,5 +330,21 @@ class Artist
                 [$artistId, $tagId]
             );
         }
+    }
+
+    public static function updateAvatar(int $id, ?string $avatarUrl): void
+    {
+        Database::getInstance()->query(
+            'UPDATE artists SET avatar_path = ? WHERE id = ?',
+            [$avatarUrl, $id]
+        );
+    }
+
+    public static function updateSubscriberCount(int $id, ?int $count): void
+    {
+        Database::getInstance()->query(
+            'UPDATE artists SET subscriber_count = ? WHERE id = ?',
+            [$count, $id]
+        );
     }
 }

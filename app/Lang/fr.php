@@ -419,4 +419,14 @@ return [
     'admin.tag_backfill.result_processed' => 'Vidéos examinées :',
     'admin.tag_backfill.result_updated' => 'Vidéos mises à jour :',
     'admin.tag_backfill.none' => 'Aucune vidéo sans tag à traiter.',
+
+    // Blocage suppression artiste (videos orphelines)
+    'artists.delete_blocked.title' => 'Suppression impossible',
+    'artists.delete_blocked.message_1' => 'Cet artiste est le seul artiste associé à',
+    'artists.delete_blocked.message_2' => 'vidéo(s). Le supprimer les laisserait sans aucun artiste.',
+    'artists.delete_blocked.hint' => 'Masque ou supprime ces vidéos, ou ajoute-leur un autre artiste, avant de pouvoir supprimer cette fiche.',
+    'artists.delete_blocked.back_to_artist' => 'Retour à la fiche artiste',
+    // Notice suppression artiste (cascade)
+    'artists.delete_notice_1' => 'Artiste supprimé.',
+    'artists.delete_notice_2' => 'vidéo(s) qui n\'avaient plus aucun artiste ont été masquées.',
 ];

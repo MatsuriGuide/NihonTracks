@@ -1,5 +1,12 @@
 <h1><?= e(t('artists.title')) ?></h1>
 
+<?php $hiddenVideos = (int) ($_GET['hidden_videos'] ?? 0); ?>
+<?php if ($hiddenVideos > 0): ?>
+    <p class="hint hint-success">
+        <?= e(t('artists.delete_notice_1')) ?> <?= $hiddenVideos ?> <?= e(t('artists.delete_notice_2')) ?>
+    </p>
+<?php endif; ?>
+
 <p>
     <a href="<?= url('/artists/create') ?>" class="btn"><?= e(t('artists.add')) ?></a>
     &nbsp;

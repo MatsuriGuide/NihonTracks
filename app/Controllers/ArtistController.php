@@ -289,8 +289,9 @@ class ArtistController extends Controller
             return;
         }
 
-        Artist::delete($id);
-        $this->redirect('/artists');
+        $hiddenCount = Artist::delete($id);
+
+        $this->redirect('/artists' . ($hiddenCount > 0 ? '?hidden_videos=' . $hiddenCount : ''));
     }
 
     public function updateAvatar(int $id): void

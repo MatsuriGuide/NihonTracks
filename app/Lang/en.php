@@ -418,4 +418,14 @@ return [
     'admin.tag_backfill.result_processed' => 'Videos examined:',
     'admin.tag_backfill.result_updated' => 'Videos updated:',
     'admin.tag_backfill.none' => 'No untagged videos to process.',
+
+    // Artist deletion blocked (orphaned videos)
+    'artists.delete_blocked.title' => 'Cannot delete',
+    'artists.delete_blocked.message_1' => 'This artist is the only artist on',
+    'artists.delete_blocked.message_2' => 'video(s). Deleting them would leave them with no artist.',
+    'artists.delete_blocked.hint' => 'Hide or delete those videos, or add another artist to them, before you can delete this page.',
+    'artists.delete_blocked.back_to_artist' => 'Back to artist page',
+    // Artist deletion notice (cascade)
+    'artists.delete_notice_1' => 'Artist deleted.',
+    'artists.delete_notice_2' => 'video(s) left without any artist were hidden.',
 ];
