@@ -33,7 +33,8 @@
                     data-invalid-label="<?= e(t('artists.json_fill_invalid')) ?>"
                     data-success-label="<?= e(t('artists.json_fill_success')) ?>"
                     data-empty-label="<?= e(t('artists.json_fill_empty')) ?>"
-                    data-tags-applied-label="<?= e(t('artists.json_fill_tags_applied')) ?>">
+                    data-tags-applied-label="<?= e(t('artists.json_fill_tags_applied')) ?>"
+                    data-tags-unmatched-label="<?= e(t('artists.json_fill_tags_unmatched')) ?>">
                 <?= e(t('artists.json_fill_submit')) ?>
             </button>
             <span id="json-fill-status"></span>

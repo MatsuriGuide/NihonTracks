@@ -397,5 +397,5 @@ return [
     'admin.csv_export.since_label' => 'Since',
     'admin.csv_export.generate' => 'Generate and download',
     'artists.json_fill_tags_applied' => 'Tags added:',
-
+    'artists.json_fill_tags_unmatched' => 'Tags not found:',
 ];

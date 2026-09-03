@@ -15,33 +15,42 @@
         bio: 'bio'
     };
 
-    function setStatus(text) {
+    function setStatus(html) {
         if (statusEl) {
-            statusEl.textContent = text;
+            statusEl.innerHTML = html;
         }
     }
 
-    // Coche les cases de tags dont le libellé (en minuscule) correspond à
-    // l'un des noms fournis — additif, ne décoche jamais une case déjà
-    // cochée par ailleurs.
+    // Coche les cases de tags dont le libellé (normalisé) correspond à l'un
+    // des noms fournis — additif, ne décoche jamais une case déjà cochée.
+    // Normalisation : minuscule + espaces multiples réduits à un seul, pour
+    // absorber les petites variations de saisie (espace en trop, etc.).
+    function normalize(str) {
+        return String(str).trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
     function checkTagsByName(names) {
         if (!Array.isArray(names) || names.length === 0) {
-            return 0;
+            return { matched: 0, unmatched: [] };
         }
 
-        var lowerNames = names.map(function (n) { return String(n).trim().toLowerCase(); });
+        var normalizedNames = names.map(normalize);
         var checkboxes = document.querySelectorAll('#artist-tags-fieldset input[type="checkbox"]');
-        var matched = 0;
+        var matchedNames = [];
 
         checkboxes.forEach(function (cb) {
             var name = cb.getAttribute('data-tag-name');
-            if (name && lowerNames.indexOf(name) !== -1) {
+            if (name && normalizedNames.indexOf(normalize(name)) !== -1) {
                 cb.checked = true;
-                matched++;
+                matchedNames.push(normalize(name));
             }
         });
 
-        return matched;
+        var unmatched = names.filter(function (n) {
+            return matchedNames.indexOf(normalize(n)) === -1;
+        });
+
+        return { matched: matchedNames.length, unmatched: unmatched };
     }
 
     btn.addEventListener('click', function () {
@@ -73,15 +82,20 @@
             }
         });
 
-        var matchedTags = checkTagsByName(data.tags);
+        var tagResult = checkTagsByName(data.tags);
 
-        var baseStatus = (filled > 0 || matchedTags > 0)
+        var baseStatus = (filled > 0 || tagResult.matched > 0)
             ? (btn.getAttribute('data-success-label') || 'Champs remplis.')
             : (btn.getAttribute('data-empty-label') || 'Aucun champ reconnu dans ce JSON.');
 
-        if (matchedTags > 0) {
+        if (tagResult.matched > 0) {
             var tagsLabel = btn.getAttribute('data-tags-applied-label') || 'Tags cochés :';
-            baseStatus += ' ' + tagsLabel + ' ' + matchedTags;
+            baseStatus += ' ' + tagsLabel + ' ' + tagResult.matched;
+        }
+
+        if (tagResult.unmatched.length > 0) {
+            baseStatus += ' — <strong>' + (btn.getAttribute('data-tags-unmatched-label') || 'Tags non trouvés :')
+                + '</strong> ' + tagResult.unmatched.join(', ');
         }
 
         setStatus(baseStatus);

@@ -397,4 +397,5 @@ return [
     'admin.csv_export.since_label' => '以降',
     'admin.csv_export.generate' => '生成してダウンロード',
     'artists.json_fill_tags_applied' => '追加されたタグ：',
+    'artists.json_fill_tags_unmatched' => '見つからなかったタグ：',
 ];

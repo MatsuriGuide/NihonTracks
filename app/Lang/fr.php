@@ -397,4 +397,5 @@ return [
     'admin.csv_export.since_label' => 'Depuis le',
     'admin.csv_export.generate' => 'Générer et télécharger',
     'artists.json_fill_tags_applied' => 'Tags ajoutés :',
+    'artists.json_fill_tags_unmatched' => 'Tags non trouvés :',
 ];
