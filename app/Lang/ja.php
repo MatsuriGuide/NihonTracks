@@ -398,4 +398,15 @@ return [
     'admin.csv_export.generate' => '生成してダウンロード',
     'artists.json_fill_tags_applied' => '追加されたタグ：',
     'artists.json_fill_tags_unmatched' => '見つからなかったタグ：',
+
+    // 動画タイトル検索 + プレイリスト検索
+    'videos.filter.title_search_label' => 'タイトルで検索',
+    'videos.filter.title_search_placeholder' => '曲のタイトル...',
+    'videos.filter.title_search_hint' => 'この検索は保存済みフィルターには含まれません。',
+    'videos.filter.title_not_saved_hint' => 'タイトル検索は保存済みフィルターに含まれることはありません。',
+    'playlists.add_video_title' => '動画を追加',
+    'playlists.add_video_search_label' => 'タイトルで動画を検索',
+    'playlists.add_video_search_placeholder' => '2文字以上入力してください...',
+    'playlists.add_video_button' => '追加',
+
 ];

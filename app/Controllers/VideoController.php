@@ -24,13 +24,19 @@ class VideoController extends Controller
     {
         // Requête "vierge" (aucun filtre dans l'URL) : on applique le
         // préréglage par défaut de l'utilisateur connecté, s'il en a un.
+        // La recherche par titre (q) n'est jamais incluse dans un
+        // préréglage enregistré — c'est une recherche ponctuelle, pas un
+        // filtre réutilisable.
         $hasExplicitFilter = $this->input('artist_id') !== null
             || $this->input('tag_ids') !== null
-            || $this->input('video_type') !== null;
+            || $this->input('video_type') !== null
+            || $this->input('q') !== null;
 
         $defaultPreset = (!$hasExplicitFilter && Auth::check())
             ? VideoFilterPreset::defaultForUser((int) Auth::id())
             : null;
+
+        $titleQuery = trim((string) $this->input('q', '')) ?: null;
 
         if ($defaultPreset !== null) {
             $artistId = $defaultPreset['artist_id'] !== null ? (int) $defaultPreset['artist_id'] : null;
@@ -45,15 +51,15 @@ class VideoController extends Controller
             $tagIds = array_map('intval', (array) $this->input('tag_ids', []));
         }
 
-        $hasActiveFilter = $artistId !== null || $videoType !== null || !empty($tagIds);
+        $hasActiveFilter = $artistId !== null || $videoType !== null || !empty($tagIds) || $titleQuery !== null;
 
-        $total = Video::countFiltered($artistId, $tagIds, $videoType);
+        $total = Video::countFiltered($artistId, $tagIds, $videoType, $titleQuery);
         $totalPages = max(1, (int) ceil($total / self::PER_PAGE));
         $page = max(1, (int) $this->input('page', 1));
         $page = min($page, $totalPages);
         $offset = ($page - 1) * self::PER_PAGE;
 
-        $videos = Video::filtered($artistId, $tagIds, $videoType, null, self::PER_PAGE, $offset);
+        $videos = Video::filtered($artistId, $tagIds, $videoType, $titleQuery, null, self::PER_PAGE, $offset);
 
         $savedPresets = Auth::check() ? VideoFilterPreset::allForUser((int) Auth::id()) : [];
 
@@ -65,6 +71,7 @@ class VideoController extends Controller
             'selectedArtistId' => $artistId,
             'selectedTagIds'   => $tagIds,
             'selectedType'     => $videoType,
+            'titleQuery'       => $titleQuery,
             'hasActiveFilter'  => $hasActiveFilter,
             'page'             => $page,
             'totalPages'       => $totalPages,
@@ -470,8 +477,7 @@ class VideoController extends Controller
             $errors[] = t('videos.error.title_required');
         }
 
-        $validTypes = self::VIDEO_TYPES;
-        if (!in_array($data['video_type'], $validTypes, true)) {
+        if (!in_array($data['video_type'], self::VIDEO_TYPES, true)) {
             $errors[] = t('videos.error.type_invalid');
         }
 

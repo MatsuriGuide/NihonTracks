@@ -48,6 +48,7 @@ class Video
         ?int $artistId,
         array $tagIds,
         ?string $videoType = null,
+        ?string $titleQuery = null,
         ?string $lang = null,
         int $limit = 24,
         int $offset = 0
@@ -57,7 +58,7 @@ class Video
         $limit = max(1, min(100, $limit));
         $offset = max(0, $offset);
 
-        [$where, $params] = self::buildFilterClause($artistId, $tagIds, $videoType);
+        [$where, $params] = self::buildFilterClause($artistId, $tagIds, $videoType, $titleQuery);
 
         $sql = 'SELECT v.id, v.youtube_id, v.thumbnail_url, v.release_date, v.video_type,
                        COALESCE(vi.title, vi_fr.title) AS title,
@@ -76,11 +77,11 @@ class Video
         return Database::getInstance()->fetchAll($sql, array_merge([$lang, $lang], $params));
     }
 
-    public static function countFiltered(?int $artistId, array $tagIds, ?string $videoType = null): int
+    public static function countFiltered(?int $artistId, array $tagIds, ?string $videoType = null, ?string $titleQuery = null): int
     {
         $tagIds = array_values(array_unique(array_map('intval', $tagIds)));
 
-        [$where, $params] = self::buildFilterClause($artistId, $tagIds, $videoType);
+        [$where, $params] = self::buildFilterClause($artistId, $tagIds, $videoType, $titleQuery);
 
         $sql = 'SELECT COUNT(DISTINCT v.id) AS n FROM videos v WHERE ' . $where;
 
@@ -91,7 +92,7 @@ class Video
      * @param int[] $tagIds
      * @return array{0: string, 1: array}
      */
-    private static function buildFilterClause(?int $artistId, array $tagIds, ?string $videoType): array
+    private static function buildFilterClause(?int $artistId, array $tagIds, ?string $videoType, ?string $titleQuery = null): array
     {
         $where = 'v.status = "published"';
         $params = [];
@@ -121,6 +122,18 @@ class Video
         if ($videoType !== null && $videoType !== '') {
             $where .= ' AND v.video_type = ?';
             $params[] = $videoType;
+        }
+
+        if ($titleQuery !== null && trim($titleQuery) !== '') {
+            // Recherche sur le titre, toutes langues confondues (pas de
+            // dépendance à la langue courante) — via EXISTS plutôt qu'un
+            // JOIN, pour que countFiltered() (qui n'a pas ce JOIN) fonctionne
+            // avec la même clause WHERE.
+            $where .= ' AND EXISTS (
+                SELECT 1 FROM videos_i18n vi_search
+                WHERE vi_search.video_id = v.id AND vi_search.title LIKE ?
+            )';
+            $params[] = '%' . trim($titleQuery) . '%';
         }
 
         return [$where, $params];
@@ -371,6 +384,49 @@ class Video
      * contient pas d'heure dans notre schéma) : c'est ce qui correspond à
      * "nouveau depuis mon dernier export".
      */
+    /**
+     * Recherche par titre (toutes langues), en excluant certains IDs
+     * (typiquement les vidéos déjà présentes dans la playlist) — utilisé
+     * par la recherche instantanée d'ajout à une playlist, pour éviter de
+     * charger des milliers de vidéos d'un coup.
+     *
+     * @param int[] $excludeIds
+     */
+    public static function searchByTitle(string $query, array $excludeIds = [], int $limit = 20, ?string $lang = null): array
+    {
+        $lang ??= Lang::current();
+        $query = trim($query);
+
+        if ($query === '') {
+            return [];
+        }
+
+        $limit = max(1, min(50, $limit));
+
+        $sql = 'SELECT v.id, v.youtube_id, v.thumbnail_url,
+                       COALESCE(vi.title, vi_fr.title) AS title
+                FROM videos v
+                LEFT JOIN videos_i18n vi ON vi.video_id = v.id AND vi.lang = ?
+                LEFT JOIN videos_i18n vi_fr ON vi_fr.video_id = v.id AND vi_fr.lang = "fr"
+                WHERE v.status = "published"
+                  AND EXISTS (
+                      SELECT 1 FROM videos_i18n vi_search
+                      WHERE vi_search.video_id = v.id AND vi_search.title LIKE ?
+                  )';
+        $params = [$lang, '%' . $query . '%'];
+
+        $excludeIds = array_map('intval', $excludeIds);
+        if (!empty($excludeIds)) {
+            $placeholders = implode(',', array_fill(0, count($excludeIds), '?'));
+            $sql .= " AND v.id NOT IN ({$placeholders})";
+            $params = array_merge($params, $excludeIds);
+        }
+
+        $sql .= ' ORDER BY v.release_date DESC LIMIT ' . $limit;
+
+        return Database::getInstance()->fetchAll($sql, $params);
+    }
+
     public static function officialMvSince(string $since, ?string $lang = null): array
     {
         $lang ??= Lang::current();

@@ -1,12 +1,15 @@
-<h1><span class="catalog-no"><?= e(catalog_no('p', (int) $playlist['id'])) ?></span><?= e($playlist['name']) ?></h1>
+<h1><?= e($playlist['name']) ?></h1>
 
 <?php if (!empty($playlist['description'])): ?>
     <p><?= nl2br(e($playlist['description'])) ?></p>
 <?php endif; ?>
 
-<p><?= $playlist['is_public'] ? e(t('playlists.is_public_state')) : e(t('playlists.is_private_state')) ?></p>
+<p>
+    <?= e(t('playlists.visibility')) ?> :
+    <?= $playlist['is_public'] ? e(t('playlists.public')) : e(t('playlists.private')) ?>
+</p>
 
-<?php if (\App\Core\Auth::canEdit((int) $playlist['user_id'])): ?>
+<?php if ($canEdit): ?>
     <p>
         <a href="<?= url('/playlists/' . $playlist['id'] . '/edit') ?>"><?= e(t('playlists.edit')) ?></a>
         &nbsp;
@@ -15,54 +18,53 @@
             <button type="submit"><?= e(t('playlists.delete')) ?></button>
         </form>
     </p>
-<?php endif; ?>
 
-<h2><?= e(t('playlists.videos_title')) ?></h2>
+    <details>
+        <summary><?= e(t('playlists.add_video_title')) ?></summary>
+        <p>
+            <label for="playlist-video-search"><?= e(t('playlists.add_video_search_label')) ?></label><br>
+            <input type="text" id="playlist-video-search" autocomplete="off"
+                   placeholder="<?= e(t('playlists.add_video_search_placeholder')) ?>"
+                   data-search-url="<?= url('/playlists/' . $playlist['id'] . '/videos/search') ?>"
+                   data-add-url="<?= url('/playlists/' . $playlist['id'] . '/videos') ?>"
+                   data-add-label="<?= e(t('playlists.add_video_button')) ?>"
+                   style="width: 100%; max-width: 400px;">
+        </p>
+        <ul id="playlist-video-search-results" class="card-grid"></ul>
+    </details>
+
+    <script src="<?= asset('js/playlist-video-search.js') ?>"></script>
+<?php endif; ?>
 
 <?php if (empty($videos)): ?>
-    <p><?= e(t('playlists.no_videos')) ?></p>
+    <p><?= e(t('playlists.empty')) ?></p>
 <?php else: ?>
-    <div class="playlist-player" id="playlist-player-panel">
-        <div id="playlist-player"></div>
-        <p class="now-playing" id="now-playing-label"></p>
-    </div>
-
-    <ol class="tracklist" id="playlist-tracklist">
-        <?php foreach ($videos as $i => $video): ?>
-            <li class="track" data-youtube-id="<?= e($video['youtube_id']) ?>">
-                <button type="button" class="track-play" data-index="<?= (int) $i ?>">
-                    <span class="track-number"><?= (int) $i + 1 ?></span>
-                    <span class="track-title"><?= e($video['title'] ?? $video['youtube_id']) ?></span>
-                    <?php if (!empty($video['artist_names'])): ?>
-                        <span class="track-artist"><?= e($video['artist_names']) ?></span>
-                    <?php endif; ?>
-                </button>
-                <a href="<?= url('/videos/' . $video['id']) ?>" class="track-link" title="<?= e(t('videos.title_label')) ?>">↗</a>
-                <?php if (\App\Core\Auth::canEdit((int) $playlist['user_id'])): ?>
-                    <form method="post"
-                          action="<?= url('/playlists/' . $playlist['id'] . '/videos/' . $video['id'] . '/remove') ?>"
-                          style="display:inline">
-                        <button type="submit" class="track-remove"><?= e(t('playlists.remove')) ?></button>
-                    </form>
+    <ul class="card-grid">
+        <?php foreach ($videos as $video): ?>
+            <li class="card">
+                <?php if (!empty($video['thumbnail_url'])): ?>
+                    <div class="card-thumb" style="background-image:url('<?= e($video['thumbnail_url']) ?>');"></div>
+                <?php else: ?>
+                    <div class="card-thumb"></div>
                 <?php endif; ?>
+                <div class="card-body">
+                    <a href="<?= url('/videos/' . $video['id']) ?>" class="card-title">
+                        <?= e($video['title'] ?? $video['youtube_id']) ?>
+                    </a>
+                    <span class="card-meta">
+                        <?php if (!empty($video['artist_names'])): ?>
+                            <?= e($video['artist_names']) ?>
+                        <?php endif; ?>
+                    </span>
+                    <?php if ($canEdit): ?>
+                        <form method="post" action="<?= url('/playlists/' . $playlist['id'] . '/videos/' . $video['id'] . '/remove') ?>" style="display:inline">
+                            <button type="submit" class="btn-small"><?= e(t('playlists.remove_video')) ?></button>
+                        </form>
+                    <?php endif; ?>
+                </div>
             </li>
         <?php endforeach; ?>
-    </ol>
-
-    <script src="<?= asset('js/playlist-player.js') ?>"></script>
-<?php endif; ?>
-
-<?php if (\App\Core\Auth::canEdit((int) $playlist['user_id']) && !empty($availableVideos)): ?>
-    <h2><?= e(t('playlists.add_video_title')) ?></h2>
-    <form method="post" action="<?= url('/playlists/' . $playlist['id'] . '/videos') ?>">
-        <select name="video_id" required>
-            <option value=""><?= e(t('playlists.add_video_placeholder')) ?></option>
-            <?php foreach ($availableVideos as $video): ?>
-                <option value="<?= (int) $video['id'] ?>"><?= e($video['title'] ?? $video['youtube_id']) ?></option>
-            <?php endforeach; ?>
-        </select>
-        <button type="submit"><?= e(t('playlists.add_video_submit')) ?></button>
-    </form>
+    </ul>
 <?php endif; ?>
 
 <p><a href="<?= url('/playlists') ?>"><?= e(t('playlists.back')) ?></a></p>

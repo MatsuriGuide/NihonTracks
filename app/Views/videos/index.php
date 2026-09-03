@@ -45,6 +45,13 @@
     <summary><?= e(t('videos.filter.title')) ?></summary>
     <form method="get" action="<?= url('/videos') ?>">
         <p>
+            <label for="q"><?= e(t('videos.filter.title_search_label')) ?></label><br>
+            <input type="text" id="q" name="q" value="<?= e($titleQuery ?? '') ?>"
+                   placeholder="<?= e(t('videos.filter.title_search_placeholder')) ?>" style="width: 100%; max-width: 400px;">
+            <br><small><?= e(t('videos.filter.title_search_hint')) ?></small>
+        </p>
+
+        <p>
             <label for="artist_id"><?= e(t('videos.filter.artist_label')) ?></label><br>
             <select id="artist_id" name="artist_id">
                 <option value=""><?= e(t('videos.filter.all_artists')) ?></option>
@@ -87,7 +94,7 @@
         <?php endif; ?>
     </form>
 
-    <?php if (\App\Core\Auth::check() && $hasActiveFilter): ?>
+    <?php if (\App\Core\Auth::check() && ($selectedArtistId !== null || $selectedType !== null || !empty($selectedTagIds))): ?>
         <form method="post" action="<?= url('/videos/filter-presets') ?>" style="margin-top: 1rem;">
             <input type="hidden" name="artist_id" value="<?= $selectedArtistId !== null ? (int) $selectedArtistId : '' ?>">
             <input type="hidden" name="video_type" value="<?= e($selectedType ?? '') ?>">
@@ -101,6 +108,7 @@
                 <?= e(t('videos.filter.make_default')) ?>
             </label>
             <button type="submit"><?= e(t('videos.filter.save_preset')) ?></button>
+            <br><small><?= e(t('videos.filter.title_not_saved_hint')) ?></small>
         </form>
     <?php endif; ?>
 </details>
@@ -148,6 +156,9 @@
             }
             if (!empty($selectedType)) {
                 $pageParams['video_type'] = $selectedType;
+            }
+            if (!empty($titleQuery)) {
+                $pageParams['q'] = $titleQuery;
             }
             $tagQuery = implode('', array_map(static fn ($tid) => '&tag_ids[]=' . (int) $tid, $selectedTagIds));
         ?>

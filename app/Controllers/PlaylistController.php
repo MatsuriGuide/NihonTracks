@@ -63,21 +63,10 @@ class PlaylistController extends Controller
             return;
         }
 
-        $videos = Playlist::videosFor($id);
-
-        $availableVideos = [];
-        if (Auth::canEdit((int) $playlist['user_id'])) {
-            $existingIds = array_column($videos, 'id');
-            $availableVideos = array_values(array_filter(
-                Video::all(),
-                fn (array $v): bool => !in_array((int) $v['id'], $existingIds, true)
-            ));
-        }
-
         $this->render('playlists/show', [
-            'playlist'        => $playlist,
-            'videos'          => $videos,
-            'availableVideos' => $availableVideos,
+            'playlist' => $playlist,
+            'videos'   => Playlist::videosFor($id),
+            'canEdit'  => Auth::canEdit((int) $playlist['user_id']),
         ]);
     }
 
@@ -187,6 +176,37 @@ class PlaylistController extends Controller
 
         Playlist::removeVideo($id, $videoId);
         $this->redirect('/playlists/' . $id);
+    }
+
+    /**
+     * Endpoint AJAX (JSON) : recherche de vidéos par titre pour l'ajout à
+     * la playlist — évite de charger toutes les vidéos d'un coup (des
+     * milliers), ne renvoie que quelques résultats correspondant à la
+     * frappe en cours, en excluant celles déjà présentes dans la playlist.
+     */
+    public function searchVideos(int $id): void
+    {
+        $playlist = Playlist::findById($id);
+
+        if (!$playlist || !Auth::canEdit((int) $playlist['user_id'])) {
+            $this->json(['error' => 'forbidden'], 403);
+
+            return;
+        }
+
+        $query = trim((string) $this->input('q', ''));
+
+        if ($query === '') {
+            $this->json(['results' => []]);
+
+            return;
+        }
+
+        $existingIds = array_column(Playlist::videosFor($id), 'id');
+
+        $results = Video::searchByTitle($query, $existingIds, 15);
+
+        $this->json(['results' => $results]);
     }
 
     /**

@@ -62,6 +62,7 @@ $router->get('/playlists/{id}/edit', 'PlaylistController@edit');
 $router->post('/playlists/{id}/edit', 'PlaylistController@update');
 $router->post('/playlists/{id}/delete', 'PlaylistController@delete');
 $router->post('/playlists/{id}/videos', 'PlaylistController@addVideo');
+$router->get('/playlists/{id}/videos/search', 'PlaylistController@searchVideos');
 $router->post('/playlists/{id}/videos/{videoId}/remove', 'PlaylistController@removeVideo');
 $router->post('/playlists/{id}/videos/{videoId}/toggle', 'PlaylistController@toggleVideo');
 $router->get('/playlists/{id}', 'PlaylistController@show');

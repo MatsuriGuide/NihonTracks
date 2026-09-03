@@ -398,4 +398,13 @@ return [
     'admin.csv_export.generate' => 'Generate and download',
     'artists.json_fill_tags_applied' => 'Tags added:',
     'artists.json_fill_tags_unmatched' => 'Tags not found:',
+    // Video title search + playlist search
+    'videos.filter.title_search_label' => 'Search by title',
+    'videos.filter.title_search_placeholder' => 'Track title...',
+    'videos.filter.title_search_hint' => 'This search is not included in saved filters.',
+    'videos.filter.title_not_saved_hint' => 'The title search is never included in a saved filter.',
+    'playlists.add_video_title' => 'Add a video',
+    'playlists.add_video_search_label' => 'Search for a video by title',
+    'playlists.add_video_search_placeholder' => 'Type at least 2 characters...',
+    'playlists.add_video_button' => 'Add',
 ];
