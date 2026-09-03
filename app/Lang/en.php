@@ -388,4 +388,14 @@ return [
     'videos.filter.preset_name_placeholder' => 'Filter name',
     'videos.filter.make_default' => 'Make this my default filter',
     'videos.filter.save_preset' => 'Save',
+
+    // CSV export / tags applied via JSON
+    'admin.csv_export_link' => 'Export extracts as CSV',
+    'admin.csv_export.title' => 'CSV extract export',
+    'admin.csv_export.hint' => 'Generates an extraits.csv file with official MV videos added to the catalog since the chosen date.',
+    'admin.csv_export.last_export' => 'Last export:',
+    'admin.csv_export.since_label' => 'Since',
+    'admin.csv_export.generate' => 'Generate and download',
+    'artists.json_fill_tags_applied' => 'Tags added:',
+
 ];

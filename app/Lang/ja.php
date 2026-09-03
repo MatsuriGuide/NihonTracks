@@ -388,4 +388,13 @@ return [
     'videos.filter.preset_name_placeholder' => 'フィルター名',
     'videos.filter.make_default' => 'これをデフォルトフィルターにする',
     'videos.filter.save_preset' => '保存',
+
+    // CSV書き出し / JSON経由で適用されたタグ
+    'admin.csv_export_link' => '抜粋をCSVで書き出す',
+    'admin.csv_export.title' => 'CSV抜粋書き出し',
+    'admin.csv_export.hint' => '選択した日時以降にカタログへ追加された「オフィシャルMV」タイプの動画を含むextraits.csvファイルを生成します。',
+    'admin.csv_export.last_export' => '前回の書き出し：',
+    'admin.csv_export.since_label' => '以降',
+    'admin.csv_export.generate' => '生成してダウンロード',
+    'artists.json_fill_tags_applied' => '追加されたタグ：',
 ];
