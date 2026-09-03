@@ -313,6 +313,28 @@ class Video
         }
     }
 
+    /**
+     * Masque une vidéo (status = "hidden") au lieu de la supprimer
+     * réellement. Contrairement à delete(), la ligne reste en base — donc
+     * findByYoutubeId() la retrouve toujours, ce qui empêche le scan de
+     * chaîne de la recréer au prochain passage si elle est toujours
+     * présente sur YouTube. C'est ce que "Supprimer" déclenche désormais
+     * côté contrôleur.
+     */
+    public static function hide(int $id): void
+    {
+        Database::getInstance()->query(
+            'UPDATE videos SET status = "hidden" WHERE id = ?',
+            [$id]
+        );
+    }
+
+    /**
+     * Suppression réelle (ligne effacée de la base) — NE PAS utiliser pour
+     * l'action "Supprimer" côté utilisateur, sous peine de voir la vidéo
+     * revenir au prochain scan de chaîne si elle existe toujours sur
+     * YouTube. Réservée à un usage interne/technique éventuel.
+     */
     public static function delete(int $id): void
     {
         Database::getInstance()->query('DELETE FROM videos WHERE id = ?', [$id]);
@@ -346,7 +368,7 @@ class Video
              LEFT JOIN video_artists va ON va.video_id = v.id
              LEFT JOIN artists_i18n ai ON ai.artist_id = va.artist_id AND ai.lang = ?
              LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
-             WHERE v.source = "auto_scan" AND v.reviewed_at IS NULL
+             WHERE v.source = "auto_scan" AND v.reviewed_at IS NULL AND v.status = "published"
              GROUP BY v.id
              ORDER BY v.release_date DESC, v.id DESC
              LIMIT ' . $limit . ' OFFSET ' . $offset,
@@ -357,7 +379,7 @@ class Video
     public static function countNeedingReview(): int
     {
         return (int) (Database::getInstance()->fetchOne(
-            'SELECT COUNT(*) AS n FROM videos WHERE source = "auto_scan" AND reviewed_at IS NULL'
+            'SELECT COUNT(*) AS n FROM videos WHERE source = "auto_scan" AND reviewed_at IS NULL AND status = "published"'
         )['n'] ?? 0);
     }
 
