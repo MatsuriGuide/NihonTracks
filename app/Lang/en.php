@@ -428,4 +428,8 @@ return [
     // Artist deletion notice (cascade)
     'artists.delete_notice_1' => 'Artist deleted.',
     'artists.delete_notice_2' => 'video(s) left without any artist were hidden.',
+
+    // Play playlist + remove video
+    'playlists.play_all' => '▶ Play all',
+    'playlists.remove_video' => 'Remove',
 ];

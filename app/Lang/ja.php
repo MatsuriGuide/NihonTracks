@@ -429,4 +429,8 @@ return [
     // アーティスト削除通知（連鎖処理）
     'artists.delete_notice_1' => 'アーティストを削除しました。',
     'artists.delete_notice_2' => '件の動画がアーティスト不在となったため非表示にしました。',
+
+    // プレイリスト再生 + 動画削除
+    'playlists.play_all' => '▶ すべて再生',
+    'playlists.remove_video' => '削除',
 ];

@@ -429,4 +429,8 @@ return [
     // Notice suppression artiste (cascade)
     'artists.delete_notice_1' => 'Artiste supprimé.',
     'artists.delete_notice_2' => 'vidéo(s) qui n\'avaient plus aucun artiste ont été masquées.',
+
+    // Lecture playlist + suppression video
+    'playlists.play_all' => '▶ Lire tout',
+    'playlists.remove_video' => 'Retirer',
 ];
