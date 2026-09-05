@@ -39,6 +39,17 @@
 <?php if (empty($videos)): ?>
     <p><?= e(t('playlists.empty')) ?></p>
 <?php else: ?>
+    <p>
+        <button type="button" id="playlist-play-all-btn" class="btn"
+                data-video-ids='<?= e(json_encode(array_column($videos, "youtube_id"))) ?>'>
+            <?= e(t('playlists.play_all')) ?>
+        </button>
+    </p>
+
+    <div id="playlist-sticky-player" style="display:none; position:sticky; top:0; z-index:10; background:var(--navy-950, #10122a); padding:0.75rem 0; margin-bottom:1rem;">
+        <div id="playlist-player-iframe"></div>
+    </div>
+
     <ul class="card-grid">
         <?php foreach ($videos as $video): ?>
             <li class="card">
@@ -65,6 +76,8 @@
             </li>
         <?php endforeach; ?>
     </ul>
+
+    <script src="<?= asset('js/playlist-player.js') ?>"></script>
 <?php endif; ?>
 
 <p><a href="<?= url('/playlists') ?>"><?= e(t('playlists.back')) ?></a></p>

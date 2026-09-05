@@ -1,75 +1,81 @@
 (function () {
     'use strict';
 
-    var panel = document.getElementById('playlist-player-panel');
-    if (!panel) {
+    var playBtn = document.getElementById('playlist-play-all-btn');
+    var playerBox = document.getElementById('playlist-sticky-player');
+
+    if (!playBtn || !playerBox) {
         return;
     }
 
-    var trackEls = Array.prototype.slice.call(document.querySelectorAll('#playlist-tracklist .track'));
-    var queue = trackEls.map(function (el) {
-        var titleEl = el.querySelector('.track-title');
-        return {
-            id: el.getAttribute('data-youtube-id'),
-            title: titleEl ? titleEl.textContent.trim() : ''
-        };
-    });
-
-    if (queue.length === 0) {
-        return;
+    var videoIds = [];
+    try {
+        videoIds = JSON.parse(playBtn.getAttribute('data-video-ids') || '[]');
+    } catch (e) {
+        videoIds = [];
     }
 
-    var currentIndex = 0;
     var player = null;
-    var nowPlayingLabel = document.getElementById('now-playing-label');
+    var currentIndex = 0;
 
-    function setActiveTrack(index) {
-        trackEls.forEach(function (el, i) {
-            el.classList.toggle('is-playing', i === index);
-        });
-        if (nowPlayingLabel && queue[index]) {
-            nowPlayingLabel.textContent = queue[index].title;
+    function loadYouTubeApi(callback) {
+        if (window.YT && window.YT.Player) {
+            callback();
+            return;
+        }
+
+        var previousCallback = window.onYouTubeIframeAPIReady;
+        window.onYouTubeIframeAPIReady = function () {
+            if (typeof previousCallback === 'function') {
+                previousCallback();
+            }
+            callback();
+        };
+
+        if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+            var tag = document.createElement('script');
+            tag.src = 'https://www.youtube.com/iframe_api';
+            document.head.appendChild(tag);
         }
     }
 
     function playIndex(index) {
-        if (index < 0 || index >= queue.length || !player || !player.loadVideoById) {
+        if (index < 0 || index >= videoIds.length || !player) {
             return;
         }
+
         currentIndex = index;
-        setActiveTrack(currentIndex);
-        player.loadVideoById(queue[currentIndex].id);
+        player.loadVideoById(videoIds[currentIndex]);
     }
 
-    window.onYouTubeIframeAPIReady = function () {
-        player = new YT.Player('playlist-player', {
-            height: '360',
-            width: '100%',
-            videoId: queue[0].id,
-            playerVars: { rel: 0 },
-            events: {
-                onReady: function () {
-                    setActiveTrack(0);
-                },
-                onStateChange: function (event) {
-                    if (event.data === YT.PlayerState.ENDED) {
-                        playIndex(currentIndex + 1);
-                    }
-                }
-            }
-        });
-    };
-
-    trackEls.forEach(function (el, i) {
-        var btn = el.querySelector('.track-play');
-        if (btn) {
-            btn.addEventListener('click', function () {
-                playIndex(i);
-            });
+    function onPlayerStateChange(event) {
+        if (event.data === YT.PlayerState.ENDED) {
+            playIndex(currentIndex + 1);
         }
-    });
+    }
 
-    var tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    document.body.appendChild(tag);
+    function createPlayer() {
+        playerBox.style.display = 'block';
+        player = new YT.Player('playlist-player-iframe', {
+            height: '215',
+            width: '380',
+            videoId: videoIds[0],
+            playerVars: { autoplay: 1 },
+            events: { onStateChange: onPlayerStateChange }
+        });
+    }
+
+    playBtn.addEventListener('click', function () {
+        if (videoIds.length === 0) {
+            return;
+        }
+
+        if (player) {
+            playerBox.style.display = 'block';
+            playIndex(0);
+            return;
+        }
+
+        loadYouTubeApi(createPlayer);
+    });
 })();
