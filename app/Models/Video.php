@@ -486,9 +486,20 @@ class Video
         }
     }
 
+    /**
+     * Vidéos de type "MV officiel" ajoutées au catalogue ET sorties depuis
+     * une date/heure donnée — utilisé par l'export CSV. Les deux
+     * conditions sont combinées (ET) :
+     * - created_at >= $since (date d'ajout au site, précision à l'heure)
+     * - release_date >= date de $since seule (date de sortie YouTube,
+     *   qui ne contient pas d'heure dans notre schéma — on ne compare
+     *   donc que la partie date, sans quoi une vidéo sortie CE jour-là
+     *   mais avant l'heure choisie serait exclue à tort).
+     */
     public static function officialMvSince(string $since, ?string $lang = null): array
     {
         $lang ??= Lang::current();
+        $sinceDate = substr($since, 0, 10);
 
         return Database::getInstance()->fetchAll(
             'SELECT v.id, v.youtube_url, v.created_at,
@@ -500,10 +511,12 @@ class Video
              LEFT JOIN video_artists va ON va.video_id = v.id
              LEFT JOIN artists_i18n ai ON ai.artist_id = va.artist_id AND ai.lang = ?
              LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
-             WHERE v.status = "published" AND v.video_type = "mv" AND v.created_at >= ?
+             WHERE v.status = "published" AND v.video_type = "mv"
+               AND v.created_at >= ?
+               AND v.release_date >= ?
              GROUP BY v.id
              ORDER BY v.created_at ASC',
-            [$lang, $lang, $since]
+            [$lang, $lang, $since, $sinceDate]
         );
     }
 }
