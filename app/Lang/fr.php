@@ -433,4 +433,11 @@ return [
     // Lecture playlist + suppression video
     'playlists.play_all' => '▶ Lire tout',
     'playlists.remove_video' => 'Retirer',
+
+    // Mode complétion en série des artistes
+    'admin.artist_completion.start_chain' => 'Compléter en série',
+    'admin.artist_completion.chain_done' => 'Toutes les fiches ont été complétées !',
+    'artists.chain_mode_active' => 'Mode complétion en série actif.',
+    'artists.chain_mode_remaining' => 'fiche(s) restante(s)',
+    'artists.chain_mode_stop' => 'Arrêter',
 ];

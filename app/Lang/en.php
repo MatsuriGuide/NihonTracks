@@ -432,4 +432,11 @@ return [
     // Play playlist + remove video
     'playlists.play_all' => '▶ Play all',
     'playlists.remove_video' => 'Remove',
+
+    // Serial artist completion mode
+    'admin.artist_completion.start_chain' => 'Complete in sequence',
+    'admin.artist_completion.chain_done' => 'All pages have been completed!',
+    'artists.chain_mode_active' => 'Sequential completion mode active.',
+    'artists.chain_mode_remaining' => 'page(s) remaining',
+    'artists.chain_mode_stop' => 'Stop',
 ];

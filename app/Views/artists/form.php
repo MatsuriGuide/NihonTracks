@@ -1,5 +1,15 @@
 <h1><?= $mode === 'edit' ? e(t('artists.edit_title')) : e(t('artists.create_title')) ?></h1>
 
+<?php if (!empty($chainMode)): ?>
+    <p class="hint">
+        <?= e(t('artists.chain_mode_active')) ?>
+        <?php if (!empty($chainRemaining)): ?>
+            — <?= (int) $chainRemaining ?> <?= e(t('artists.chain_mode_remaining')) ?>
+        <?php endif; ?>
+        &nbsp;<a href="<?= url('/admin/incomplete-artists') ?>"><?= e(t('artists.chain_mode_stop')) ?></a>
+    </p>
+<?php endif; ?>
+
 <?php if (!empty($errors)): ?>
     <ul class="errors">
         <?php foreach ($errors as $error): ?>
@@ -43,6 +53,9 @@
 <?php endif; ?>
 
 <form method="post" action="<?= $mode === 'edit' ? url('/artists/' . $artistId . '/edit') : url('/artists/create') ?>">
+    <?php if (!empty($chainMode)): ?>
+        <input type="hidden" name="chain" value="1">
+    <?php endif; ?>
     <p>
         <label for="name"><?= e(t('artists.name')) ?></label><br>
         <input type="text" id="name" name="name" value="<?= e($old['name'] ?? '') ?>" required>

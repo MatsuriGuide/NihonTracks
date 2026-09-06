@@ -433,4 +433,11 @@ return [
     // プレイリスト再生 + 動画削除
     'playlists.play_all' => '▶ すべて再生',
     'playlists.remove_video' => '削除',
+
+    // アーティスト連続補完モード
+    'admin.artist_completion.start_chain' => '連続で補完する',
+    'admin.artist_completion.chain_done' => 'すべてのページが完成しました！',
+    'artists.chain_mode_active' => '連続補完モード有効中。',
+    'artists.chain_mode_remaining' => '件残り',
+    'artists.chain_mode_stop' => '停止',
 ];

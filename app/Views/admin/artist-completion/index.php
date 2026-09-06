@@ -1,8 +1,17 @@
 <h1><?= e(t('admin.artist_completion.title')) ?></h1>
 
+<?php if (($_GET['chain_done'] ?? '') === '1'): ?>
+    <p class="hint hint-success"><?= e(t('admin.artist_completion.chain_done')) ?></p>
+<?php endif; ?>
+
 <?php if (empty($artists)): ?>
     <p><?= e(t('admin.artist_completion.none')) ?></p>
 <?php else: ?>
+    <p>
+        <a href="<?= url('/artists/' . $artists[0]['id'] . '/edit?chain=1') ?>" class="btn">
+            <?= e(t('admin.artist_completion.start_chain')) ?>
+        </a>
+    </p>
     <ul>
         <?php foreach ($artists as $artist): ?>
             <li>

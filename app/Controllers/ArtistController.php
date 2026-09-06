@@ -235,6 +235,8 @@ class ArtistController extends Controller
             'artistId'       => $id,
             'tagGroups'      => Tag::selectable(),
             'selectedTagIds' => Artist::tagIdsFor($id),
+            'chainMode'      => $this->input('chain') === '1',
+            'chainRemaining' => $this->input('chain') === '1' ? Artist::countIncomplete() : 0,
         ]);
     }
 
@@ -251,6 +253,8 @@ class ArtistController extends Controller
             return;
         }
 
+        $chainMode = $this->input('chain') === '1';
+
         [$data, $errors] = $this->validate();
 
         if (!empty($errors)) {
@@ -261,6 +265,8 @@ class ArtistController extends Controller
                 'artistId'       => $id,
                 'tagGroups'      => Tag::selectable(),
                 'selectedTagIds' => array_map('intval', (array) $this->input('tag_ids', [])),
+                'chainMode'      => $chainMode,
+                'chainRemaining' => $chainMode ? Artist::countIncomplete() : 0,
             ]);
 
             return;
@@ -272,6 +278,24 @@ class ArtistController extends Controller
 
         Artist::update($id, $data, $data['name'], $data['bio']);
         Artist::setTags($id, array_map('intval', (array) $this->input('tag_ids', [])));
+
+        // Mode "compléter en série" : on enchaîne directement sur la
+        // prochaine fiche incomplète plutôt que de renvoyer vers la fiche
+        // qu'on vient de sauvegarder — gain de temps pour traiter la liste
+        // d'un coup sans repasser par l'écran de complétion à chaque fois.
+        if ($chainMode) {
+            $remaining = Artist::allIncomplete();
+
+            if (!empty($remaining)) {
+                $this->redirect('/artists/' . $remaining[0]['id'] . '/edit?chain=1');
+
+                return;
+            }
+
+            $this->redirect('/admin/incomplete-artists?chain_done=1');
+
+            return;
+        }
 
         $this->redirect('/artists/' . $data['slug']);
     }
