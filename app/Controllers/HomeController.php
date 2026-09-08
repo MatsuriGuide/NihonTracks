@@ -3,36 +3,44 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
-use App\Core\Database;
+use App\Models\Artist;
+use App\Models\Playlist;
+use App\Models\Tag;
+use App\Models\Video;
 
 class HomeController extends Controller
 {
     public function index(): void
     {
-        $db = Database::getInstance();
+        $latestVideos = Video::latest(12);
+        $latestIds = array_map(static fn (array $v): int => (int) $v['id'], $latestVideos);
 
-        $lang = \App\Core\Lang::current();
+        // Vidéos "à découvrir" : tirées au hasard, jamais les mêmes que
+        // celles déjà montrées dans "Dernières sorties" (voir randomDiscover).
+        $discoverVideos = Video::randomDiscover(6, $latestIds);
 
-        // Exemple : dernières vidéos publiées (une fois la table remplie)
-        $latestVideos = $db->fetchAll(
-            'SELECT v.id, v.youtube_id, v.release_date, v.thumbnail_url,
-                    COALESCE(vi.title, vi_fr.title) AS title,
-                    GROUP_CONCAT(DISTINCT COALESCE(ai.name, ai_fr.name) ORDER BY ai.name SEPARATOR ", ") AS artist_names
-             FROM videos v
-             LEFT JOIN videos_i18n vi ON vi.video_id = v.id AND vi.lang = ?
-             LEFT JOIN videos_i18n vi_fr ON vi_fr.video_id = v.id AND vi_fr.lang = "fr"
-             LEFT JOIN video_artists va ON va.video_id = v.id
-             LEFT JOIN artists_i18n ai ON ai.artist_id = va.artist_id AND ai.lang = ?
-             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
-             WHERE v.status = "published"
-             GROUP BY v.id
-             ORDER BY v.release_date DESC
-             LIMIT 12',
-            [$lang, $lang]
-        );
+        $discoverArtists = Artist::randomWithVideos(6);
+        $newArtists = Artist::recentlyAdded(6);
+
+        $tagGroups = Tag::selectable();
+        $genreTags = $tagGroups['genre']['tags'] ?? [];
+
+        $publicPlaylists = array_slice(Playlist::allPublic(), 0, 6);
+        foreach ($publicPlaylists as &$playlist) {
+            $playlist['preview_thumbnails'] = Playlist::previewThumbnails((int) $playlist['id'], 4);
+        }
+        unset($playlist);
 
         $this->render('home/index', [
-            'latestVideos' => $latestVideos,
+            'latestVideos'    => $latestVideos,
+            'discoverVideos'  => $discoverVideos,
+            'discoverArtists' => $discoverArtists,
+            'newArtists'      => $newArtists,
+            'genreTags'       => $genreTags,
+            'playlists'       => $publicPlaylists,
+            'artistCount'     => Artist::countApproved(),
+            'videoCount'      => Video::countPublished(),
+            'playlistCount'   => Playlist::countAll(),
         ]);
     }
 }

@@ -14,6 +14,19 @@ return [
     // ホーム
     'home.title' => '最新リリース',
     'home.empty' => 'まだ動画がありません。',
+    'home.hero_title' => '新しい日本の音楽との出会い',
+    'home.hero_subtitle' => 'ジャンル・アーティスト・プレイリストで整理されたカタログを通して、日本の音楽アーティストと動画を探索しましょう。',
+    'home.explore_videos' => '動画を探す',
+    'home.discover_artists_cta' => 'アーティストを見る',
+    'home.latest_releases' => '最新リリース',
+    'home.view_all_videos' => 'すべての動画を見る',
+    'home.discover' => 'おすすめ',
+    'home.discover_artists' => '注目のアーティスト',
+    'home.view_all_artists' => 'すべてのアーティストを見る',
+    'home.explore_genres' => 'ジャンルで探す',
+    'home.playlists' => 'プレイリスト',
+    'home.view_all_playlists' => 'すべてのプレイリストを見る',
+    'home.new_artists' => '新着アーティスト',
 
     // 認証
     'auth.register.title'            => 'アカウント作成',

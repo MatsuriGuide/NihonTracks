@@ -76,19 +76,56 @@ class Artist
 
     /**
      * Repli de détection : artistes approuvés dont le nom (langue courante
-     * ou français) correspond exactement au nom de la chaîne YouTube.
+     * ou français) correspond au nom de la chaîne YouTube, une fois les
+     * suffixes usuels des chaînes officielles ignorés ("Official",
+     * "Topic", "VEVO"...). Nécessaire car les noms de chaîne réels sont
+     * rarement identiques mot pour mot au nom de l'artiste ("HANA
+     * official" vs "HANA") — une égalité stricte manquait ces cas très
+     * courants. Comparaison faite en PHP (le nombre d'artistes reste
+     * raisonnable) plutôt qu'en SQL, la normalisation n'étant pas
+     * exprimable proprement en LIKE.
      */
     public static function findIdsByExactName(string $name): array
     {
+        $normalizedTarget = self::normalizeChannelName($name);
+
+        if ($normalizedTarget === '') {
+            return [];
+        }
+
         $rows = Database::getInstance()->fetchAll(
-            'SELECT DISTINCT ai.artist_id
+            'SELECT DISTINCT ai.artist_id, ai.name
              FROM artists_i18n ai
-             JOIN artists a ON a.id = ai.artist_id AND a.moderation_status = "approved"
-             WHERE LOWER(ai.name) = LOWER(?)',
-            [$name]
+             JOIN artists a ON a.id = ai.artist_id AND a.moderation_status = "approved"'
         );
 
-        return array_map(static fn (array $r): int => (int) $r['artist_id'], $rows);
+        $matches = [];
+        foreach ($rows as $row) {
+            if (self::normalizeChannelName((string) $row['name']) === $normalizedTarget) {
+                $matches[] = (int) $row['artist_id'];
+            }
+        }
+
+        return array_values(array_unique($matches));
+    }
+
+    /**
+     * Nettoie un nom de chaîne YouTube pour comparaison : minuscule, et
+     * retrait des suffixes usuels ("Official", "Official Channel",
+     * "Topic" — les chaînes auto-générées par YouTube pour la musique,
+     * "VEVO") qui n'apparaissent jamais dans le nom de l'artiste tel que
+     * saisi sur le site.
+     */
+    private static function normalizeChannelName(string $name): string
+    {
+        $name = mb_strtolower(trim($name));
+        $name = (string) preg_replace(
+            '/\s*[-|–—]?\s*(official\s*(youtube\s*)?(channel|account)?|topic|vevo)\s*$/u',
+            '',
+            $name
+        );
+
+        return trim($name);
     }
 
     public static function slugExists(string $slug, ?int $excludeId = null): bool
@@ -357,5 +394,133 @@ class Artist
             'UPDATE artists SET subscriber_count = ? WHERE id = ?',
             [$count, $id]
         );
+    }
+
+    /**
+     * Artistes tirés au hasard parmi ceux ayant au moins une vidéo — pour
+     * la section "Artistes à découvrir" de l'accueil. Même technique que
+     * Video::randomDiscover() : pas d'ORDER BY RAND(), un COUNT() puis des
+     * LIMIT 1 OFFSET à des positions aléatoires, qui reste rapide même
+     * avec plusieurs centaines/milliers d'artistes.
+     */
+    public static function randomWithVideos(int $limit = 6, ?string $lang = null): array
+    {
+        $lang ??= Lang::current();
+        $limit = max(1, min(20, $limit));
+        $db = Database::getInstance();
+
+        $total = (int) ($db->fetchOne(
+            'SELECT COUNT(DISTINCT a.id) AS n
+             FROM artists a
+             JOIN video_artists va ON va.artist_id = a.id
+             WHERE a.moderation_status = "approved"'
+        )['n'] ?? 0);
+
+        if ($total === 0) {
+            return [];
+        }
+
+        $picked = [];
+        $pickedIds = [];
+        $attempts = 0;
+        $maxAttempts = $limit * 6;
+
+        while (count($picked) < $limit && $attempts < $maxAttempts) {
+            $attempts++;
+            $offset = random_int(0, $total - 1);
+
+            $row = $db->fetchOne(
+                'SELECT DISTINCT a.id, a.slug, a.type, a.avatar_path,
+                        COALESCE(ai.name, ai_fr.name) AS name,
+                        COALESCE(ai_ja.name, NULL) AS name_ja,
+                        (SELECT COUNT(*) FROM video_artists va2 WHERE va2.artist_id = a.id) AS video_count
+                 FROM artists a
+                 JOIN video_artists va ON va.artist_id = a.id
+                 LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = ?
+                 LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
+                 LEFT JOIN artists_i18n ai_ja ON ai_ja.artist_id = a.id AND ai_ja.lang = "ja"
+                 WHERE a.moderation_status = "approved"
+                 ORDER BY a.id ASC
+                 LIMIT 1 OFFSET ' . $offset,
+                [$lang]
+            );
+
+            if ($row === null) {
+                continue;
+            }
+
+            $id = (int) $row['id'];
+
+            if (isset($pickedIds[$id])) {
+                continue;
+            }
+
+            $pickedIds[$id] = true;
+            $picked[] = $row;
+        }
+
+        return self::attachTagPreview($picked);
+    }
+
+    /**
+     * Derniers artistes ajoutés au catalogue (date de création de la
+     * fiche) — pour la section "Nouveaux artistes" de l'accueil.
+     */
+    public static function recentlyAdded(int $limit = 6, ?string $lang = null): array
+    {
+        $lang ??= Lang::current();
+        $limit = max(1, min(20, $limit));
+
+        $rows = Database::getInstance()->fetchAll(
+            'SELECT a.id, a.slug, a.type, a.avatar_path, a.created_at,
+                    COALESCE(ai.name, ai_fr.name) AS name,
+                    (SELECT COUNT(*) FROM video_artists va WHERE va.artist_id = a.id) AS video_count
+             FROM artists a
+             LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = ?
+             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
+             WHERE a.moderation_status = "approved"
+             ORDER BY a.created_at DESC
+             LIMIT ' . $limit,
+            [$lang]
+        );
+
+        return self::attachTagPreview($rows);
+    }
+
+    /**
+     * Ajoute 2-3 tags principaux à une petite liste d'artistes déjà
+     * chargée — une requête groupée pour tout le lot, jamais une par
+     * artiste.
+     */
+    private static function attachTagPreview(array $artists): array
+    {
+        if (empty($artists)) {
+            return [];
+        }
+
+        $ids = array_map(static fn (array $a): int => (int) $a['id'], $artists);
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+        $tagRows = Database::getInstance()->fetchAll(
+            "SELECT at.artist_id, ti_fr.name
+             FROM artist_tags at
+             JOIN tags t ON t.id = at.tag_id
+             LEFT JOIN tags_i18n ti_fr ON ti_fr.tag_id = t.id AND ti_fr.lang = \"fr\"
+             WHERE at.artist_id IN ({$placeholders})",
+            $ids
+        );
+
+        $tagsByArtist = [];
+        foreach ($tagRows as $row) {
+            if (!empty($row['name'])) {
+                $tagsByArtist[(int) $row['artist_id']][] = $row['name'];
+            }
+        }
+
+        foreach ($artists as &$artist) {
+            $artist['tags'] = array_slice($tagsByArtist[(int) $artist['id']] ?? [], 0, 3);
+        }
+
+        return $artists;
     }
 }

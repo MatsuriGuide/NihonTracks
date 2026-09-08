@@ -14,6 +14,19 @@ return [
     // Accueil
     'home.title' => 'Dernières sorties',
     'home.empty' => 'Aucune vidéo pour le moment.',
+    'home.hero_title' => 'Découvrez la musique japonaise autrement',
+    'home.hero_subtitle' => 'Explorez des artistes et vidéos musicales japonaises à travers un catalogue organisé par genres, artistes et playlists.',
+    'home.explore_videos' => 'Explorer les vidéos',
+    'home.discover_artists_cta' => 'Découvrir les artistes',
+    'home.latest_releases' => 'Dernières sorties',
+    'home.view_all_videos' => 'Voir toutes les vidéos',
+    'home.discover' => 'À découvrir',
+    'home.discover_artists' => 'Artistes à découvrir',
+    'home.view_all_artists' => 'Voir tous les artistes',
+    'home.explore_genres' => 'Explorer par genre',
+    'home.playlists' => 'Playlists',
+    'home.view_all_playlists' => 'Voir toutes les playlists',
+    'home.new_artists' => 'Nouveaux artistes',
 
     // Auth
     'auth.register.title'            => 'Créer un compte',

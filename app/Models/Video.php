@@ -519,4 +519,140 @@ class Video
             [$lang, $lang, $since, $sinceDate]
         );
     }
+
+    /**
+     * Dernières vidéos publiées, avec leurs tags — pour la page d'accueil.
+     * Les tags sont récupérés en une requête groupée séparée (pas de JOIN
+     * dans la requête principale, qui multiplierait les lignes) plutôt
+     * qu'un aller par vidéo : le nombre de vidéos affichées ici reste
+     * toujours petit (8-12), donc deux requêtes courtes valent mieux
+     * qu'une jointure complexe.
+     */
+    public static function latest(int $limit = 12, ?string $lang = null): array
+    {
+        $lang ??= Lang::current();
+        $limit = max(1, min(50, $limit));
+
+        $videos = Database::getInstance()->fetchAll(
+            'SELECT v.id, v.youtube_id, v.thumbnail_url, v.release_date, v.video_type,
+                    COALESCE(vi.title, vi_fr.title) AS title,
+                    GROUP_CONCAT(DISTINCT COALESCE(ai.name, ai_fr.name) ORDER BY ai.name SEPARATOR ", ") AS artist_names
+             FROM videos v
+             LEFT JOIN videos_i18n vi ON vi.video_id = v.id AND vi.lang = ?
+             LEFT JOIN videos_i18n vi_fr ON vi_fr.video_id = v.id AND vi_fr.lang = "fr"
+             LEFT JOIN video_artists va ON va.video_id = v.id
+             LEFT JOIN artists_i18n ai ON ai.artist_id = va.artist_id AND ai.lang = ?
+             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
+             WHERE v.status = "published"
+             GROUP BY v.id
+             ORDER BY v.release_date DESC, v.id DESC
+             LIMIT ' . $limit,
+            [$lang, $lang]
+        );
+
+        return self::attachTags($videos, $lang);
+    }
+
+    /**
+     * Sélection "à découvrir" : des vidéos tirées au hasard dans tout le
+     * catalogue, en excluant celles déjà montrées ailleurs sur la page
+     * (typiquement les "dernières sorties"). Volontairement SANS
+     * "ORDER BY RAND()", qui forcerait un tri complet de la table à
+     * chaque chargement de page — coûteux dès quelques dizaines de
+     * milliers de lignes. À la place : un COUNT() puis quelques
+     * "LIMIT 1 OFFSET x" à des positions aléatoires, une technique qui
+     * reste rapide à cette échelle car chaque requête individuelle
+     * s'arrête dès qu'elle atteint sa position, sans trier le reste.
+     */
+    public static function randomDiscover(int $limit = 6, array $excludeIds = [], ?string $lang = null): array
+    {
+        $lang ??= Lang::current();
+        $limit = max(1, min(20, $limit));
+
+        $total = self::countPublished();
+
+        if ($total === 0) {
+            return [];
+        }
+
+        $picked = [];
+        $pickedIds = [];
+        $attempts = 0;
+        $maxAttempts = $limit * 6; // marge pour absorber les doublons/exclusions
+
+        while (count($picked) < $limit && $attempts < $maxAttempts) {
+            $attempts++;
+            $offset = random_int(0, $total - 1);
+
+            $row = Database::getInstance()->fetchOne(
+                'SELECT v.id, v.youtube_id, v.thumbnail_url, v.release_date, v.video_type,
+                        COALESCE(vi.title, vi_fr.title) AS title,
+                        GROUP_CONCAT(DISTINCT COALESCE(ai.name, ai_fr.name) ORDER BY ai.name SEPARATOR ", ") AS artist_names
+                 FROM videos v
+                 LEFT JOIN videos_i18n vi ON vi.video_id = v.id AND vi.lang = ?
+                 LEFT JOIN videos_i18n vi_fr ON vi_fr.video_id = v.id AND vi_fr.lang = "fr"
+                 LEFT JOIN video_artists va ON va.video_id = v.id
+                 LEFT JOIN artists_i18n ai ON ai.artist_id = va.artist_id AND ai.lang = ?
+                 LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
+                 WHERE v.status = "published"
+                 GROUP BY v.id
+                 ORDER BY v.id ASC
+                 LIMIT 1 OFFSET ' . $offset,
+                [$lang, $lang]
+            );
+
+            if ($row === null) {
+                continue;
+            }
+
+            $id = (int) $row['id'];
+
+            if (in_array($id, $excludeIds, true) || isset($pickedIds[$id])) {
+                continue;
+            }
+
+            $pickedIds[$id] = true;
+            $picked[] = $row;
+        }
+
+        return self::attachTags($picked, $lang);
+    }
+
+    /**
+     * Ajoute les tags (2-3 principaux) à une petite liste de vidéos déjà
+     * chargées — une seule requête groupée pour tout le lot, jamais une
+     * par vidéo.
+     */
+    private static function attachTags(array $videos, string $lang): array
+    {
+        if (empty($videos)) {
+            return [];
+        }
+
+        $ids = array_map(static fn (array $v): int => (int) $v['id'], $videos);
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+        $tagRows = Database::getInstance()->fetchAll(
+            "SELECT vt.video_id, COALESCE(ti.name, ti_fr.name) AS name
+             FROM video_tags vt
+             JOIN tags t ON t.id = vt.tag_id
+             LEFT JOIN tags_i18n ti ON ti.tag_id = t.id AND ti.lang = ?
+             LEFT JOIN tags_i18n ti_fr ON ti_fr.tag_id = t.id AND ti_fr.lang = \"fr\"
+             WHERE vt.video_id IN ({$placeholders})",
+            array_merge([$lang], $ids)
+        );
+
+        $tagsByVideo = [];
+        foreach ($tagRows as $row) {
+            if (!empty($row['name'])) {
+                $tagsByVideo[(int) $row['video_id']][] = $row['name'];
+            }
+        }
+
+        foreach ($videos as &$video) {
+            $video['tags'] = array_slice($tagsByVideo[(int) $video['id']] ?? [], 0, 3);
+        }
+
+        return $videos;
+    }
 }

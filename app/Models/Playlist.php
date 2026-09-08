@@ -59,6 +59,27 @@ class Playlist
         )['n'] ?? 0);
     }
 
+    /**
+     * Les N premières miniatures d'une playlist (par position) — pour la
+     * couverture en mosaïque sur la page d'accueil. Les playlists
+     * affichées y sont en petit nombre, donc un aller par playlist reste
+     * négligeable (pas de N+1 problématique à cette échelle).
+     */
+    public static function previewThumbnails(int $playlistId, int $limit = 4): array
+    {
+        $rows = Database::getInstance()->fetchAll(
+            'SELECT v.thumbnail_url
+             FROM playlist_videos pv
+             JOIN videos v ON v.id = pv.video_id
+             WHERE pv.playlist_id = ? AND v.thumbnail_url IS NOT NULL
+             ORDER BY pv.position ASC
+             LIMIT ' . max(1, min(10, $limit)),
+            [$playlistId]
+        );
+
+        return array_map(static fn (array $r): string => $r['thumbnail_url'], $rows);
+    }
+
     public static function create(string $name, ?string $description, bool $isPublic, int $userId): int
     {
         $db = Database::getInstance();
