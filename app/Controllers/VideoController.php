@@ -83,7 +83,9 @@ class VideoController extends Controller
     {
         $video = Video::findById($id);
 
-        if (!$video) {
+        $isModOrAdmin = in_array(Auth::role(), ['moderator', 'admin'], true);
+
+        if (!$video || ($video['status'] === 'hidden' && !$isModOrAdmin)) {
             http_response_code(404);
             require dirname(__DIR__) . '/Views/errors/404.php';
 
@@ -329,7 +331,7 @@ class VideoController extends Controller
             return;
         }
 
-        Video::delete($id);
+        Video::hide($id);
         $this->redirect('/videos');
     }
 
