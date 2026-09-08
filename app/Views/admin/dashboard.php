@@ -14,4 +14,5 @@
     <li><a href="<?= url('/admin/tags') ?>"><?= e(t('admin.tags_link')) ?></a></li>
     <li><a href="<?= url('/admin/csv-export') ?>"><?= e(t('admin.csv_export_link')) ?></a></li>
     <li><a href="<?= url('/admin/video-tag-backfill') ?>"><?= e(t('admin.tag_backfill_link')) ?></a></li>
+    <li><a href="<?= url('/admin/exports') ?>"><?= e(t('admin.exports_link')) ?></a></li>
 </ul>

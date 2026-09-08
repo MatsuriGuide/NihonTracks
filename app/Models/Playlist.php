@@ -39,11 +39,6 @@ class Playlist
         );
     }
 
-    /**
-     * Playlists de l'utilisateur, avec un indicateur has_video précisant si
-     * la vidéo donnée y figure déjà — utilisé sur la fiche vidéo pour le
-     * bouton d'ajout rapide (état "déjà ajouté" affiché sans requête à part).
-     */
     public static function allByUserWithVideoStatus(int $userId, int $videoId): array
     {
         return Database::getInstance()->fetchAll(
@@ -55,6 +50,13 @@ class Playlist
              ORDER BY p.updated_at DESC',
             [$videoId, $userId]
         );
+    }
+
+    public static function countAll(): int
+    {
+        return (int) (Database::getInstance()->fetchOne(
+            'SELECT COUNT(*) AS n FROM playlists'
+        )['n'] ?? 0);
     }
 
     public static function create(string $name, ?string $description, bool $isPublic, int $userId): int

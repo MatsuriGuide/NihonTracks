@@ -25,6 +25,14 @@ $router->get('/admin/csv-export', 'Admin\CsvExportController@index');
 $router->post('/admin/csv-export/generate', 'Admin\CsvExportController@generate');
 $router->get('/admin/video-tag-backfill', 'Admin\VideoTagBackfillController@index');
 $router->post('/admin/video-tag-backfill/run', 'Admin\VideoTagBackfillController@run');
+$router->get('/admin/exports', 'Admin\ExportController@index');
+$router->get('/admin/exports/artists.json', 'Admin\ExportController@artistsJson');
+$router->get('/admin/exports/artists.csv', 'Admin\ExportController@artistsCsv');
+$router->get('/admin/exports/videos.json', 'Admin\ExportController@videosJson');
+$router->get('/admin/exports/videos.csv', 'Admin\ExportController@videosCsv');
+$router->get('/admin/exports/taxonomy.json', 'Admin\ExportController@taxonomyJson');
+$router->get('/admin/exports/playlists.json', 'Admin\ExportController@playlistsJson');
+$router->get('/admin/exports/full.json', 'Admin\ExportController@fullAudit');
 
 // À compléter au fur et à mesure :
 // $router->get('/admin/users', 'Admin\UserAdminController@index');

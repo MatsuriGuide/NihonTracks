@@ -139,6 +139,7 @@ return [
     'playlists.edit'             => 'Modifier',
     'playlists.delete'           => 'Supprimer',
     'playlists.delete_confirm'   => 'Supprimer cette playlist ?',
+    'playlists.visibility'       => 'Visibilité',
 
     // Admin
     'admin.dashboard_title'    => 'Administration',
@@ -285,7 +286,7 @@ return [
     'admin.artist_approvals.submitted_by' => 'soumis par',
     'admin.artist_approvals.approve' => 'Approuver',
     'admin.artist_approvals.reject' => 'Rejeter',
-    'admin.artist_approvals.reject_confirm' => 'Rejeter cette fiche ? Elle restera cachée mais ne sera pas supprimée.',
+    'admin.artist_approvals.reject_confirm' => 'Rejeter cette fiche ? Elle restera cachée mais ne sera pas supprimée.',
     'artists.moderation.pending_banner' => 'Cette fiche est en attente de validation par un modérateur.',
     'artists.moderation.rejected_banner' => 'Cette fiche a été rejetée par la modération.',
     'artists.quick_create.link' => '+ Ajout rapide via une chaîne YouTube',
@@ -404,7 +405,6 @@ return [
     'videos.filter.title_search_placeholder' => 'Titre du morceau...',
     'videos.filter.title_search_hint' => 'Cette recherche n\'est pas incluse dans les filtres enregistrés.',
     'videos.filter.title_not_saved_hint' => 'La recherche par titre n\'est jamais incluse dans un filtre enregistré.',
-    'playlists.add_video_title' => 'Ajouter une vidéo',
     'playlists.add_video_search_label' => 'Rechercher une vidéo par titre',
     'playlists.add_video_search_placeholder' => 'Tape au moins 2 caractères...',
     'playlists.add_video_button' => 'Ajouter',
@@ -433,7 +433,6 @@ return [
     // Lecture playlist + suppression video
     'playlists.play_all' => '▶ Lire tout',
     'playlists.remove_video' => 'Retirer',
-    'playlists.visibility' => 'Visibilité',
 
     // Mode complétion en série des artistes
     'admin.artist_completion.start_chain' => 'Compléter en série',
@@ -444,5 +443,19 @@ return [
 
     // Chaine YouTube non reconnue (lien fantome)
     'videos.unmatched_channel_hint' => 'Cette chaîne (URL ci-dessous) n\'est enregistrée sur aucun artiste. Si c\'est bien la chaîne d\'un des artistes ci-dessous, ajoute ce lien sur sa fiche pour fiabiliser la détection des prochaines vidéos.',
-    
+
+    // Exports et audit qualité des donnees (admin)
+    'admin.exports_link' => 'Exports et audit des données',
+    'admin.exports.title' => 'Exports et audit des données',
+    'admin.exports.stats_artists' => 'Artistes :',
+    'admin.exports.stats_videos' => 'Vidéos :',
+    'admin.exports.stats_playlists' => 'Playlists :',
+    'admin.exports.generated_at' => 'Généré le',
+    'admin.exports.section_artists' => 'Artistes',
+    'admin.exports.section_videos' => 'Vidéos',
+    'admin.exports.section_taxonomy' => 'Taxonomie (tags)',
+    'admin.exports.section_playlists' => 'Playlists',
+    'admin.exports.section_full' => 'Export complet',
+    'admin.exports.full_button' => 'Export complet pour audit',
+    'admin.exports.full_hint' => 'Un seul fichier JSON regroupant artistes, vidéos, playlists, relations et taxonomie, avec des indicateurs de qualité calculés automatiquement — prêt à transmettre à un outil d\'analyse ou à ChatGPT pour un audit global.',
 ];

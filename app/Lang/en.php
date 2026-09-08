@@ -139,6 +139,7 @@ return [
     'playlists.edit'             => 'Edit',
     'playlists.delete'           => 'Delete',
     'playlists.delete_confirm'   => 'Delete this playlist?',
+    'playlists.visibility'       => 'Visibility',
 
     // Admin
     'admin.dashboard_title'    => 'Admin',
@@ -398,12 +399,12 @@ return [
     'admin.csv_export.generate' => 'Generate and download',
     'artists.json_fill_tags_applied' => 'Tags added:',
     'artists.json_fill_tags_unmatched' => 'Tags not found:',
+
     // Video title search + playlist search
     'videos.filter.title_search_label' => 'Search by title',
     'videos.filter.title_search_placeholder' => 'Track title...',
     'videos.filter.title_search_hint' => 'This search is not included in saved filters.',
     'videos.filter.title_not_saved_hint' => 'The title search is never included in a saved filter.',
-    'playlists.add_video_title' => 'Add a video',
     'playlists.add_video_search_label' => 'Search for a video by title',
     'playlists.add_video_search_placeholder' => 'Type at least 2 characters...',
     'playlists.add_video_button' => 'Add',
@@ -432,7 +433,6 @@ return [
     // Play playlist + remove video
     'playlists.play_all' => '▶ Play all',
     'playlists.remove_video' => 'Remove',
-    'playlists.visibility' => 'Visibility',
 
     // Serial artist completion mode
     'admin.artist_completion.start_chain' => 'Complete in sequence',
@@ -443,4 +443,19 @@ return [
 
     // Unrecognized YouTube channel (ghost link)
     'videos.unmatched_channel_hint' => 'This channel (URL below) isn\'t registered on any artist. If it belongs to one of the artists below, add this link to their page to make future video detection more reliable.',
+
+    // Data exports & quality audit (admin)
+    'admin.exports_link' => 'Exports & data audit',
+    'admin.exports.title' => 'Exports & data audit',
+    'admin.exports.stats_artists' => 'Artists:',
+    'admin.exports.stats_videos' => 'Videos:',
+    'admin.exports.stats_playlists' => 'Playlists:',
+    'admin.exports.generated_at' => 'Generated on',
+    'admin.exports.section_artists' => 'Artists',
+    'admin.exports.section_videos' => 'Videos',
+    'admin.exports.section_taxonomy' => 'Taxonomy (tags)',
+    'admin.exports.section_playlists' => 'Playlists',
+    'admin.exports.section_full' => 'Full export',
+    'admin.exports.full_button' => 'Full export for audit',
+    'admin.exports.full_hint' => 'A single JSON file with artists, videos, playlists, relations and taxonomy, plus automatically computed quality flags — ready to hand to an analysis tool or ChatGPT for a full audit.',
 ];

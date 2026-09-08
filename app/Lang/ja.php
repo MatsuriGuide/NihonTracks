@@ -139,6 +139,7 @@ return [
     'playlists.edit'             => '編集',
     'playlists.delete'           => '削除',
     'playlists.delete_confirm'   => 'このプレイリストを削除しますか？',
+    'playlists.visibility'       => '公開設定',
 
     // 管理画面
     'admin.dashboard_title'    => '管理画面',
@@ -404,7 +405,6 @@ return [
     'videos.filter.title_search_placeholder' => '曲のタイトル...',
     'videos.filter.title_search_hint' => 'この検索は保存済みフィルターには含まれません。',
     'videos.filter.title_not_saved_hint' => 'タイトル検索は保存済みフィルターに含まれることはありません。',
-    'playlists.add_video_title' => '動画を追加',
     'playlists.add_video_search_label' => 'タイトルで動画を検索',
     'playlists.add_video_search_placeholder' => '2文字以上入力してください...',
     'playlists.add_video_button' => '追加',
@@ -433,7 +433,6 @@ return [
     // プレイリスト再生 + 動画削除
     'playlists.play_all' => '▶ すべて再生',
     'playlists.remove_video' => '削除',
-    'playlists.visibility' => '公開設定',
 
     // アーティスト連続補完モード
     'admin.artist_completion.start_chain' => '連続で補完する',
@@ -444,4 +443,19 @@ return [
 
     // 未登録のYouTubeチャンネル（ゴーストリンク）
     'videos.unmatched_channel_hint' => 'このチャンネル（下記URL）はどのアーティストにも登録されていません。以下のアーティストのいずれかのチャンネルであれば、そのページにこのリンクを追加すると、今後の動画検出が確実になります。',
+
+    // データ書き出しと品質監査（管理者）
+    'admin.exports_link' => 'データ書き出しと監査',
+    'admin.exports.title' => 'データ書き出しと監査',
+    'admin.exports.stats_artists' => 'アーティスト数：',
+    'admin.exports.stats_videos' => '動画数：',
+    'admin.exports.stats_playlists' => 'プレイリスト数：',
+    'admin.exports.generated_at' => '生成日時：',
+    'admin.exports.section_artists' => 'アーティスト',
+    'admin.exports.section_videos' => '動画',
+    'admin.exports.section_taxonomy' => 'タグ分類',
+    'admin.exports.section_playlists' => 'プレイリスト',
+    'admin.exports.section_full' => '完全書き出し',
+    'admin.exports.full_button' => '監査用の完全書き出し',
+    'admin.exports.full_hint' => 'アーティスト・動画・プレイリスト・関連性・タグ分類を1つのJSONファイルにまとめ、自動計算された品質指標も含みます。分析ツールやChatGPTにそのまま渡して全体監査が行えます。',
 ];
