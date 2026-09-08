@@ -433,6 +433,7 @@ return [
     // プレイリスト再生 + 動画削除
     'playlists.play_all' => '▶ すべて再生',
     'playlists.remove_video' => '削除',
+    'playlists.visibility' => '公開設定',
 
     // アーティスト連続補完モード
     'admin.artist_completion.start_chain' => '連続で補完する',

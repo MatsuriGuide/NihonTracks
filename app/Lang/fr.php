@@ -433,6 +433,7 @@ return [
     // Lecture playlist + suppression video
     'playlists.play_all' => '▶ Lire tout',
     'playlists.remove_video' => 'Retirer',
+    'playlists.visibility' => 'Visibilité',
 
     // Mode complétion en série des artistes
     'admin.artist_completion.start_chain' => 'Compléter en série',
@@ -443,4 +444,5 @@ return [
 
     // Chaine YouTube non reconnue (lien fantome)
     'videos.unmatched_channel_hint' => 'Cette chaîne (URL ci-dessous) n\'est enregistrée sur aucun artiste. Si c\'est bien la chaîne d\'un des artistes ci-dessous, ajoute ce lien sur sa fiche pour fiabiliser la détection des prochaines vidéos.',
+    
 ];

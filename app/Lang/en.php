@@ -432,6 +432,7 @@ return [
     // Play playlist + remove video
     'playlists.play_all' => '▶ Play all',
     'playlists.remove_video' => 'Remove',
+    'playlists.visibility' => 'Visibility',
 
     // Serial artist completion mode
     'admin.artist_completion.start_chain' => 'Complete in sequence',

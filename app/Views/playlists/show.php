@@ -37,7 +37,7 @@
 <?php endif; ?>
 
 <?php if (empty($videos)): ?>
-    <p><?= e(t('playlists.empty')) ?></p>
+    <p><?= e(t('playlists.no_videos')) ?></p>
 <?php else: ?>
     <p>
         <button type="button" id="playlist-play-all-btn" class="btn"
