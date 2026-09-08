@@ -150,16 +150,32 @@ class VideoController extends Controller
 
         // Détection automatique de l'artiste : d'abord via l'ID de chaîne
         // (fiable, nécessite un lien YouTube au format /channel/UC... sur la
-        // fiche artiste), puis en repli via une correspondance exacte de nom.
+        // fiche artiste), puis en repli via une correspondance de nom
+        // (tolérante aux suffixes usuels : "official", "Topic", "VEVO"...).
         $detectedArtistIds = [];
+        $channelIdMatched = false;
 
         if (!empty($prefill['channel_id'])) {
             $detectedArtistIds = ArtistLink::findArtistIdsByYoutubeChannelId($prefill['channel_id']);
+            $channelIdMatched = !empty($detectedArtistIds);
         }
 
         if (empty($detectedArtistIds) && !empty($prefill['channel_name'])) {
             $detectedArtistIds = Artist::findIdsByExactName($prefill['channel_name']);
         }
+
+        // Certains gros labels (Sony, etc.) publient leurs vidéos via un
+        // ID de chaîne technique/interne différent de la chaîne publique
+        // affichée sous la vidéo (souvent lié à leur système de gestion des
+        // droits). Si ce channel_id n'est enregistré sur AUCUN artiste
+        // (même quand le repli par nom a quand même trouvé le bon artiste),
+        // on affiche son URL aux modérateurs/admins pour qu'ils puissent
+        // l'ajouter manuellement comme lien supplémentaire sur la fiche —
+        // ça fiabilise la détection automatique des prochaines vidéos de
+        // cette même chaîne technique.
+        $unmatchedChannelUrl = (!empty($prefill['channel_id']) && !$channelIdMatched)
+            ? 'https://www.youtube.com/channel/' . $prefill['channel_id']
+            : null;
 
         // Tags hérités des artistes détectés — simple pré-remplissage,
         // pleinement modifiable avant validation du formulaire.
@@ -170,16 +186,17 @@ class VideoController extends Controller
         $detectedTagIds = array_values(array_unique($detectedTagIds));
 
         $this->render('videos/form', [
-            'errors'            => $metadata === null
+            'errors'               => $metadata === null
                 ? [t('videos.api_fallback')]
                 : [],
-            'old'               => $prefill,
-            'mode'              => 'create',
-            'artists'           => Artist::all(),
-            'tagGroups'         => Tag::selectable(),
-            'selectedArtistIds' => $detectedArtistIds,
-            'selectedTagIds'    => $detectedTagIds,
-            'autoDetected'      => !empty($detectedArtistIds),
+            'old'                  => $prefill,
+            'mode'                 => 'create',
+            'artists'              => Artist::all(),
+            'tagGroups'            => Tag::selectable(),
+            'selectedArtistIds'    => $detectedArtistIds,
+            'selectedTagIds'       => $detectedTagIds,
+            'autoDetected'         => !empty($detectedArtistIds),
+            'unmatchedChannelUrl'  => $unmatchedChannelUrl,
         ]);
     }
 

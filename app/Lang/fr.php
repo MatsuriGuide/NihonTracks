@@ -440,4 +440,7 @@ return [
     'artists.chain_mode_active' => 'Mode complétion en série actif.',
     'artists.chain_mode_remaining' => 'fiche(s) restante(s)',
     'artists.chain_mode_stop' => 'Arrêter',
+
+    // Chaine YouTube non reconnue (lien fantome)
+    'videos.unmatched_channel_hint' => 'Cette chaîne (URL ci-dessous) n\'est enregistrée sur aucun artiste. Si c\'est bien la chaîne d\'un des artistes ci-dessous, ajoute ce lien sur sa fiche pour fiabiliser la détection des prochaines vidéos.',
 ];

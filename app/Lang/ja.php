@@ -440,4 +440,7 @@ return [
     'artists.chain_mode_active' => '連続補完モード有効中。',
     'artists.chain_mode_remaining' => '件残り',
     'artists.chain_mode_stop' => '停止',
+
+    // 未登録のYouTubeチャンネル（ゴーストリンク）
+    'videos.unmatched_channel_hint' => 'このチャンネル（下記URL）はどのアーティストにも登録されていません。以下のアーティストのいずれかのチャンネルであれば、そのページにこのリンクを追加すると、今後の動画検出が確実になります。',
 ];

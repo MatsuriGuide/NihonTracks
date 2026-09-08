@@ -12,6 +12,14 @@
     <img src="<?= e($old['thumbnail_url']) ?>" alt="" style="max-width: 320px; display:block; margin-bottom: 1em;">
 <?php endif; ?>
 
+<?php if (!empty($unmatchedChannelUrl)): ?>
+    <p class="hint">
+        <?= e(t('videos.unmatched_channel_hint')) ?><br>
+        <input type="text" readonly value="<?= e($unmatchedChannelUrl) ?>" onclick="this.select();"
+               style="width: 100%; max-width: 500px;">
+    </p>
+<?php endif; ?>
+
 <form method="post" action="<?= $mode === 'edit' ? url('/videos/' . $videoId . '/edit') : url('/videos/store') ?>">
     <input type="hidden" name="youtube_id" value="<?= e($old['youtube_id'] ?? '') ?>">
     <input type="hidden" name="youtube_url" value="<?= e($old['youtube_url'] ?? '') ?>">

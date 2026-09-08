@@ -439,4 +439,7 @@ return [
     'artists.chain_mode_active' => 'Sequential completion mode active.',
     'artists.chain_mode_remaining' => 'page(s) remaining',
     'artists.chain_mode_stop' => 'Stop',
+
+    // Unrecognized YouTube channel (ghost link)
+    'videos.unmatched_channel_hint' => 'This channel (URL below) isn\'t registered on any artist. If it belongs to one of the artists below, add this link to their page to make future video detection more reliable.',
 ];
