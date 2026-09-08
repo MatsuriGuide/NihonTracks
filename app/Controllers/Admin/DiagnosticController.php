@@ -90,4 +90,38 @@ class DiagnosticController extends AdminController
         );
         exit;
     }
+
+    /**
+     * Dump complet de la chaîne de détection pour une vidéo donnée : ce
+     * que l'API YouTube renvoie réellement, et ce que la recherche
+     * d'artiste par channel_id retourne à partir de cette valeur exacte.
+     */
+    public function youtubeVideo(): void
+    {
+        $videoId = (string) ($_GET['id'] ?? '');
+
+        if ($videoId === '') {
+            header('Content-Type: text/plain; charset=utf-8');
+            echo json_encode(['error' => 'Ajoute ?id=IDVIDEO a l\'URL']);
+            exit;
+        }
+
+        $metadata = \App\Services\YoutubeApiService::fetchMetadata($videoId);
+
+        $result = [
+            'video_id'                => $videoId,
+            'metadata_from_youtube'   => $metadata,
+        ];
+
+        if ($metadata !== null && !empty($metadata['channel_id'])) {
+            $result['channel_id_used_for_search'] = $metadata['channel_id'];
+            $result['matching_artist_ids'] = \App\Models\ArtistLink::findArtistIdsByYoutubeChannelId($metadata['channel_id']);
+        } else {
+            $result['note'] = 'Aucun channel_id renvoye par l\'API pour cette video.';
+        }
+
+        header('Content-Type: text/plain; charset=utf-8');
+        echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        exit;
+    }
 }
