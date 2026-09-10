@@ -19,8 +19,11 @@ class HomeController extends Controller
         // celles déjà montrées dans "Dernières sorties" (voir randomDiscover).
         $discoverVideos = Video::randomDiscover(6, $latestIds);
 
-        $discoverArtists = Artist::randomWithVideos(6);
-        $newArtists = Artist::recentlyAdded(6);
+        // 8 plutôt que 6 : avec la grille compacte (4 colonnes sur desktop),
+        // 6 laissait une ligne à moitié vide (4 + 2) ; 8 remplit deux lignes
+        // complètes.
+        $discoverArtists = Artist::randomWithVideos(8);
+        $newArtists = Artist::recentlyAdded(8);
 
         $tagGroups = Tag::selectable();
         $genreTags = $tagGroups['genre']['tags'] ?? [];
