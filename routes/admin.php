@@ -33,6 +33,7 @@ $router->get('/admin/exports/videos.csv', 'Admin\ExportController@videosCsv');
 $router->get('/admin/exports/taxonomy.json', 'Admin\ExportController@taxonomyJson');
 $router->get('/admin/exports/playlists.json', 'Admin\ExportController@playlistsJson');
 $router->get('/admin/exports/full.json', 'Admin\ExportController@fullAudit');
+$router->get('/admin/translation-review', 'Admin\TranslationReviewController@index');
 
 // À compléter au fur et à mesure :
 // $router->get('/admin/users', 'Admin\UserAdminController@index');

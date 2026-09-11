@@ -471,4 +471,11 @@ return [
     'admin.exports.section_full' => '完全書き出し',
     'admin.exports.full_button' => '監査用の完全書き出し',
     'admin.exports.full_hint' => 'アーティスト・動画・プレイリスト・関連性・タグ分類を1つのJSONファイルにまとめ、自動計算された品質指標も含みます。分析ツールやChatGPTにそのまま渡して全体監査が行えます。',
+
+    // 未翻訳アーティストの確認（管理者）
+    'admin.translation_review_link' => '未翻訳のアーティスト',
+    'admin.translation_review.title' => '翻訳が必要なアーティスト',
+    'admin.translation_review.hint' => '英語または日本語の翻訳が未設定の承認済みアーティストです。ボタンを押すと自動翻訳が実行され、完了するとこのリストから消えます。',
+    'admin.translation_review.none' => 'すべての承認済みアーティストにEN・JAの翻訳があります。',
+    'admin.translation_review.no_videos' => 'このアーティストの動画はありません。',
 ];

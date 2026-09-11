@@ -523,4 +523,48 @@ class Artist
 
         return $artists;
     }
+
+    /**
+     * Artistes approuvés à qui il manque au moins une traduction (EN ou
+     * JA) — c'est-à-dire aucune ligne du tout dans artists_i18n pour
+     * cette langue (pas juste un champ vide). Indique pour chacun quelles
+     * langues précises manquent, pour afficher le bon bouton.
+     */
+    public static function missingTranslations(int $limit = 24, int $offset = 0, ?string $lang = null): array
+    {
+        $lang ??= Lang::current();
+        $limit = max(1, min(100, $limit));
+        $offset = max(0, $offset);
+
+        return Database::getInstance()->fetchAll(
+            'SELECT a.id, a.slug,
+                    COALESCE(ai.name, ai_fr.name) AS name,
+                    (SELECT COUNT(*) FROM artists_i18n x WHERE x.artist_id = a.id AND x.lang = "en") AS has_en,
+                    (SELECT COUNT(*) FROM artists_i18n x WHERE x.artist_id = a.id AND x.lang = "ja") AS has_ja
+             FROM artists a
+             LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = ?
+             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
+             WHERE a.moderation_status = "approved"
+               AND (
+                   NOT EXISTS (SELECT 1 FROM artists_i18n x WHERE x.artist_id = a.id AND x.lang = "en")
+                   OR NOT EXISTS (SELECT 1 FROM artists_i18n x WHERE x.artist_id = a.id AND x.lang = "ja")
+               )
+             ORDER BY name
+             LIMIT ' . $limit . ' OFFSET ' . $offset,
+            [$lang]
+        );
+    }
+
+    public static function countMissingTranslations(): int
+    {
+        return (int) (Database::getInstance()->fetchOne(
+            'SELECT COUNT(*) AS n
+             FROM artists a
+             WHERE a.moderation_status = "approved"
+               AND (
+                   NOT EXISTS (SELECT 1 FROM artists_i18n x WHERE x.artist_id = a.id AND x.lang = "en")
+                   OR NOT EXISTS (SELECT 1 FROM artists_i18n x WHERE x.artist_id = a.id AND x.lang = "ja")
+               )'
+        )['n'] ?? 0);
+    }
 }

@@ -471,4 +471,11 @@ return [
     'admin.exports.section_full' => 'Export complet',
     'admin.exports.full_button' => 'Export complet pour audit',
     'admin.exports.full_hint' => 'Un seul fichier JSON regroupant artistes, vidéos, playlists, relations et taxonomie, avec des indicateurs de qualité calculés automatiquement — prêt à transmettre à un outil d\'analyse ou à ChatGPT pour un audit global.',
+
+    // Relecture des traductions manquantes (admin)
+    'admin.translation_review_link' => 'Traductions manquantes',
+    'admin.translation_review.title' => 'Artistes à traduire',
+    'admin.translation_review.hint' => 'Artistes approuvés sans traduction anglaise et/ou japonaise. Clique sur un bouton pour lancer la traduction automatique — la liste se réactualise et l\'artiste disparaît une fois complet.',
+    'admin.translation_review.none' => 'Tous les artistes approuvés ont leurs traductions EN et JA.',
+    'admin.translation_review.no_videos' => 'Aucune vidéo pour cet artiste.',
 ];
