@@ -31,7 +31,9 @@ class VideoReviewController extends AdminController
 
     /**
      * Applique le type choisi (via le menu déroulant de la liste) et marque
-     * la vidéo comme relue, en une seule action.
+     * la vidéo comme relue, en une seule action. Redirige en conservant le
+     * filtre/page en cours (transmis en champs cachés par le formulaire),
+     * pour ne pas perdre sa recherche à chaque validation.
      */
     public function validate(int $id): void
     {
@@ -43,6 +45,18 @@ class VideoReviewController extends AdminController
 
         Video::markReviewed($id);
 
-        $this->redirect('/admin/video-review');
+        $params = [];
+
+        $titleQuery = trim((string) $this->input('q', ''));
+        if ($titleQuery !== '') {
+            $params['q'] = $titleQuery;
+        }
+
+        $page = (int) $this->input('page', 1);
+        if ($page > 1) {
+            $params['page'] = $page;
+        }
+
+        $this->redirect('/admin/video-review' . (!empty($params) ? '?' . http_build_query($params) : ''));
     }
 }

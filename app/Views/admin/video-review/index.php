@@ -63,6 +63,10 @@ $formatDuration = static function (int $seconds): string {
                     </span>
 
                     <form method="post" action="<?= url('/admin/video-review/' . $video['id'] . '/validate') ?>">
+                        <?php if (!empty($titleQuery)): ?>
+                            <input type="hidden" name="q" value="<?= e($titleQuery) ?>">
+                        <?php endif; ?>
+                        <input type="hidden" name="page" value="<?= (int) $page ?>">
                         <p>
                             <select name="video_type">
                                 <?php foreach ($videoTypes as $typeValue): ?>
