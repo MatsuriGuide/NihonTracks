@@ -11,7 +11,9 @@ class VideoReviewController extends AdminController
 
     public function index(): void
     {
-        $total = Video::countNeedingReview();
+        $titleQuery = trim((string) $this->input('q', '')) ?: null;
+
+        $total = Video::countNeedingReview($titleQuery);
         $totalPages = max(1, (int) ceil($total / self::PER_PAGE));
 
         $page = max(1, (int) $this->input('page', 1));
@@ -19,10 +21,11 @@ class VideoReviewController extends AdminController
         $offset = ($page - 1) * self::PER_PAGE;
 
         $this->render('admin/video-review/index', [
-            'videos'     => Video::allNeedingReview(null, self::PER_PAGE, $offset),
+            'videos'     => Video::allNeedingReview(null, self::PER_PAGE, $offset, $titleQuery),
             'videoTypes' => self::VIDEO_TYPES,
             'page'       => $page,
             'totalPages' => $totalPages,
+            'titleQuery' => $titleQuery,
         ]);
     }
 

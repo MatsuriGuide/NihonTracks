@@ -352,11 +352,22 @@ class Video
      * relues par un modérateur/admin — triées de la plus récente à la plus
      * ancienne (date de sortie), pas par ordre d'ajout.
      */
-    public static function allNeedingReview(?string $lang = null, int $limit = 24, int $offset = 0): array
+    public static function allNeedingReview(?string $lang = null, int $limit = 24, int $offset = 0, ?string $titleQuery = null): array
     {
         $lang ??= Lang::current();
         $limit = max(1, min(100, $limit));
         $offset = max(0, $offset);
+
+        $where = 'v.source = "auto_scan" AND v.reviewed_at IS NULL AND v.status = "published"';
+        $params = [$lang, $lang];
+
+        if ($titleQuery !== null && trim($titleQuery) !== '') {
+            $where .= ' AND EXISTS (
+                SELECT 1 FROM videos_i18n vi_search
+                WHERE vi_search.video_id = v.id AND vi_search.title LIKE ?
+            )';
+            $params[] = '%' . trim($titleQuery) . '%';
+        }
 
         return Database::getInstance()->fetchAll(
             'SELECT v.id, v.youtube_id, v.thumbnail_url, v.release_date, v.video_type, v.duration_seconds,
@@ -368,18 +379,30 @@ class Video
              LEFT JOIN video_artists va ON va.video_id = v.id
              LEFT JOIN artists_i18n ai ON ai.artist_id = va.artist_id AND ai.lang = ?
              LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
-             WHERE v.source = "auto_scan" AND v.reviewed_at IS NULL AND v.status = "published"
+             WHERE ' . $where . '
              GROUP BY v.id
              ORDER BY v.release_date DESC, v.id DESC
              LIMIT ' . $limit . ' OFFSET ' . $offset,
-            [$lang, $lang]
+            $params
         );
     }
 
-    public static function countNeedingReview(): int
+    public static function countNeedingReview(?string $titleQuery = null): int
     {
+        $where = 'source = "auto_scan" AND reviewed_at IS NULL AND status = "published"';
+        $params = [];
+
+        if ($titleQuery !== null && trim($titleQuery) !== '') {
+            $where .= ' AND EXISTS (
+                SELECT 1 FROM videos_i18n vi_search
+                WHERE vi_search.video_id = videos.id AND vi_search.title LIKE ?
+            )';
+            $params[] = '%' . trim($titleQuery) . '%';
+        }
+
         return (int) (Database::getInstance()->fetchOne(
-            'SELECT COUNT(*) AS n FROM videos WHERE source = "auto_scan" AND reviewed_at IS NULL AND status = "published"'
+            'SELECT COUNT(*) AS n FROM videos WHERE ' . $where,
+            $params
         )['n'] ?? 0);
     }
 

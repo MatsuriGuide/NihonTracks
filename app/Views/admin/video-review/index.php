@@ -18,8 +18,23 @@ $formatDuration = static function (int $seconds): string {
 
 <p><small><?= e(t('admin.video_review.hint')) ?></small></p>
 
+<form method="get" action="<?= url('/admin/video-review') ?>">
+    <input type="text" name="q" value="<?= e($titleQuery ?? '') ?>"
+           placeholder="<?= e(t('videos.filter.title_search_placeholder')) ?>" style="width: 100%; max-width: 400px;">
+    <button type="submit"><?= e(t('videos.filter.apply')) ?></button>
+    <?php if (!empty($titleQuery)): ?>
+        <a href="<?= url('/admin/video-review') ?>"><?= e(t('videos.filter.reset')) ?></a>
+    <?php endif; ?>
+</form>
+
 <?php if (empty($videos)): ?>
-    <p><?= e(t('admin.video_review.none')) ?></p>
+    <p>
+        <?php if (!empty($titleQuery)): ?>
+            <?= e(t('videos.filter.no_results')) ?>
+        <?php else: ?>
+            <?= e(t('admin.video_review.none')) ?>
+        <?php endif; ?>
+    </p>
 <?php else: ?>
     <ul class="card-grid">
         <?php foreach ($videos as $video): ?>
@@ -70,16 +85,17 @@ $formatDuration = static function (int $seconds): string {
     </ul>
 
     <?php if ($totalPages > 1): ?>
+        <?php $pageQuery = !empty($titleQuery) ? '&q=' . urlencode($titleQuery) : ''; ?>
         <style>
             .pagination { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
         </style>
         <nav class="pagination">
             <?php if ($page > 1): ?>
-                <a href="<?= url('/admin/video-review?page=' . ($page - 1)) ?>"><?= e(t('pagination.previous')) ?></a>
+                <a href="<?= url('/admin/video-review?page=' . ($page - 1) . $pageQuery) ?>"><?= e(t('pagination.previous')) ?></a>
             <?php endif; ?>
             <span class="mono"><?= e(t('pagination.page_of')) ?> <?= (int) $page ?> / <?= (int) $totalPages ?></span>
             <?php if ($page < $totalPages): ?>
-                <a href="<?= url('/admin/video-review?page=' . ($page + 1)) ?>"><?= e(t('pagination.next')) ?></a>
+                <a href="<?= url('/admin/video-review?page=' . ($page + 1) . $pageQuery) ?>"><?= e(t('pagination.next')) ?></a>
             <?php endif; ?>
         </nav>
     <?php endif; ?>
