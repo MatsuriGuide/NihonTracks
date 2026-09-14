@@ -510,19 +510,22 @@ class Video
     }
 
     /**
-     * Vidéos de type "MV officiel" ajoutées au catalogue ET sorties depuis
-     * une date/heure donnée — utilisé par l'export CSV. Les deux
-     * conditions sont combinées (ET) :
-     * - created_at >= $since (date d'ajout au site, précision à l'heure)
-     * - release_date >= date de $since seule (date de sortie YouTube,
-     *   qui ne contient pas d'heure dans notre schéma — on ne compare
-     *   donc que la partie date, sans quoi une vidéo sortie CE jour-là
-     *   mais avant l'heure choisie serait exclue à tort).
+     * Vidéos de type "MV officiel" ajoutées au catalogue ET sorties
+     * récemment — utilisé par l'export CSV. Deux conditions combinées (ET),
+     * volontairement DÉCOUPLÉES l'une de l'autre :
+     * - created_at >= $since (nouveauté sur le site — date/heure choisie,
+     *   typiquement celle du dernier export)
+     * - release_date >= aujourd'hui - 7 jours (sortie YouTube récente,
+     *   fenêtre glissante indépendante de $since)
+     * Ce découplage permet de rattraper une vidéo trouvée/ajoutée sur le
+     * site plusieurs jours après sa sortie réelle : sans lui, une vidéo
+     * sortie il y a 5 jours mais ajoutée aujourd'hui aurait été exclue si
+     * $since datait d'avant sa sortie.
      */
     public static function officialMvSince(string $since, ?string $lang = null): array
     {
         $lang ??= Lang::current();
-        $sinceDate = substr($since, 0, 10);
+        $recentReleaseCutoff = date('Y-m-d', strtotime('-7 days'));
 
         return Database::getInstance()->fetchAll(
             'SELECT v.id, v.youtube_url, v.created_at,
@@ -539,7 +542,7 @@ class Video
                AND v.release_date >= ?
              GROUP BY v.id
              ORDER BY v.created_at ASC',
-            [$lang, $lang, $since, $sinceDate]
+            [$lang, $lang, $since, $recentReleaseCutoff]
         );
     }
 

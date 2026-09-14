@@ -406,7 +406,7 @@ return [
     // CSV export / tags applied via JSON
     'admin.csv_export_link' => 'Export extracts as CSV',
     'admin.csv_export.title' => 'CSV extract export',
-    'admin.csv_export.hint' => 'Generates an extraits.csv file with official MV videos added to the catalog since the chosen date.',
+    'admin.csv_export.hint' => 'Generates an extraits.csv file with official MV videos added to the catalog since the chosen date AND released on YouTube less than a week ago (catches videos found a few days after their actual release).',
     'admin.csv_export.last_export' => 'Last export:',
     'admin.csv_export.since_label' => 'Since',
     'admin.csv_export.generate' => 'Generate and download',

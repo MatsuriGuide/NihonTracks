@@ -406,7 +406,7 @@ return [
     // Export CSV / tags appliqués via JSON
     'admin.csv_export_link' => 'Exporter les extraits en CSV',
     'admin.csv_export.title' => 'Export CSV des extraits',
-    'admin.csv_export.hint' => 'Génère un fichier extraits.csv contenant les vidéos de type MV officiel ajoutées au catalogue depuis la date choisie.',
+    'admin.csv_export.hint' => 'Génère un fichier extraits.csv contenant les vidéos de type MV officiel ajoutées au catalogue depuis la date choisie ET sorties sur YouTube il y a moins d\'une semaine (permet de rattraper une vidéo trouvée quelques jours après sa sortie réelle).',
     'admin.csv_export.last_export' => 'Dernier export :',
     'admin.csv_export.since_label' => 'Depuis le',
     'admin.csv_export.generate' => 'Générer et télécharger',
