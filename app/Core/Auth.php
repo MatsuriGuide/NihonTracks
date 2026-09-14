@@ -44,14 +44,23 @@ class Auth
 
     /**
      * Bloque l'accès si l'utilisateur n'a pas un des rôles autorisés.
+     * Distingue deux cas bien différents : pas connecté du tout (session
+     * expirée, jamais connecté...) → redirection vers la connexion, comme
+     * requireLogin(). Connecté mais rôle insuffisant → 403, le vrai cas
+     * de droits refusés.
      *
      * @param string|string[] $roles
      */
     public static function requireRole(string|array $roles): void
     {
+        if (!self::check()) {
+            header('Location: /login');
+            exit;
+        }
+
         $roles = (array) $roles;
 
-        if (!self::check() || !in_array(self::role(), $roles, true)) {
+        if (!in_array(self::role(), $roles, true)) {
             http_response_code(403);
             require dirname(__DIR__) . '/Views/errors/403.php';
             exit;
