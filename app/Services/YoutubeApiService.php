@@ -31,7 +31,8 @@ class YoutubeApiService
      *   channel_id: ?string,
      *   release_date: ?string,
      *   thumbnail_url: ?string,
-     *   duration_seconds: ?int
+     *   duration_seconds: ?int,
+     *   live_broadcast_content: string
      * }|null
      */
     public static function fetchMetadata(string $videoId): ?array
@@ -64,19 +65,22 @@ class YoutubeApiService
         $contentDetails = $item['contentDetails'] ?? [];
 
         return [
-            'youtube_id'       => $videoId,
-            'title'            => $snippet['title'] ?? '',
-            'channel_name'     => $snippet['channelTitle'] ?? null,
-            'channel_id'       => $snippet['channelId'] ?? null,
-            'release_date'     => isset($snippet['publishedAt'])
+            'youtube_id'             => $videoId,
+            'title'                  => $snippet['title'] ?? '',
+            'channel_name'           => $snippet['channelTitle'] ?? null,
+            'channel_id'             => $snippet['channelId'] ?? null,
+            'release_date'           => isset($snippet['publishedAt'])
                 ? substr($snippet['publishedAt'], 0, 10)
                 : null,
-            'thumbnail_url'    => $snippet['thumbnails']['high']['url']
+            'thumbnail_url'          => $snippet['thumbnails']['high']['url']
                 ?? $snippet['thumbnails']['default']['url']
                 ?? null,
-            'duration_seconds' => isset($contentDetails['duration'])
+            'duration_seconds'       => isset($contentDetails['duration'])
                 ? self::parseDuration($contentDetails['duration'])
                 : null,
+            // "none" = vidéo normale, "upcoming" = première programmée pas
+            // encore diffusée, "live" = diffusion en direct en cours.
+            'live_broadcast_content' => $snippet['liveBroadcastContent'] ?? 'none',
         ];
     }
 
@@ -168,15 +172,11 @@ class YoutubeApiService
         return [
             'channel_id'    => $resolvedId,
             'title'         => $item['snippet']['title'] ?? '',
-            // On stocke toujours l'URL canonique /channel/UC..., quel que soit
-            // le format saisi au départ — c'est le seul format exploitable
-            // par la détection auto et la surveillance de chaîne.
             'canonical_url' => 'https://www.youtube.com/channel/' . $resolvedId,
             'thumbnail_url' => $item['snippet']['thumbnails']['high']['url']
                 ?? $item['snippet']['thumbnails']['medium']['url']
                 ?? $item['snippet']['thumbnails']['default']['url']
                 ?? null,
-            // null si la chaîne masque volontairement son nombre d'abonnés
             'subscriber_count'    => (!$hiddenSubscribers && isset($statistics['subscriberCount']))
                 ? (int) $statistics['subscriberCount']
                 : null,
@@ -216,7 +216,9 @@ class YoutubeApiService
     /**
      * Récupère les $maxResults vidéos les plus récentes d'une playlist
      * "uploads". Coût : 1 unité de quota par tranche de 50 résultats
-     * (donc 1 unité jusqu'à 50, 2 unités pour 51-100, etc.).
+     * (donc 1 unité jusqu'à 50, 2 unités pour 51-100, etc.). Ne contient
+     * PAS le statut de diffusion (liveBroadcastContent) — cette info n'est
+     * disponible que via videos.list, voir fetchVideosDetails().
      *
      * @return array<int, array{youtube_id: string, title: string, thumbnail_url: ?string, channel_name: ?string, published_at: ?string}>
      */
@@ -276,13 +278,19 @@ class YoutubeApiService
     }
 
     /**
-     * Récupère la durée (en secondes) de plusieurs vidéos. Coût : 1 unité de
-     * quota par tranche de 50 IDs.
+     * Récupère durée ET statut de diffusion (liveBroadcastContent) de
+     * plusieurs vidéos en un seul appel groupé par tranche de 50 —
+     * ajouter "snippet" à côté de "contentDetails" ne coûte rien de plus
+     * en quota (1 unité par tranche de 50, comme avant). Le statut de
+     * diffusion permet de distinguer une vidéo normale ("none") d'une
+     * "première" programmée pas encore diffusée ("upcoming") ou en
+     * direct ("live") — utilisé par le scan de chaîne pour ne jamais
+     * publier une vidéo qui n'est pas encore réellement regardable.
      *
      * @param string[] $videoIds
-     * @return array<string, int> Durée indexée par ID vidéo
+     * @return array<string, array{duration_seconds: int, live_broadcast_content: string}>
      */
-    public static function fetchVideosDurations(array $videoIds): array
+    public static function fetchVideosDetails(array $videoIds): array
     {
         $apiKey = $_ENV['YOUTUBE_API_KEY'] ?? '';
 
@@ -290,11 +298,11 @@ class YoutubeApiService
             return [];
         }
 
-        $durations = [];
+        $details = [];
 
         foreach (array_chunk($videoIds, 50) as $chunk) {
             $endpoint = 'https://www.googleapis.com/youtube/v3/videos'
-                . '?part=contentDetails'
+                . '?part=contentDetails,snippet'
                 . '&id=' . urlencode(implode(',', $chunk))
                 . '&key=' . urlencode($apiKey);
 
@@ -310,10 +318,34 @@ class YoutubeApiService
                 $id = $item['id'] ?? null;
                 $duration = $item['contentDetails']['duration'] ?? null;
 
-                if ($id !== null && $duration !== null) {
-                    $durations[$id] = self::parseDuration($duration);
+                if ($id === null) {
+                    continue;
                 }
+
+                $details[$id] = [
+                    'duration_seconds'       => $duration !== null ? self::parseDuration($duration) : 0,
+                    'live_broadcast_content' => $item['snippet']['liveBroadcastContent'] ?? 'none',
+                ];
             }
+        }
+
+        return $details;
+    }
+
+    /**
+     * @deprecated Conservée pour compatibilité — fetchVideosDetails()
+     * renvoie la même durée en plus du statut de diffusion, en un seul appel.
+     *
+     * @param string[] $videoIds
+     * @return array<string, int> Durée indexée par ID vidéo
+     */
+    public static function fetchVideosDurations(array $videoIds): array
+    {
+        $details = self::fetchVideosDetails($videoIds);
+
+        $durations = [];
+        foreach ($details as $id => $info) {
+            $durations[$id] = $info['duration_seconds'];
         }
 
         return $durations;

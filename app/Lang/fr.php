@@ -478,4 +478,8 @@ return [
     'admin.translation_review.hint' => 'Artistes approuvés sans traduction anglaise et/ou japonaise. Clique sur un bouton pour lancer la traduction automatique — la liste se réactualise et l\'artiste disparaît une fois complet.',
     'admin.translation_review.none' => 'Tous les artistes approuvés ont leurs traductions EN et JA.',
     'admin.translation_review.no_videos' => 'Aucune vidéo pour cet artiste.',
+
+    // Avertissement premiere YouTube pas encore diffusee
+    'videos.premiere_upcoming' => 'Cette vidéo est une "première" programmée, pas encore diffusée — elle ne sera pas regardable tant que la diffusion n\'aura pas commencé.',
+    'videos.premiere_live' => 'Cette vidéo est actuellement en direct (première en cours de diffusion).',
 ];

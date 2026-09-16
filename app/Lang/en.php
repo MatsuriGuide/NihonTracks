@@ -478,4 +478,8 @@ return [
     'admin.translation_review.hint' => 'Approved artists missing an English and/or Japanese translation. Click a button to trigger automatic translation — the list refreshes and the artist disappears once complete.',
     'admin.translation_review.none' => 'Every approved artist has both EN and JA translations.',
     'admin.translation_review.no_videos' => 'No videos for this artist.',
+
+    // YouTube premiere not yet aired warning
+    'videos.premiere_upcoming' => 'This video is a scheduled premiere, not aired yet — it won\'t be watchable until the broadcast starts.',
+    'videos.premiere_live' => 'This video is currently live (premiere broadcast in progress).',
 ];

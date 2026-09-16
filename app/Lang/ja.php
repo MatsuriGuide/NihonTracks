@@ -478,4 +478,8 @@ return [
     'admin.translation_review.hint' => '英語または日本語の翻訳が未設定の承認済みアーティストです。ボタンを押すと自動翻訳が実行され、完了するとこのリストから消えます。',
     'admin.translation_review.none' => 'すべての承認済みアーティストにEN・JAの翻訳があります。',
     'admin.translation_review.no_videos' => 'このアーティストの動画はありません。',
+
+    // 未配信のYouTubeプレミア公開に関する警告
+    'videos.premiere_upcoming' => 'この動画は予定されている「プレミア公開」で、まだ配信されていません。配信が始まるまで視聴できません。',
+    'videos.premiere_live' => 'この動画は現在ライブ配信中です（プレミア公開中）。',
 ];

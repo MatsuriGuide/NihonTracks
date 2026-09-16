@@ -60,12 +60,26 @@ class ChannelWatcherService
         $tagIds = Artist::tagIdsFor($artistId);
         $addedBy = (int) $artist['created_by'];
 
-        $durations = YoutubeApiService::fetchVideosDurations(array_column($videos, 'youtube_id'));
+        // Un seul appel groupé pour la durée ET le statut de diffusion
+        // (voir YoutubeApiService::fetchVideosDetails) — "snippet" ajouté
+        // à côté de "contentDetails" ne coûte rien de plus en quota.
+        $details = YoutubeApiService::fetchVideosDetails(array_column($videos, 'youtube_id'));
 
         $published = 0;
 
         foreach ($videos as $video) {
-            $duration = $durations[$video['youtube_id']] ?? null;
+            $info = $details[$video['youtube_id']] ?? null;
+            $duration = $info['duration_seconds'] ?? null;
+            $liveStatus = $info['live_broadcast_content'] ?? 'none';
+
+            // Une "première" programmée ("upcoming") ou en cours de
+            // diffusion ("live") existe déjà sur la chaîne mais n'est pas
+            // encore réellement regardable — on ne la publie pas tant
+            // qu'elle n'est pas passée à "none". Elle sera reprise
+            // automatiquement lors d'un prochain scan, une fois diffusée.
+            if ($liveStatus !== 'none') {
+                continue;
+            }
 
             if ($duration !== null && $duration < $minDurationSeconds) {
                 continue;

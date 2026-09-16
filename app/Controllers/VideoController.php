@@ -185,10 +185,21 @@ class VideoController extends Controller
         }
         $detectedTagIds = array_values(array_unique($detectedTagIds));
 
+        $errors = $metadata === null ? [t('videos.api_fallback')] : [];
+
+        // Une "première" programmée ou en cours de diffusion n'est pas
+        // encore réellement regardable — on laisse le modérateur préparer
+        // la fiche s'il le souhaite, mais on le prévient plutôt que de le
+        // laisser découvrir une vidéo qui ne se lance pas.
+        $liveStatus = $metadata['live_broadcast_content'] ?? 'none';
+        if ($liveStatus !== 'none') {
+            $errors[] = $liveStatus === 'upcoming'
+                ? t('videos.premiere_upcoming')
+                : t('videos.premiere_live');
+        }
+
         $this->render('videos/form', [
-            'errors'               => $metadata === null
-                ? [t('videos.api_fallback')]
-                : [],
+            'errors'               => $errors,
             'old'                  => $prefill,
             'mode'                 => 'create',
             'artists'              => Artist::all(),
