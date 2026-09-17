@@ -124,4 +124,43 @@ class DiagnosticController extends AdminController
         echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         exit;
     }
+
+    /**
+     * Envoie un email de test à l'admin actuellement connecté via le SMTP
+     * configuré dans .env, et affiche le résultat exact (succès, ou
+     * message d'erreur PHPMailer précis en cas d'échec) — sans dépendre du
+     * cron ni d'un vrai abonné newsletter pour vérifier la configuration.
+     */
+    public function smtp(): void
+    {
+        $admin = \App\Models\User::findById((int) Auth::id());
+
+        $result = [
+            'smtp_host'     => $_ENV['SMTP_HOST'] ?? null,
+            'smtp_port'     => $_ENV['SMTP_PORT'] ?? null,
+            'smtp_encryption' => $_ENV['SMTP_ENCRYPTION'] ?? null,
+            'smtp_username' => $_ENV['SMTP_USERNAME'] ?? null,
+            'sent_to'       => $admin['email'] ?? null,
+        ];
+
+        if ($admin === null || empty($admin['email'])) {
+            $result['success'] = false;
+            $result['error'] = 'Impossible de retrouver l\'email de l\'admin connecté.';
+        } else {
+            $success = \App\Services\NewsletterMailerService::send(
+                $admin['email'],
+                $admin['display_name'] ?? '',
+                'Test SMTP NihonTracks',
+                '<p>Si tu lis ceci, la configuration SMTP fonctionne correctement.</p>',
+                'Si tu lis ceci, la configuration SMTP fonctionne correctement.'
+            );
+
+            $result['success'] = $success;
+            $result['error'] = $success ? null : \App\Services\NewsletterMailerService::lastError();
+        }
+
+        header('Content-Type: text/plain; charset=utf-8');
+        echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        exit;
+    }
 }

@@ -27,13 +27,30 @@ use PHPMailer\PHPMailer\PHPMailer;
  */
 class NewsletterMailerService
 {
+    /**
+     * Dernier message d'erreur PHPMailer rencontré — consultable après un
+     * send() ayant retourné false, pour le diagnostic (/admin/diagnostic/smtp).
+     * Ne fait rien d'autre que mémoriser la dernière tentative ; pas
+     * partagé entre requêtes.
+     */
+    private static ?string $lastError = null;
+
+    public static function lastError(): ?string
+    {
+        return self::$lastError;
+    }
+
     public static function send(string $toEmail, string $toName, string $subject, string $htmlBody, string $textBody): bool
     {
+        self::$lastError = null;
+
         $host = $_ENV['SMTP_HOST'] ?? '';
         $username = $_ENV['SMTP_USERNAME'] ?? '';
         $password = $_ENV['SMTP_PASSWORD'] ?? '';
 
         if ($host === '' || $username === '' || $password === '') {
+            self::$lastError = 'Configuration SMTP incomplète dans .env (SMTP_HOST/SMTP_USERNAME/SMTP_PASSWORD manquant).';
+
             return false;
         }
 
@@ -67,6 +84,7 @@ class NewsletterMailerService
 
             return true;
         } catch (PHPMailerException $e) {
+            self::$lastError = $mail->ErrorInfo;
             error_log('[Newsletter] Échec envoi à ' . $toEmail . ' : ' . $mail->ErrorInfo);
 
             return false;
