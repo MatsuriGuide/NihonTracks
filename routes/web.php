@@ -44,12 +44,16 @@ $router->post('/videos/filter-presets', 'VideoController@savePreset');
 $router->post('/videos/filter-presets/{id}/delete', 'VideoController@deletePreset');
 $router->post('/videos/filter-presets/{id}/set-default', 'VideoController@setDefaultPreset');
 $router->post('/videos/filter-presets/clear-default', 'VideoController@clearDefaultPreset');
+$router->post('/videos/filter-presets/{id}/toggle-newsletter', 'VideoController@toggleNewsletter');
 $router->get('/videos/{id}/edit', 'VideoController@edit');
 $router->post('/videos/{id}/edit', 'VideoController@update');
 $router->post('/videos/{id}/delete', 'VideoController@delete');
 $router->get('/videos/{id}', 'VideoController@show');
 
 $router->get('/lang/{lang}', 'LangController@switch');
+
+// Public, sans connexion requise (lien de désabonnement dans les emails)
+$router->get('/newsletter/unsubscribe/{token}', 'NewsletterController@unsubscribe');
 
 $router->post('/reports', 'ReportController@store');
 

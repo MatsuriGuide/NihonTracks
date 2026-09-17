@@ -89,6 +89,42 @@ class Video
     }
 
     /**
+     * Vidéos correspondant à un préréglage de filtre, ajoutées au catalogue
+     * depuis une date/heure donnée — utilisé par la newsletter (recherche
+     * "qu'y a-t-il de nouveau depuis mon dernier envoi").
+     */
+    public static function newForPreset(
+        ?int $artistId,
+        array $tagIds,
+        ?string $videoType,
+        string $createdSince,
+        ?string $lang = null
+    ): array {
+        $lang ??= Lang::current();
+        $tagIds = array_values(array_unique(array_map('intval', $tagIds)));
+
+        [$where, $params] = self::buildFilterClause($artistId, $tagIds, $videoType);
+        $where .= ' AND v.created_at >= ?';
+        $params[] = $createdSince;
+
+        return Database::getInstance()->fetchAll(
+            'SELECT v.id, v.youtube_id, v.youtube_url, v.release_date,
+                    COALESCE(vi.title, vi_fr.title) AS title,
+                    GROUP_CONCAT(DISTINCT COALESCE(ai.name, ai_fr.name) ORDER BY ai.name SEPARATOR ", ") AS artist_names
+             FROM videos v
+             LEFT JOIN videos_i18n vi ON vi.video_id = v.id AND vi.lang = ?
+             LEFT JOIN videos_i18n vi_fr ON vi_fr.video_id = v.id AND vi_fr.lang = "fr"
+             LEFT JOIN video_artists va ON va.video_id = v.id
+             LEFT JOIN artists_i18n ai ON ai.artist_id = va.artist_id AND ai.lang = ?
+             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
+             WHERE ' . $where . '
+             GROUP BY v.id
+             ORDER BY v.release_date DESC, v.id DESC',
+            array_merge([$lang, $lang], $params)
+        );
+    }
+
+    /**
      * @param int[] $tagIds
      * @return array{0: string, 1: array}
      */

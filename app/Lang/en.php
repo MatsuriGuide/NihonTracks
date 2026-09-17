@@ -482,4 +482,11 @@ return [
     // YouTube premiere not yet aired warning
     'videos.premiere_upcoming' => 'This video is a scheduled premiere, not aired yet — it won\'t be watchable until the broadcast starts.',
     'videos.premiere_live' => 'This video is currently live (premiere broadcast in progress).',
+
+    // Newsletter (reuses saved video filters)
+    'videos.filter.newsletter' => 'Receive by email',
+    'newsletter.unsubscribed_title' => 'Unsubscribed',
+    'newsletter.unsubscribed_message_1' => 'See you around',
+    'newsletter.unsubscribed_message_2' => 'You won\'t receive newsletter emails anymore — your saved filters are untouched, you can turn email delivery back on anytime from the videos page.',
+    'newsletter.back_to_site' => '← Back to the site',
 ];

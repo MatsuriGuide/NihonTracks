@@ -482,4 +482,11 @@ return [
     // Avertissement premiere YouTube pas encore diffusee
     'videos.premiere_upcoming' => 'Cette vidéo est une "première" programmée, pas encore diffusée — elle ne sera pas regardable tant que la diffusion n\'aura pas commencé.',
     'videos.premiere_live' => 'Cette vidéo est actuellement en direct (première en cours de diffusion).',
+
+    // Newsletter (réutilise les filtres vidéo enregistrés)
+    'videos.filter.newsletter' => 'Recevoir par email',
+    'newsletter.unsubscribed_title' => 'Désabonnement confirmé',
+    'newsletter.unsubscribed_message_1' => 'À bientôt',
+    'newsletter.unsubscribed_message_2' => 'Tu ne recevras plus d\'emails de newsletter — tes filtres enregistrés restent intacts, tu peux réactiver l\'envoi par email à tout moment depuis la page des vidéos.',
+    'newsletter.back_to_site' => '← Retour au site',
 ];

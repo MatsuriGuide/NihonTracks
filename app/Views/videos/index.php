@@ -32,6 +32,15 @@
                         <button type="submit" class="btn-small"><?= e(t('videos.filter.set_default')) ?></button>
                     </form>
                 <?php endif; ?>
+                <form method="post" action="<?= url('/videos/filter-presets/' . $preset['id'] . '/toggle-newsletter') ?>" style="display:inline">
+                    <input type="hidden" name="enabled" value="<?= (int) $preset['newsletter_enabled'] === 1 ? '0' : '1' ?>">
+                    <label class="btn-small" style="cursor:pointer;">
+                        <input type="checkbox" onchange="this.form.submit()"
+                               <?= (int) $preset['newsletter_enabled'] === 1 ? 'checked' : '' ?>
+                               style="vertical-align: middle;">
+                        <?= e(t('videos.filter.newsletter')) ?>
+                    </label>
+                </form>
                 <form method="post" action="<?= url('/videos/filter-presets/' . $preset['id'] . '/delete') ?>"
                       onsubmit="return confirm('<?= e(t('videos.filter.delete_preset_confirm')) ?>');" style="display:inline">
                     <button type="submit" class="btn-small"><?= e(t('videos.filter.delete_preset')) ?></button>

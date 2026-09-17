@@ -482,4 +482,11 @@ return [
     // 未配信のYouTubeプレミア公開に関する警告
     'videos.premiere_upcoming' => 'この動画は予定されている「プレミア公開」で、まだ配信されていません。配信が始まるまで視聴できません。',
     'videos.premiere_live' => 'この動画は現在ライブ配信中です（プレミア公開中）。',
+
+    // ニュースレター（保存済み動画フィルターを再利用）
+    'videos.filter.newsletter' => 'メールで受け取る',
+    'newsletter.unsubscribed_title' => '配信停止が完了しました',
+    'newsletter.unsubscribed_message_1' => 'またのご利用をお待ちしています、',
+    'newsletter.unsubscribed_message_2' => '今後ニュースレターのメールは届きません。保存済みのフィルターはそのまま残るので、いつでも動画ページからメール配信を再開できます。',
+    'newsletter.back_to_site' => '← サイトに戻る',
 ];

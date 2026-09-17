@@ -446,6 +446,27 @@ class VideoController extends Controller
     }
 
     /**
+     * Active/désactive l'envoi par newsletter pour un préréglage donné.
+     * Réutilise directement les filtres enregistrés — un seul endroit à
+     * maintenir pour "quels filtres existent" plutôt qu'un système séparé.
+     * Pas exclusif comme le préréglage par défaut : plusieurs filtres
+     * peuvent être cochés à la fois pour la newsletter.
+     */
+    public function toggleNewsletter(int $id): void
+    {
+        Auth::requireLogin();
+
+        $preset = VideoFilterPreset::findById($id);
+
+        if ($preset && (int) $preset['user_id'] === (int) Auth::id()) {
+            $enabled = $this->input('enabled') === '1';
+            VideoFilterPreset::setNewsletterEnabled($id, (int) Auth::id(), $enabled);
+        }
+
+        $this->redirect('/videos');
+    }
+
+    /**
      * Crée un artiste minimal (nom + type) à la volée depuis le formulaire
      * vidéo, pour éviter de devoir quitter la page. Uniquement accessible
      * aux modérateurs/admins désormais (seuls autorisés à ajouter des

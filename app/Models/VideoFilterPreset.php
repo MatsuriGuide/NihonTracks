@@ -87,6 +87,54 @@ class VideoFilterPreset
     }
 
     /**
+     * Active/désactive l'envoi par newsletter pour UN préréglage donné.
+     * Contrairement au statut "par défaut", il ne s'agit pas d'un choix
+     * exclusif : un utilisateur peut cocher plusieurs filtres à la fois
+     * pour sa newsletter (ex. "tout le rock" + "un artiste précis").
+     */
+    public static function setNewsletterEnabled(int $id, int $userId, bool $enabled): void
+    {
+        Database::getInstance()->query(
+            'UPDATE video_filter_presets SET newsletter_enabled = ? WHERE id = ? AND user_id = ?',
+            [$enabled ? 1 : 0, $id, $userId]
+        );
+    }
+
+    /**
+     * Tous les préréglages activés pour la newsletter, groupés par
+     * utilisateur — point d'entrée du script d'envoi quotidien.
+     *
+     * @return array<int, array{email: string, display_name: string, presets: array}>
+     */
+    public static function allNewsletterSubscribers(): array
+    {
+        $rows = Database::getInstance()->fetchAll(
+            'SELECT p.*, u.email, u.display_name
+             FROM video_filter_presets p
+             JOIN users u ON u.id = p.user_id
+             WHERE p.newsletter_enabled = 1
+             ORDER BY p.user_id'
+        );
+
+        $byUser = [];
+        foreach ($rows as $row) {
+            $userId = (int) $row['user_id'];
+
+            if (!isset($byUser[$userId])) {
+                $byUser[$userId] = [
+                    'email'        => $row['email'],
+                    'display_name' => $row['display_name'],
+                    'presets'      => [],
+                ];
+            }
+
+            $byUser[$userId]['presets'][] = $row;
+        }
+
+        return $byUser;
+    }
+
+    /**
      * @return int[]
      */
     public static function tagIds(array $preset): array

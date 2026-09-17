@@ -38,4 +38,40 @@ class User
 
         return (int) $db->lastInsertId();
     }
+
+    public static function findByUnsubscribeToken(string $token): ?array
+    {
+        return Database::getInstance()->fetchOne(
+            'SELECT id, display_name FROM users WHERE newsletter_unsubscribe_token = ?',
+            [$token]
+        );
+    }
+
+    /**
+     * Génère et enregistre un jeton de désabonnement stable pour cet
+     * utilisateur s'il n'en a pas déjà un — pas besoin de le préremplir
+     * pour tout le monde à l'avance, il naît au premier envoi de newsletter.
+     */
+    public static function getOrCreateUnsubscribeToken(int $userId): string
+    {
+        $db = Database::getInstance();
+
+        $existing = $db->fetchOne(
+            'SELECT newsletter_unsubscribe_token FROM users WHERE id = ?',
+            [$userId]
+        );
+
+        if (!empty($existing['newsletter_unsubscribe_token'])) {
+            return $existing['newsletter_unsubscribe_token'];
+        }
+
+        $token = bin2hex(random_bytes(24));
+
+        $db->query(
+            'UPDATE users SET newsletter_unsubscribe_token = ? WHERE id = ?',
+            [$token, $userId]
+        );
+
+        return $token;
+    }
 }
