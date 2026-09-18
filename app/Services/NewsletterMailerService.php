@@ -57,17 +57,31 @@ class NewsletterMailerService
         $mail = new PHPMailer(true);
 
         try {
+            $port = (int) ($_ENV['SMTP_PORT'] ?? 587);
+
             $mail->isSMTP();
             $mail->Host = $host;
             $mail->SMTPAuth = true;
             $mail->Username = $username;
             $mail->Password = $password;
-            $mail->SMTPSecure = ($_ENV['SMTP_ENCRYPTION'] ?? 'tls') === 'ssl'
+            // Le port 465 exige un TLS immédiat (SMTPS) dès l'ouverture de la
+            // connexion ; le port 587 utilise STARTTLS (connexion en clair
+            // puis mise à niveau). Les deux mécanismes sont incompatibles —
+            // un mauvais réglage ne renvoie pas une erreur claire mais fait
+            // geler la connexion jusqu'au timeout (symptôme observé : 504
+            // Gateway Timeout plutôt qu'un message d'erreur). On déduit donc
+            // le chiffrement du PORT en priorité, SMTP_ENCRYPTION ne servant
+            // plus que pour un port non standard.
+            $mail->SMTPSecure = ($port === 465 || ($_ENV['SMTP_ENCRYPTION'] ?? '') === 'ssl')
                 ? PHPMailer::ENCRYPTION_SMTPS
                 : PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = (int) ($_ENV['SMTP_PORT'] ?? 587);
+            $mail->Port = $port;
             $mail->CharSet = 'UTF-8';
-            $mail->Timeout = 20;
+            // Volontairement court : un dépassement doit remonter comme une
+            // erreur claire plutôt que de faire attendre le serveur web
+            // jusqu'à SON propre timeout (504 Gateway Timeout, sans aucun
+            // message exploitable).
+            $mail->Timeout = 10;
 
             $mail->setFrom(
                 $_ENV['SMTP_FROM_EMAIL'] ?? $username,
