@@ -93,6 +93,18 @@ class Video
      * depuis une date/heure donnée — utilisé par la newsletter (recherche
      * "qu'y a-t-il de nouveau depuis mon dernier envoi").
      */
+    /**
+     * Vidéos correspondant à un préréglage de filtre, ajoutées au catalogue
+     * depuis une date/heure donnée — utilisé par la newsletter (recherche
+     * "qu'y a-t-il de nouveau depuis mon dernier envoi"). Même logique à
+     * deux conditions DÉCOUPLÉES que l'export CSV (officialMvSince) :
+     * - created_at >= $createdSince (nouveauté sur le site)
+     * - release_date >= aujourd'hui - 7 jours (sortie YouTube récente,
+     *   fenêtre glissante indépendante de $createdSince)
+     * Permet de rattraper une vidéo ajoutée au catalogue plusieurs jours
+     * après sa sortie réelle, plutôt que de la manquer si $createdSince
+     * est postérieur à sa date de sortie.
+     */
     public static function newForPreset(
         ?int $artistId,
         array $tagIds,
@@ -102,10 +114,12 @@ class Video
     ): array {
         $lang ??= Lang::current();
         $tagIds = array_values(array_unique(array_map('intval', $tagIds)));
+        $recentReleaseCutoff = date('Y-m-d', strtotime('-7 days'));
 
         [$where, $params] = self::buildFilterClause($artistId, $tagIds, $videoType);
-        $where .= ' AND v.created_at >= ?';
+        $where .= ' AND v.created_at >= ? AND v.release_date >= ?';
         $params[] = $createdSince;
+        $params[] = $recentReleaseCutoff;
 
         return Database::getInstance()->fetchAll(
             'SELECT v.id, v.youtube_id, v.youtube_url, v.release_date,
