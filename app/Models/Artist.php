@@ -403,17 +403,24 @@ class Artist
      * LIMIT 1 OFFSET à des positions aléatoires, qui reste rapide même
      * avec plusieurs centaines/milliers d'artistes.
      */
-    public static function randomWithVideos(int $limit = 6, ?string $lang = null): array
+    public static function randomWithVideos(int $limit = 6, ?string $lang = null, int $maxSubscribers = 1000): array
     {
         $lang ??= Lang::current();
         $limit = max(1, min(20, $limit));
         $db = Database::getInstance();
 
+        // "À découvrir" cible les artistes moins connus — on exclut ceux
+        // qui dépassent le seuil d'abonnés. Un nombre d'abonnés inconnu
+        // (pas de chaîne YouTube renseignée, ou jamais scannée) reste
+        // éligible plutôt qu'exclu par défaut : ça ne veut pas dire que
+        // l'artiste est gros, souvent l'inverse.
         $total = (int) ($db->fetchOne(
             'SELECT COUNT(DISTINCT a.id) AS n
              FROM artists a
              JOIN video_artists va ON va.artist_id = a.id
-             WHERE a.moderation_status = "approved"'
+             WHERE a.moderation_status = "approved"
+               AND (a.subscriber_count IS NULL OR a.subscriber_count < ?)',
+            [$maxSubscribers]
         )['n'] ?? 0);
 
         if ($total === 0) {
@@ -440,9 +447,10 @@ class Artist
                  LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
                  LEFT JOIN artists_i18n ai_ja ON ai_ja.artist_id = a.id AND ai_ja.lang = "ja"
                  WHERE a.moderation_status = "approved"
+                   AND (a.subscriber_count IS NULL OR a.subscriber_count < ?)
                  ORDER BY a.id ASC
                  LIMIT 1 OFFSET ' . $offset,
-                [$lang]
+                [$lang, $maxSubscribers]
             );
 
             if ($row === null) {
