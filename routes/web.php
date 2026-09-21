@@ -4,6 +4,7 @@
 
 $router->get('/', 'HomeController@index');
 $router->get('/about', 'PageController@about');
+$router->get('/faq', 'PageController@faq');
 
 $router->get('/register', 'AuthController@registerForm');
 $router->post('/register', 'AuthController@register');

@@ -72,11 +72,19 @@
             &copy; <?= date('Y') ?> NihonTracks — <span class="mono">nihontracks.koshiki.art</span>
             &nbsp;·&nbsp;
             <a href="<?= url('/about') ?>">À propos</a>
+            &nbsp;·&nbsp;
+            <a href="<?= url('/faq') ?>">FAQ</a>
         </p>
         <p class="mono">
             <?= (int) \App\Models\Video::countPublished() ?> <?= e(t('footer.videos_count')) ?>
             &nbsp;·&nbsp;
             <?= (int) \App\Models\Artist::countApproved() ?> <?= e(t('footer.artists_count')) ?>
+        </p>
+        <p>
+            <small>
+                Un site de
+                <a href="https://perron.biz/" target="_blank" rel="noopener">Cédrick Perron</a>
+            </small>
         </p>
     </footer>
 </body>

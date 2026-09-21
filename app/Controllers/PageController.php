@@ -10,4 +10,9 @@ class PageController extends Controller
     {
         $this->render('pages/about', []);
     }
+
+    public function faq(): void
+    {
+        $this->render('pages/faq', []);
+    }
 }
