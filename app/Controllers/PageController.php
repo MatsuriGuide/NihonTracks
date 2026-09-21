@@ -13,6 +13,10 @@ class PageController extends Controller
 
     public function faq(): void
     {
-        $this->render('pages/faq', []);
+        $lang = in_array(\App\Core\Lang::current(), ['fr', 'en', 'ja'], true)
+            ? \App\Core\Lang::current()
+            : 'fr';
+
+        $this->render('pages/faq_' . $lang, []);
     }
 }
