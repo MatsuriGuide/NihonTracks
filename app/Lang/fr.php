@@ -343,6 +343,8 @@ return [
 
     // Import avatar YouTube
     'artists.avatar_import_youtube' => 'Importer depuis YouTube',
+    'artists.scan_channel' => 'Scanner les nouveaux morceaux',
+    'artists.scan_channel_result' => 'Scan terminé — nouvelles vidéos publiées :',
 
     // Nombre d'abonnes
     'artists.subscriber_count' => 'abonnés',
@@ -365,6 +367,7 @@ return [
     'admin.video_review.hint' => 'Ces videos ont été publiées automatiquement par la surveillance de chaîne (type par defaut, tags hérités de l\'artiste). Vérifie/corrige si besoin, puis marque comme vérifié.',
     'admin.video_review.none' => 'Aucune vidéo en attente de relecture.',
     'admin.video_review.edit' => 'Modifier',
+    'admin.video_review.preview' => '▶ Prévisualiser',
     'admin.video_review.mark_reviewed' => 'Marquer comme vérifié',
     'admin.artist_completion.missing_tags' => 'Tags manquants',
     'artists.tags_label' => 'Tags',

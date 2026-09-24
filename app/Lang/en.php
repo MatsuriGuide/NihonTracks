@@ -343,6 +343,8 @@ return [
 
     // Import avatar YouTube
     'artists.avatar_import_youtube' => 'Import from YouTube',
+    'artists.scan_channel' => 'Scan for new tracks',
+    'artists.scan_channel_result' => 'Scan complete — new videos published:',
 
     // Nombre d'abonnes
     'artists.subscriber_count' => 'subscribers',
@@ -365,6 +367,7 @@ return [
     'admin.video_review.hint' => 'These videos were auto-published by channel watching (default type, tags inherited from the artist). Check/fix if needed, then mark as reviewed.',
     'admin.video_review.none' => 'No videos pending review.',
     'admin.video_review.edit' => 'Edit',
+    'admin.video_review.preview' => '▶ Preview',
     'admin.video_review.mark_reviewed' => 'Mark as reviewed',
     'admin.artist_completion.missing_tags' => 'Missing tags',
     'artists.tags_label' => 'Tags',

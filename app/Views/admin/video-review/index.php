@@ -37,7 +37,7 @@ $formatDuration = static function (int $seconds): string {
     </p>
 <?php else: ?>
     <ul class="card-grid">
-        <?php foreach ($videos as $video): ?>
+        <?php foreach ($videos as $index => $video): ?>
             <li class="card">
                 <a href="<?= url('/videos/' . $video['id']) ?>" target="_blank">
                     <?php if (!empty($video['thumbnail_url'])): ?>
@@ -61,6 +61,21 @@ $formatDuration = static function (int $seconds): string {
                             — <?= e($video['release_date']) ?>
                         <?php endif; ?>
                     </span>
+
+                    <div class="video-review-preview" id="preview-<?= (int) $video['id'] ?>">
+                        <?php if ($index === 0): ?>
+                            <iframe width="100%" height="180"
+                                    src="https://www.youtube.com/embed/<?= e($video['youtube_id']) ?>"
+                                    title="<?= e($video['title'] ?? $video['youtube_id']) ?>"
+                                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+                        <?php else: ?>
+                            <button type="button" class="btn-small video-preview-toggle"
+                                    data-youtube-id="<?= e($video['youtube_id']) ?>"
+                                    data-target="preview-<?= (int) $video['id'] ?>">
+                                <?= e(t('admin.video_review.preview')) ?>
+                            </button>
+                        <?php endif; ?>
+                    </div>
 
                     <form method="post" action="<?= url('/admin/video-review/' . $video['id'] . '/validate') ?>">
                         <?php if (!empty($titleQuery)): ?>
@@ -87,6 +102,23 @@ $formatDuration = static function (int $seconds): string {
             </li>
         <?php endforeach; ?>
     </ul>
+
+    <script>
+        document.querySelectorAll('.video-preview-toggle').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var target = document.getElementById(btn.dataset.target);
+                var iframe = document.createElement('iframe');
+                iframe.width = '100%';
+                iframe.height = '180';
+                iframe.src = 'https://www.youtube.com/embed/' + btn.dataset.youtubeId + '?autoplay=1';
+                iframe.frameBorder = '0';
+                iframe.allow = 'autoplay; encrypted-media';
+                iframe.allowFullscreen = true;
+                target.innerHTML = '';
+                target.appendChild(iframe);
+            });
+        });
+    </script>
 
     <?php if ($totalPages > 1): ?>
         <?php $pageQuery = !empty($titleQuery) ? '&q=' . urlencode($titleQuery) : ''; ?>

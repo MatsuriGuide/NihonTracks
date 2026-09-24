@@ -343,6 +343,8 @@ return [
 
     // Import avatar YouTube
     'artists.avatar_import_youtube' => 'YouTubeからインポート',
+    'artists.scan_channel' => '新しい曲をスキャン',
+    'artists.scan_channel_result' => 'スキャン完了 — 公開された新しい動画数：',
 
     // Nombre d'abonnes
     'artists.subscriber_count' => '登録者',
@@ -365,6 +367,7 @@ return [
     'admin.video_review.hint' => 'これらの動画はチャンネル監視により自動公開されました（デフォルトのタイプ、アーティストから引き継いだタグ）。必要に応じて確認・修正し、確認済みにしてください。',
     'admin.video_review.none' => '確認待ちの動画はありません。',
     'admin.video_review.edit' => '編集',
+    'admin.video_review.preview' => '▶ プレビュー',
     'admin.video_review.mark_reviewed' => '確認済みにする',
     'admin.artist_completion.missing_tags' => 'タグ未設定',
     'artists.tags_label' => 'タグ',

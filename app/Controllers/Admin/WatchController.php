@@ -64,6 +64,18 @@ class WatchController extends AdminController
 
         ScanLog::record('manual', $result !== null ? 1 : 0, $result ?? 0, $result === null ? 1 : 0);
 
+        // Permet de déclencher un scan depuis n'importe quelle page (ex. la
+        // fiche artiste) et d'y revenir avec le résultat, plutôt que de
+        // toujours renvoyer vers /admin/watch.
+        $returnTo = (string) $this->input('return_to', '');
+
+        if ($returnTo !== '' && strpos($returnTo, '/') === 0) {
+            $separator = strpos($returnTo, '?') !== false ? '&' : '?';
+            $this->redirect($returnTo . $separator . 'scanned=' . ($result ?? 0));
+
+            return;
+        }
+
         $this->redirect('/admin/watch?found=' . ($result ?? 0));
     }
 }

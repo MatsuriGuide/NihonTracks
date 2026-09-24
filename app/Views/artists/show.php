@@ -121,9 +121,11 @@
         </form>
         <?php
         $hasYoutubeLink = false;
+        $youtubeLinkId = null;
         foreach ($links as $link) {
             if ($link['platform'] === 'youtube') {
                 $hasYoutubeLink = true;
+                $youtubeLinkId = (int) $link['id'];
                 break;
             }
         }
@@ -134,6 +136,16 @@
             </form>
         <?php endif; ?>
     </details>
+
+    <?php if ($hasYoutubeLink && \App\Core\Auth::role() === 'admin'): ?>
+        <form method="post" action="<?= url('/admin/watch/' . $youtubeLinkId . '/scan') ?>" style="margin-top: 0.5rem;">
+            <input type="hidden" name="return_to" value="<?= url('/artists/' . $artist['slug']) ?>">
+            <button type="submit"><?= e(t('artists.scan_channel')) ?></button>
+        </form>
+        <?php if (($_GET['scanned'] ?? '') !== ''): ?>
+            <p class="hint"><?= e(t('artists.scan_channel_result')) ?> <?= (int) $_GET['scanned'] ?></p>
+        <?php endif; ?>
+    <?php endif; ?>
 
     <?php if (\App\Core\Auth::role() === 'admin'): ?>
         <div class="admin-translate">
