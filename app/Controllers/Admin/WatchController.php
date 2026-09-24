@@ -66,10 +66,14 @@ class WatchController extends AdminController
 
         // Permet de déclencher un scan depuis n'importe quelle page (ex. la
         // fiche artiste) et d'y revenir avec le résultat, plutôt que de
-        // toujours renvoyer vers /admin/watch.
+        // toujours renvoyer vers /admin/watch. url() génère une URL
+        // complète (avec le domaine), donc on vérifie que return_to
+        // pointe bien vers ce même site plutôt que d'exiger un chemin
+        // relatif commençant par "/".
         $returnTo = (string) $this->input('return_to', '');
+        $appUrl = rtrim($GLOBALS['config']['app_url'] ?? '', '/');
 
-        if ($returnTo !== '' && strpos($returnTo, '/') === 0) {
+        if ($returnTo !== '' && $appUrl !== '' && strpos($returnTo, $appUrl) === 0) {
             $separator = strpos($returnTo, '?') !== false ? '&' : '?';
             $this->redirect($returnTo . $separator . 'scanned=' . ($result ?? 0));
 
