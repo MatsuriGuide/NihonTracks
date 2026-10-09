@@ -8,8 +8,9 @@
  *   0 star-slash-4 * * * php /home/xxx/domains/koshiki.art/public_html/nihontracks/scripts/scan-channels.php
  * (remplacer star-slash-4 par l'expression cron réelle "*\/4")
  *
- * Coût API : 3 unités par artiste surveillé (channels.list + playlistItems.list
- * + videos.list groupé pour le filtre anti-Shorts), jusqu'à 50 vidéos examinées.
+ * Coût API : 1 unité par chaîne (playlistItems.list, 5 vidéos récentes), +1 si
+ * de nouvelles vidéos sont trouvées (videos.list pour durée/premières), +1 pour
+ * le rafraîchissement hebdomadaire avatar/abonnés (channels.list).
  *
  * Chaque exécution (réussie, en erreur, ou tentative d'accès web bloquée) est
  * journalisée dans la table scan_log, consultable depuis /admin/watch.
@@ -25,6 +26,10 @@ ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
 require dirname(__DIR__) . '/autoload.php';
+
+// Nombre de vidéos récentes examinées par chaîne lors du scan automatique
+// (le scan manuel depuis l'admin garde 25/50/100).
+const CRON_MAX_RESULTS = 5;
 
 use App\Core\Database;
 use App\Core\Env;
@@ -71,7 +76,18 @@ try {
             continue;
         }
 
-        $result = ChannelWatcherService::scanArtist((int) $link['artist_id'], $channelId);
+        // Quota : 5 vidéos récentes par chaîne suffisent en CRON (3 passages/jour).
+        // channels.list (avatar + abonnés) n'est rappelé qu'environ une fois
+        // par semaine et par chaîne, réparti sur les artistes et les créneaux.
+        $refresh = (((int) $link['artist_id'] + (int) date('z') * 3 + intdiv((int) date('G'), 8)) % 21) === 0;
+
+        $result = ChannelWatcherService::scanArtist(
+            (int) $link['artist_id'],
+            $channelId,
+            CRON_MAX_RESULTS,
+            90,
+            $refresh
+        );
 
         if ($result === null) {
             $errors++;

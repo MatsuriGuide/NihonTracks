@@ -19,6 +19,7 @@ class ChannelWatcherService
      * Retourne le nombre de nouvelles vidéos publiées (null en cas d'échec API).
      *
      * @param int $maxResults Nombre de vidéos récentes examinées par scan (max 50 par page)
+     * @param bool $refreshChannel Appelle channels.list pour mettre à jour avatar et abonnés (true par défaut, false pour économiser du quota en CRON)
      * @param int $minDurationSeconds Filtre heuristique anti-Shorts : les vidéos
      *   plus courtes que ce seuil sont ignorées. Imparfait — YouTube autorise
      *   des Shorts jusqu'à 3 min depuis 2024, donc certains passeront quand
@@ -29,23 +30,43 @@ class ChannelWatcherService
         int $artistId,
         string $channelId,
         int $maxResults = 50,
-        int $minDurationSeconds = 90
+        int $minDurationSeconds = 90,
+        bool $refreshChannel = true
     ): ?int {
-        $channelDetails = YoutubeApiService::fetchChannelDetailsById($channelId);
+        $uploadsPlaylistId = null;
 
-        if ($channelDetails === null || empty($channelDetails['uploads_playlist_id'])) {
-            return null;
+        // channels.list (1 unité) ne sert qu'à rafraîchir avatar + nombre
+        // d'abonnés, et à trouver la playlist "uploads". Or celle-ci se déduit
+        // de l'ID de chaîne (UC... -> UU...) : on peut donc s'en passer lors
+        // des scans automatiques, sauf pour le rafraîchissement périodique.
+        if ($refreshChannel || strncmp($channelId, 'UC', 2) !== 0) {
+            $channelDetails = YoutubeApiService::fetchChannelDetailsById($channelId);
+
+            if ($channelDetails === null || empty($channelDetails['uploads_playlist_id'])) {
+                return null;
+            }
+
+            if (!empty($channelDetails['thumbnail_url'])) {
+                Artist::updateAvatar($artistId, $channelDetails['thumbnail_url']);
+            }
+            Artist::updateSubscriberCount($artistId, $channelDetails['subscriber_count']);
+
+            $uploadsPlaylistId = $channelDetails['uploads_playlist_id'];
+        } else {
+            $uploadsPlaylistId = 'UU' . substr($channelId, 2);
         }
 
-        // Effet de bord "gratuit" : la photo et le nombre d'abonnés viennent
-        // du même appel API que celui qui sert à trouver les nouvelles
-        // vidéos, donc les tenir à jour à chaque scan ne coûte rien de plus.
-        if (!empty($channelDetails['thumbnail_url'])) {
-            Artist::updateAvatar($artistId, $channelDetails['thumbnail_url']);
-        }
-        Artist::updateSubscriberCount($artistId, $channelDetails['subscriber_count']);
+        $videos = YoutubeApiService::fetchPlaylistVideos($uploadsPlaylistId, $maxResults);
 
-        $videos = YoutubeApiService::fetchPlaylistVideos($channelDetails['uploads_playlist_id'], $maxResults);
+        if (empty($videos)) {
+            return 0;
+        }
+
+        // On écarte d'abord ce qui est déjà en base : si rien de nouveau, on
+        // évite l'appel videos.list (1 unité) pour cette chaîne.
+        $videos = array_values(array_filter($videos, static function (array $v): bool {
+            return Video::findByYoutubeId($v['youtube_id']) === null;
+        }));
 
         if (empty($videos)) {
             return 0;
