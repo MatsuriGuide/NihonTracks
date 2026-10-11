@@ -645,7 +645,13 @@ class Video
         $lang ??= Lang::current();
         $limit = max(1, min(20, $limit));
 
-        $total = self::countPublished();
+        // Seulement de la musique : clips (mv) et lives, pour ne pas voir
+        // apparaître reportages, making-of, etc. dans "à découvrir". Le
+        // COUNT doit utiliser exactement le même filtre que la requête
+        // aléatoire ci-dessous, sinon les OFFSET tombent dans le vide.
+        $total = (int) (Database::getInstance()->fetchOne(
+            'SELECT COUNT(*) AS n FROM videos WHERE status = "published" AND video_type IN ("mv", "live")'
+        )['n'] ?? 0);
 
         if ($total === 0) {
             return [];
@@ -670,7 +676,7 @@ class Video
                  LEFT JOIN video_artists va ON va.video_id = v.id
                  LEFT JOIN artists_i18n ai ON ai.artist_id = va.artist_id AND ai.lang = ?
                  LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = va.artist_id AND ai_fr.lang = "fr"
-                 WHERE v.status = "published"
+                 WHERE v.status = "published" AND v.video_type IN ("mv", "live")
                  GROUP BY v.id
                  ORDER BY v.id ASC
                  LIMIT 1 OFFSET ' . $offset,
