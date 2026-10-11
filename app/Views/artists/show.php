@@ -177,6 +177,17 @@
                 <strong><?= e(t('artists.links.platform.' . $link['platform'])) ?></strong> :
                 <a href="<?= e($link['url']) ?>" target="_blank" rel="noopener"><?= e($link['url']) ?></a>
                 <?php if ($editMode): ?>
+                    <form method="post" action="<?= url('/artists/' . $artist['id'] . '/links/' . $link['id'] . '/platform') ?>" style="display:inline">
+                        <select name="platform" onchange="this.form.submit()" aria-label="<?= e(t('artists.links.platform_label')) ?>">
+                            <?php foreach (\App\Models\ArtistLink::PLATFORMS as $platformOption): ?>
+                                <option value="<?= e($platformOption) ?>"<?= $platformOption === $link['platform'] ? ' selected' : '' ?>>
+                                    <?= e(t('artists.links.platform.' . $platformOption)) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <noscript><button type="submit"><?= e(t('artists.links.change_type')) ?></button></noscript>
+                    </form>
+
                     <form method="post" action="<?= url('/artists/' . $artist['id'] . '/links/' . $link['id'] . '/delete') ?>"
                           onsubmit="return confirm('<?= e(t('artists.links.remove_confirm')) ?>');" style="display:inline">
                         <button type="submit"><?= e(t('artists.links.remove')) ?></button>

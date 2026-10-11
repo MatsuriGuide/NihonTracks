@@ -472,6 +472,28 @@ class ArtistController extends Controller
         $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
     }
 
+    public function updateLinkPlatform(int $id, int $linkId): void
+    {
+        Auth::requireLogin();
+
+        $artist = Artist::findById($id);
+
+        if (!$artist || !Auth::canEdit((int) $artist['created_by'])) {
+            http_response_code(403);
+            require dirname(__DIR__) . '/Views/errors/403.php';
+
+            return;
+        }
+
+        $link = ArtistLink::findById($linkId);
+
+        if ($link && (int) $link['artist_id'] === $id) {
+            ArtistLink::updatePlatform($linkId, (string) $this->input('platform', ''));
+        }
+
+        $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
+    }
+
     public function addRelation(int $id): void
     {
         Auth::requireLogin();

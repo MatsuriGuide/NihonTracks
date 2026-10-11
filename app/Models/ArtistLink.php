@@ -7,12 +7,12 @@ use App\Services\YoutubeApiService;
 
 class ArtistLink
 {
-    public const PLATFORMS = ['website', 'twitter', 'instagram', 'facebook', 'tiktok', 'youtube', 'spotify', 'other'];
+    public const PLATFORMS = ['website', 'youtube', 'youtube_music', 'spotify', 'apple_music', 'amazon_music', 'deezer', 'line_music', 'awa', 'soundcloud', 'bandcamp', 'niconico', 'twitter', 'instagram', 'facebook', 'tiktok', 'threads', 'twitch', 'linktree', 'wikipedia', 'other'];
 
     public static function forArtist(int $artistId): array
     {
         return Database::getInstance()->fetchAll(
-            'SELECT * FROM artist_links WHERE artist_id = ? ORDER BY FIELD(platform, "youtube", "website", "twitter", "instagram", "facebook", "tiktok", "spotify", "other")',
+            'SELECT * FROM artist_links WHERE artist_id = ? ORDER BY FIELD(platform, "youtube", "website", "youtube_music", "spotify", "apple_music", "amazon_music", "deezer", "line_music", "awa", "soundcloud", "bandcamp", "niconico", "twitter", "instagram", "facebook", "tiktok", "threads", "twitch", "linktree", "wikipedia", "other"), id',
             [$artistId]
         );
     }
@@ -32,6 +32,22 @@ class ArtistLink
         );
 
         return (int) $db->lastInsertId();
+    }
+
+    /**
+     * Change le type d'un lien existant (ex: "website" -> "apple_music").
+     * Refuse silencieusement toute valeur hors liste.
+     */
+    public static function updatePlatform(int $id, string $platform): void
+    {
+        if (!in_array($platform, self::PLATFORMS, true)) {
+            return;
+        }
+
+        Database::getInstance()->query(
+            'UPDATE artist_links SET platform = ? WHERE id = ?',
+            [$platform, $id]
+        );
     }
 
     public static function delete(int $id): void
@@ -98,18 +114,40 @@ class ArtistLink
     {
         $host = strtolower((string) parse_url($url, PHP_URL_HOST));
 
+        // Les entrées les plus spécifiques d'abord (music.youtube.com avant youtube.com).
         $map = [
-            'twitter.com'      => 'twitter',
-            'x.com'            => 'twitter',
-            'instagram.com'    => 'instagram',
-            'facebook.com'     => 'facebook',
-            'fb.com'           => 'facebook',
-            'tiktok.com'       => 'tiktok',
-            'youtube.com'      => 'youtube',
-            'youtu.be'         => 'youtube',
-            'open.spotify.com' => 'spotify',
-            'spotify.com'      => 'spotify',
+            'music.youtube.com' => 'youtube_music',
+            'music.apple.com'   => 'apple_music',
+            'itunes.apple.com'  => 'apple_music',
+            'open.spotify.com'  => 'spotify',
+            'spotify.com'       => 'spotify',
+            'spotify.link'      => 'spotify',
+            'deezer.com'        => 'deezer',
+            'music.line.me'     => 'line_music',
+            'awa.fm'            => 'awa',
+            'soundcloud.com'    => 'soundcloud',
+            'bandcamp.com'      => 'bandcamp',
+            'nicovideo.jp'      => 'niconico',
+            'nico.ms'           => 'niconico',
+            'twitter.com'       => 'twitter',
+            'x.com'             => 'twitter',
+            'instagram.com'     => 'instagram',
+            'facebook.com'      => 'facebook',
+            'fb.com'            => 'facebook',
+            'tiktok.com'        => 'tiktok',
+            'threads.net'       => 'threads',
+            'threads.com'       => 'threads',
+            'twitch.tv'         => 'twitch',
+            'linktr.ee'         => 'linktree',
+            'wikipedia.org'     => 'wikipedia',
+            'youtube.com'       => 'youtube',
+            'youtu.be'          => 'youtube',
         ];
+
+        // Amazon Music : music.amazon.co.jp, music.amazon.com, music.amazon.fr...
+        if (strpos($host, 'music.amazon.') === 0) {
+            return 'amazon_music';
+        }
 
         foreach ($map as $domain => $platform) {
             if ($host === $domain || substr($host, -(strlen($domain) + 1)) === '.' . $domain) {
