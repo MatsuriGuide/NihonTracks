@@ -36,5 +36,8 @@ $router->get('/admin/exports/playlists.json', 'Admin\ExportController@playlistsJ
 $router->get('/admin/exports/full.json', 'Admin\ExportController@fullAudit');
 $router->get('/admin/translation-review', 'Admin\TranslationReviewController@index');
 
+$router->get('/admin/top', 'Admin\TopAdminController@index');
+$router->post('/admin/top/baseline', 'Admin\TopAdminController@baseline');
+$router->post('/admin/top/run', 'Admin\TopAdminController@run');
 // À compléter au fur et à mesure :
 // $router->get('/admin/users', 'Admin\UserAdminController@index');

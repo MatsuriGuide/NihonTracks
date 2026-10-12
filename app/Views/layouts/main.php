@@ -36,6 +36,7 @@
             <a href="<?= url('/artists') ?>"><?= e(t('nav.artists')) ?></a>
             <a href="<?= url('/videos') ?>"><?= e(t('nav.videos')) ?></a>
             <a href="<?= url('/playlists') ?>"><?= e(t('nav.playlists')) ?></a>
+            <a href="<?= url('/top') ?>"><?= e(t('nav.top')) ?></a>
         </nav>
 
         <div class="site-header-side">

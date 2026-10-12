@@ -51,6 +51,7 @@ $router->get('/videos/{id}/edit', 'VideoController@edit');
 $router->post('/videos/{id}/edit', 'VideoController@update');
 $router->post('/videos/{id}/delete', 'VideoController@delete');
 $router->get('/videos/{id}', 'VideoController@show');
+$router->get('/top', 'TopController@index');
 
 $router->get('/lang/{lang}', 'LangController@switch');
 
