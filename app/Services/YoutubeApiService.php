@@ -288,7 +288,7 @@ class YoutubeApiService
      * publier une vidéo qui n'est pas encore réellement regardable.
      *
      * @param string[] $videoIds
-     * @return array<string, array{duration_seconds: int, live_broadcast_content: string}>
+     * @return array<string, array{duration_seconds: int, live_broadcast_content: string, view_count: ?int}>
      */
     public static function fetchVideosDetails(array $videoIds): array
     {
@@ -302,7 +302,7 @@ class YoutubeApiService
 
         foreach (array_chunk($videoIds, 50) as $chunk) {
             $endpoint = 'https://www.googleapis.com/youtube/v3/videos'
-                . '?part=contentDetails,snippet'
+                . '?part=contentDetails,snippet,statistics'
                 . '&id=' . urlencode(implode(',', $chunk))
                 . '&key=' . urlencode($apiKey);
 
@@ -325,11 +325,58 @@ class YoutubeApiService
                 $details[$id] = [
                     'duration_seconds'       => $duration !== null ? self::parseDuration($duration) : 0,
                     'live_broadcast_content' => $item['snippet']['liveBroadcastContent'] ?? 'none',
+                    // null si YouTube masque le compteur de vues.
+                    'view_count'             => isset($item['statistics']['viewCount'])
+                        ? (int) $item['statistics']['viewCount']
+                        : null,
                 ];
             }
         }
 
         return $details;
+    }
+
+    /**
+     * Nombre de vues de plusieurs vidéos (videos.list, part=statistics) —
+     * 1 unité de quota par tranche de 50 identifiants. Les vidéos absentes
+     * de la réponse (supprimées, privées) ou dont le compteur est masqué
+     * n'apparaissent simplement pas dans le résultat.
+     *
+     * @param string[] $videoIds
+     * @return array<string, int> youtube_id => nombre de vues
+     */
+    public static function fetchVideosViews(array $videoIds): array
+    {
+        $apiKey = $_ENV['YOUTUBE_API_KEY'] ?? '';
+
+        if ($apiKey === '' || empty($videoIds)) {
+            return [];
+        }
+
+        $views = [];
+
+        foreach (array_chunk(array_values($videoIds), 50) as $chunk) {
+            $endpoint = 'https://www.googleapis.com/youtube/v3/videos'
+                . '?part=statistics'
+                . '&id=' . urlencode(implode(',', $chunk))
+                . '&key=' . urlencode($apiKey);
+
+            $response = self::httpGet($endpoint);
+
+            if ($response === null) {
+                continue;
+            }
+
+            $data = json_decode($response, true);
+
+            foreach ($data['items'] ?? [] as $item) {
+                if (isset($item['id'], $item['statistics']['viewCount'])) {
+                    $views[$item['id']] = (int) $item['statistics']['viewCount'];
+                }
+            }
+        }
+
+        return $views;
     }
 
     /**

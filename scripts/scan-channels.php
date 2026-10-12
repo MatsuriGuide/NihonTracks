@@ -35,6 +35,7 @@ use App\Core\Database;
 use App\Core\Env;
 use App\Models\ScanLog;
 use App\Services\ChannelWatcherService;
+use App\Services\VideoStatsService;
 use App\Services\YoutubeApiService;
 
 try {
@@ -56,6 +57,26 @@ try {
     }
 
     $db = Database::getInstance();
+
+    // TOP hebdomadaire : relevé des vues au 1er passage du jeudi. Fait AVANT
+    // le scan des chaînes, pour que les vidéos que le scan ajoute ensuite
+    // gardent leurs vues de départ comme base du jeudi suivant. Une erreur
+    // ici ne doit jamais empêcher le scan lui-même.
+    try {
+        $weekly = VideoStatsService::runWeeklyIfDue();
+
+        if ($weekly !== null) {
+            echo sprintf(
+                "[%s] TOP du %s : %d vidéo(s) mesurée(s), %d classée(s).\n",
+                date('Y-m-d H:i:s'),
+                $weekly['week_date'],
+                $weekly['measured'],
+                $weekly['ranked']
+            );
+        }
+    } catch (\Throwable $e) {
+        echo sprintf("[%s] TOP : erreur (%s)\n", date('Y-m-d H:i:s'), $e->getMessage());
+    }
 
     // Un seul artiste peut avoir plusieurs liens YouTube (cas d'une chaîne
     // "topic" distincte, cf. artist_links) : on surveille chacun d'eux séparément.

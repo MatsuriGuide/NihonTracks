@@ -278,9 +278,18 @@ class Video
     {
         $db = Database::getInstance();
 
+        // Vues de départ (base du prochain relevé hebdomadaire du TOP). Les
+        // appelants qui les connaissent déjà (scan de chaîne) les passent
+        // dans $data['view_count'] ; sinon on les demande à YouTube (1 unité).
+        if (array_key_exists('view_count', $data)) {
+            $viewCount = $data['view_count'];
+        } else {
+            $viewCount = \App\Services\YoutubeApiService::fetchVideosViews([$data['youtube_id']])[$data['youtube_id']] ?? null;
+        }
+
         $db->query(
-            'INSERT INTO videos (youtube_id, youtube_url, release_date, video_type, thumbnail_url, channel_name, duration_seconds, added_by, source)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO videos (youtube_id, youtube_url, release_date, video_type, thumbnail_url, channel_name, duration_seconds, view_count, view_count_at, added_by, source)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $data['youtube_id'],
                 $data['youtube_url'],
@@ -289,6 +298,8 @@ class Video
                 $data['thumbnail_url'],
                 $data['channel_name'],
                 $data['duration_seconds'],
+                $viewCount,
+                $viewCount !== null ? date('Y-m-d H:i:s') : null,
                 $addedBy,
                 $source,
             ]

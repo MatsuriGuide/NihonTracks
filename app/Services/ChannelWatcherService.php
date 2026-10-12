@@ -120,6 +120,8 @@ class ChannelWatcherService
                     'thumbnail_url'    => $video['thumbnail_url'],
                     'channel_name'     => $video['channel_name'],
                     'duration_seconds' => $duration,
+                    // Vues de départ : base du premier calcul du TOP hebdomadaire.
+                    'view_count'       => $info['view_count'] ?? null,
                 ],
                 [$artistId],
                 $tagIds,
