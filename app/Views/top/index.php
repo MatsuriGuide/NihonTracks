@@ -47,6 +47,11 @@ $trend = static function (array $row): string {
 
 <h1><?= e(t('top.title')) ?></h1>
 
+<p class="top-tabs">
+    <strong><?= e(t('top.tab_videos')) ?></strong> ·
+    <a href="<?= url('/top/artists') ?>"><?= e(t('top.tab_artists')) ?></a>
+</p>
+
 <?php if ($weekDate === null): ?>
     <p><?= e(t('top.empty')) ?></p>
     <?php if (\App\Core\Auth::check() && in_array(\App\Core\Auth::role(), ['moderator', 'admin'], true)): ?>

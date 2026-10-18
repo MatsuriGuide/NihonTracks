@@ -547,4 +547,13 @@ return [
     'admin.top.result_already' => '今週の集計はすでに完了しています。',
     'admin.top.result_failed' => 'YouTube APIから応答がありません（クォータ超過？）。何も保存されていません。',
     'admin.top.see_top' => 'TOPページを見る',
+
+        // TOP artistes émergents
+    'top.tab_videos' => '動画',
+    'top.tab_artists' => '注目の新進アーティスト',
+    'top.artists_subtitle' => '登録者数の少ないアーティストを、今週の動画の再生増加数で順位付け',
+    'top.artists_limit' => 'チャンネル登録者数：',
+    'top.artists_none' => 'この条件で今週ランクインしたアーティストはいません。',
+    'top.subscribers' => '登録者',
+
 ];

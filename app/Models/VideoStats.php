@@ -127,6 +127,113 @@ class VideoStats
         );
     }
 
+    /**
+     * Classement des artistes "émergents" d'une semaine : artistes approuvés
+     * dont la chaîne a moins de $maxSubscribers abonnés (abonnés inconnus =
+     * exclu), classés selon la somme des vues gagnées par leurs clips classés
+     * cette semaine-là. Pour chaque artiste : sa meilleure vidéo de la semaine.
+     *
+     * @return array<int, array> trié, avec la clé 'rank' (1 = meilleur)
+     */
+    public static function emergingArtistsRanking(string $weekDate, int $maxSubscribers, ?string $lang = null): array
+    {
+        $lang = $lang ?? Lang::current();
+
+        $rows = Database::getInstance()->fetchAll(
+            'SELECT a.id AS artist_id, a.slug, a.avatar_path, a.subscriber_count,
+                    COALESCE(ai.name, ai_fr.name) AS artist_name,
+                    v.id AS video_id, COALESCE(vi.title, vi_fr.title) AS video_title,
+                    s.gain, s.view_count
+             FROM video_weekly_stats s
+             JOIN videos v ON v.id = s.video_id AND v.status = "published"
+             JOIN video_artists va ON va.video_id = v.id
+             JOIN artists a ON a.id = va.artist_id AND a.moderation_status = "approved"
+                           AND a.subscriber_count IS NOT NULL AND a.subscriber_count < ?
+             LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = ?
+             LEFT JOIN artists_i18n ai_fr ON ai_fr.artist_id = a.id AND ai_fr.lang = "fr"
+             LEFT JOIN videos_i18n vi ON vi.video_id = v.id AND vi.lang = ?
+             LEFT JOIN videos_i18n vi_fr ON vi_fr.video_id = v.id AND vi_fr.lang = "fr"
+             WHERE s.week_date = ?',
+            [$maxSubscribers, $lang, $lang, $weekDate]
+        );
+
+        $artists = [];
+
+        foreach ($rows as $r) {
+            $id = (int) $r['artist_id'];
+
+            if (!isset($artists[$id])) {
+                $artists[$id] = [
+                    'id'               => $id,
+                    'slug'             => $r['slug'],
+                    'name'             => $r['artist_name'],
+                    'avatar_path'      => $r['avatar_path'],
+                    'subscriber_count' => (int) $r['subscriber_count'],
+                    'gain'             => 0,
+                    'video_count'      => 0,
+                    'best_video_id'    => null,
+                    'best_video_title' => null,
+                    'best_gain'        => null,
+                ];
+            }
+
+            $artists[$id]['gain'] += (int) $r['gain'];
+            $artists[$id]['video_count']++;
+
+            if ($artists[$id]['best_gain'] === null || (int) $r['gain'] > $artists[$id]['best_gain']) {
+                $artists[$id]['best_gain'] = (int) $r['gain'];
+                $artists[$id]['best_video_id'] = (int) $r['video_id'];
+                $artists[$id]['best_video_title'] = $r['video_title'];
+            }
+        }
+
+        // Un artiste sans aucune vue gagnée n'a rien à faire dans un classement.
+        $artists = array_values(array_filter($artists, static function (array $a): bool {
+            return $a['gain'] > 0;
+        }));
+
+        usort($artists, static function (array $a, array $b): int {
+            if ($a['gain'] !== $b['gain']) {
+                return $b['gain'] <=> $a['gain'];
+            }
+
+            return $a['subscriber_count'] <=> $b['subscriber_count'];
+        });
+
+        foreach ($artists as $i => &$a) {
+            $a['rank'] = $i + 1;
+        }
+        unset($a);
+
+        return $artists;
+    }
+
+    /**
+     * Top des artistes émergents avec rang de la semaine précédente
+     * (prev_rank = null : nouvelle entrée). Les deux semaines sont calculées
+     * avec le même seuil d'abonnés.
+     */
+    public static function emergingArtists(string $weekDate, ?string $prevWeek, int $maxSubscribers, int $limit = 10): array
+    {
+        $current = self::emergingArtistsRanking($weekDate, $maxSubscribers);
+
+        $prevRanks = [];
+        if ($prevWeek !== null) {
+            foreach (self::emergingArtistsRanking($prevWeek, $maxSubscribers) as $a) {
+                $prevRanks[$a['id']] = $a['rank'];
+            }
+        }
+
+        $top = array_slice($current, 0, max(1, min(50, $limit)));
+
+        foreach ($top as &$a) {
+            $a['prev_rank'] = $prevRanks[$a['id']] ?? null;
+        }
+        unset($a);
+
+        return $top;
+    }
+
     /** Vidéos MV publiées sans vues de départ (pour l'écran admin). */
     public static function countMvWithoutBaseline(): int
     {

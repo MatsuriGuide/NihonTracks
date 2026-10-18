@@ -34,4 +34,36 @@ class TopController extends Controller
             'releases'     => VideoStats::weekReleases($isLatest ? date('Y-m-d') : $weekDate, 12),
         ]);
     }
+
+    /** Seuils d'abonnés proposés pour "artistes émergents". */
+    public const SUBSCRIBER_LIMITS = [5000, 10000, 25000];
+
+    public function artists(): void
+    {
+        $weeks = VideoStats::weeks();
+        $requested = (string) $this->input('week', '');
+        $weekDate = in_array($requested, $weeks, true) ? $requested : ($weeks[0] ?? null);
+
+        $maxSubscribers = (int) $this->input('max', 10000);
+        if (!in_array($maxSubscribers, self::SUBSCRIBER_LIMITS, true)) {
+            $maxSubscribers = 10000;
+        }
+
+        if ($weekDate === null) {
+            $this->render('top/artists', ['weekDate' => null, 'limits' => self::SUBSCRIBER_LIMITS, 'maxSubscribers' => $maxSubscribers]);
+
+            return;
+        }
+
+        $prevWeek = VideoStats::previousWeek($weekDate);
+
+        $this->render('top/artists', [
+            'weekDate'       => $weekDate,
+            'prevWeek'       => $prevWeek,
+            'nextWeek'       => VideoStats::nextWeek($weekDate),
+            'artists'        => VideoStats::emergingArtists($weekDate, $prevWeek, $maxSubscribers, 10),
+            'limits'         => self::SUBSCRIBER_LIMITS,
+            'maxSubscribers' => $maxSubscribers,
+        ]);
+    }
 }

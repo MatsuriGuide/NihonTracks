@@ -547,4 +547,13 @@ return [
     'admin.top.result_already' => 'This week\'s count has already been done.',
     'admin.top.result_failed' => 'No answer from the YouTube API (quota exhausted?). Nothing was saved.',
     'admin.top.see_top' => 'See the TOP page',
+
+        // TOP artistes émergents
+    'top.tab_videos' => 'Videos',
+    'top.tab_artists' => 'Emerging artists',
+    'top.artists_subtitle' => 'Artists with a small channel, ranked by views gained by their videos this week',
+    'top.artists_limit' => 'Channel with fewer than',
+    'top.artists_none' => 'No artist ranked for this threshold this week.',
+    'top.subscribers' => 'subscribers',
+
 ];

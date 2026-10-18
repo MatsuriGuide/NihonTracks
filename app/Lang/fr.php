@@ -547,4 +547,12 @@ return [
     'admin.top.result_already' => 'Le relevé de cette semaine a déjà été effectué.',
     'admin.top.result_failed' => 'Aucune réponse de l\'API YouTube (quota épuisé ?). Rien n\'a été enregistré.',
     'admin.top.see_top' => 'Voir la page TOP',
+
+        // TOP artistes émergents
+    'top.tab_videos' => 'Clips',
+    'top.tab_artists' => 'Artistes émergents',
+    'top.artists_subtitle' => 'Artistes dont la chaîne compte peu d\'abonnés, classés selon les vues gagnées par leurs clips cette semaine',
+    'top.artists_limit' => 'Chaîne avec moins de',
+    'top.artists_none' => 'Aucun artiste classé pour ce seuil cette semaine.',
+    'top.subscribers' => 'abonnés',
 ];
