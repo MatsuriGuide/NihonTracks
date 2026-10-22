@@ -99,4 +99,5 @@ $query = static function (array $extra) use ($maxSubscribers, $weekDate): string
             <?php endforeach; ?>
         </ol>
     <?php endif; ?>
+    <?php $exportDefaultType = 'artists'; require __DIR__ . '/_export.php'; ?>
 <?php endif; ?>

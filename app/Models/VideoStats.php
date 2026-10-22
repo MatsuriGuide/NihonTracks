@@ -86,7 +86,7 @@ class VideoStats
         }
 
         $lang = $lang ?? Lang::current();
-        $limit = max(1, min(20, $limit));
+        $limit = max(1, min(50, $limit));
 
         return Database::getInstance()->fetchAll(
             self::SELECT_BASE . '
@@ -142,7 +142,7 @@ class VideoStats
         $rows = Database::getInstance()->fetchAll(
             'SELECT a.id AS artist_id, a.slug, a.avatar_path, a.subscriber_count,
                     COALESCE(ai.name, ai_fr.name) AS artist_name,
-                    v.id AS video_id, COALESCE(vi.title, vi_fr.title) AS video_title,
+                    v.id AS video_id, v.youtube_id AS video_youtube_id, COALESCE(vi.title, vi_fr.title) AS video_title,
                     s.gain, s.view_count
              FROM video_weekly_stats s
              JOIN videos v ON v.id = s.video_id AND v.status = "published"
@@ -172,6 +172,7 @@ class VideoStats
                     'gain'             => 0,
                     'video_count'      => 0,
                     'best_video_id'    => null,
+                    'best_video_youtube_id' => null,
                     'best_video_title' => null,
                     'best_gain'        => null,
                 ];
@@ -183,6 +184,7 @@ class VideoStats
             if ($artists[$id]['best_gain'] === null || (int) $r['gain'] > $artists[$id]['best_gain']) {
                 $artists[$id]['best_gain'] = (int) $r['gain'];
                 $artists[$id]['best_video_id'] = (int) $r['video_id'];
+                $artists[$id]['best_video_youtube_id'] = $r['video_youtube_id'];
                 $artists[$id]['best_video_title'] = $r['video_title'];
             }
         }

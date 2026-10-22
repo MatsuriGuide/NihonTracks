@@ -555,5 +555,12 @@ return [
     'top.artists_limit' => 'Channel with fewer than',
     'top.artists_none' => 'No artist ranked for this threshold this week.',
     'top.subscribers' => 'subscribers',
+    // Export CSV du TOP
+    'top.export_title' => 'CSV export',
+    'top.export_type_videos' => 'Top videos',
+    'top.export_type_progress' => 'Biggest climbers',
+    'top.export_type_artists' => 'Emerging artists',
+    'top.export_count' => 'Count:',
+    'top.export_button' => 'Export',
 
 ];

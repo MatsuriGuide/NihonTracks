@@ -126,4 +126,5 @@ $trend = static function (array $row): string {
             <?php endforeach; ?>
         </ul>
     <?php endif; ?>
+    <?php $exportDefaultType = 'videos'; require __DIR__ . '/_export.php'; ?>
 <?php endif; ?>

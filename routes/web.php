@@ -53,7 +53,7 @@ $router->post('/videos/{id}/delete', 'VideoController@delete');
 $router->get('/videos/{id}', 'VideoController@show');
 $router->get('/top', 'TopController@index');
 $router->get('/top/artists', 'TopController@artists');
-
+$router->get('/top/export.csv', 'TopController@exportCsv');
 $router->get('/lang/{lang}', 'LangController@switch');
 
 // Public, sans connexion requise (lien de désabonnement dans les emails)
