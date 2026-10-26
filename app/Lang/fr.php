@@ -561,5 +561,15 @@ return [
     'top.export_type_artists' => 'Artistes émergents',
     'top.export_count' => 'Nombre :',
     'top.export_button' => 'Exporter',
+    // Réparation des titres
+    'admin.title_repair_link' => 'Réparer les titres « Deleted video »',
+    'admin.title_repair.title' => 'Réparer les titres manquants',
+    'admin.title_repair.hint' => 'YouTube renvoie parfois « Deleted video » ou « Private video » à la place du vrai titre lors du scan d\'une chaîne. Cet outil redemande le titre réel de ces vidéos à YouTube.',
+    'admin.title_repair.remaining' => 'Vidéos concernées :',
+    'admin.title_repair.processed' => 'Vérifiées :',
+    'admin.title_repair.fixed' => 'Réparées :',
+    'admin.title_repair.run' => 'Réparer les titres',
+    'admin.title_repair.batch_hint' => '100 vidéos par clic. Si le compteur ne baisse pas, ces vidéos sont réellement indisponibles côté API : modifie leur titre à la main.',
+    'admin.title_repair.none' => 'Aucun titre à réparer.',
     
 ];

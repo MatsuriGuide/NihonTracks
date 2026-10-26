@@ -17,4 +17,5 @@
     <li><a href="<?= url('/admin/exports') ?>"><?= e(t('admin.exports_link')) ?></a></li>
     <li><a href="<?= url('/admin/translation-review') ?>"><?= e(t('admin.translation_review_link')) ?></a></li>
     <li><a href="<?= url('/admin/top') ?>"><?= e(t('admin.top_link')) ?></a></li>
+    <li><a href="<?= url('/admin/title-repair') ?>"><?= e(t('admin.title_repair_link')) ?></a></li>
 </ul>

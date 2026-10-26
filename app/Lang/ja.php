@@ -561,5 +561,15 @@ return [
     'top.export_type_artists' => '注目の新進アーティスト',
     'top.export_count' => '件数：',
     'top.export_button' => 'エクスポート',
+    // Réparation des titres
+    'admin.title_repair_link' => '「Deleted video」タイトルを修復',
+    'admin.title_repair.title' => 'タイトルの修復',
+    'admin.title_repair.hint' => 'チャンネルのスキャン時に、YouTubeが実際のタイトルの代わりに「Deleted video」「Private video」を返すことがあります。このツールは該当動画の実際のタイトルをYouTubeに再取得します。',
+    'admin.title_repair.remaining' => '対象の動画：',
+    'admin.title_repair.processed' => '確認：',
+    'admin.title_repair.fixed' => '修復：',
+    'admin.title_repair.run' => 'タイトルを修復',
+    'admin.title_repair.batch_hint' => '1回につき100件。件数が減らない場合、その動画はAPI上で本当に利用できません。タイトルを手動で編集してください。',
+    'admin.title_repair.none' => '修復するタイトルはありません。',
 
 ];

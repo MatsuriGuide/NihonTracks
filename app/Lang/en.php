@@ -562,5 +562,15 @@ return [
     'top.export_type_artists' => 'Emerging artists',
     'top.export_count' => 'Count:',
     'top.export_button' => 'Export',
+    // Réparation des titres
+    'admin.title_repair_link' => 'Fix "Deleted video" titles',
+    'admin.title_repair.title' => 'Fix missing titles',
+    'admin.title_repair.hint' => 'YouTube sometimes returns "Deleted video" or "Private video" instead of the real title when scanning a channel. This tool asks YouTube again for the real title of these videos.',
+    'admin.title_repair.remaining' => 'Affected videos:',
+    'admin.title_repair.processed' => 'Checked:',
+    'admin.title_repair.fixed' => 'Fixed:',
+    'admin.title_repair.run' => 'Fix titles',
+    'admin.title_repair.batch_hint' => '100 videos per click. If the counter does not go down, those videos are really unavailable through the API: edit their title by hand.',
+    'admin.title_repair.none' => 'No title to fix.',
 
 ];

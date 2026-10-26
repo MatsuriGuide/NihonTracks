@@ -110,11 +110,22 @@ class ChannelWatcherService
                 continue;
             }
 
+            // Le titre de la liste de lecture ("uploads") est parfois un
+            // texte de remplacement ("Deleted video", "Private video") même
+            // pour une vidéo lisible : on préfère le titre de videos.list,
+            // et on ignore la vidéo (reprise au prochain scan) si aucun
+            // vrai titre n'est disponible.
+            $title = $info['title'] ?? $video['title'];
+
+            if (in_array(trim((string) $title), ['', 'Deleted video', 'Private video'], true)) {
+                continue;
+            }
+
             Video::create(
                 [
                     'youtube_id'       => $video['youtube_id'],
                     'youtube_url'      => 'https://www.youtube.com/watch?v=' . $video['youtube_id'],
-                    'title'            => $video['title'],
+                    'title'            => $title,
                     'release_date'     => $video['published_at'],
                     'video_type'       => 'other',
                     'thumbnail_url'    => $video['thumbnail_url'],

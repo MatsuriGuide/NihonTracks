@@ -288,7 +288,7 @@ class YoutubeApiService
      * publier une vidéo qui n'est pas encore réellement regardable.
      *
      * @param string[] $videoIds
-     * @return array<string, array{duration_seconds: int, live_broadcast_content: string, view_count: ?int}>
+     * @return array<string, array{duration_seconds: int, live_broadcast_content: string, title: ?string, view_count: ?int}>
      */
     public static function fetchVideosDetails(array $videoIds): array
     {
@@ -325,6 +325,9 @@ class YoutubeApiService
                 $details[$id] = [
                     'duration_seconds'       => $duration !== null ? self::parseDuration($duration) : 0,
                     'live_broadcast_content' => $item['snippet']['liveBroadcastContent'] ?? 'none',
+                    // Titre réel de la vidéo : playlistItems.list renvoie parfois
+                    // "Deleted video" / "Private video" à la place du vrai titre.
+                    'title'                  => $item['snippet']['title'] ?? null,
                     // null si YouTube masque le compteur de vues.
                     'view_count'             => isset($item['statistics']['viewCount'])
                         ? (int) $item['statistics']['viewCount']

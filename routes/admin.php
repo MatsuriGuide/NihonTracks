@@ -39,5 +39,7 @@ $router->get('/admin/translation-review', 'Admin\TranslationReviewController@ind
 $router->get('/admin/top', 'Admin\TopAdminController@index');
 $router->post('/admin/top/baseline', 'Admin\TopAdminController@baseline');
 $router->post('/admin/top/run', 'Admin\TopAdminController@run');
+    $router->get('/admin/title-repair', 'Admin\TitleRepairController@index');
+    $router->post('/admin/title-repair/run', 'Admin\TitleRepairController@run');
 // À compléter au fur et à mesure :
 // $router->get('/admin/users', 'Admin\UserAdminController@index');
