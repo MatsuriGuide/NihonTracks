@@ -571,5 +571,7 @@ return [
     'admin.title_repair.run' => 'Réparer les titres',
     'admin.title_repair.batch_hint' => '100 vidéos par clic. Si le compteur ne baisse pas, ces vidéos sont réellement indisponibles côté API : modifie leur titre à la main.',
     'admin.title_repair.none' => 'Aucun titre à réparer.',
+    'admin.title_repair.thumbs_fixed' => 'Miniatures ajoutées :',
+    'admin.title_repair.missing_thumbs' => 'sans miniature :',
     
 ];

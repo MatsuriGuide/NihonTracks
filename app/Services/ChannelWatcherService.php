@@ -128,7 +128,11 @@ class ChannelWatcherService
                     'title'            => $title,
                     'release_date'     => $video['published_at'],
                     'video_type'       => 'other',
-                    'thumbnail_url'    => $video['thumbnail_url'],
+                    // Vidéo "Deleted video" de la liste uploads : pas de miniature dans
+                    // la réponse, mais l'URL standard YouTube fonctionne toujours.
+                    'thumbnail_url'    => !empty($video['thumbnail_url'])
+                        ? $video['thumbnail_url']
+                        : 'https://i.ytimg.com/vi/' . $video['youtube_id'] . '/hqdefault.jpg',
                     'channel_name'     => $video['channel_name'],
                     'duration_seconds' => $duration,
                     // Vues de départ : base du premier calcul du TOP hebdomadaire.

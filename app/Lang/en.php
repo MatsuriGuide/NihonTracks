@@ -572,5 +572,7 @@ return [
     'admin.title_repair.run' => 'Fix titles',
     'admin.title_repair.batch_hint' => '100 videos per click. If the counter does not go down, those videos are really unavailable through the API: edit their title by hand.',
     'admin.title_repair.none' => 'No title to fix.',
+    'admin.title_repair.thumbs_fixed' => 'Thumbnails added:',
+    'admin.title_repair.missing_thumbs' => 'without thumbnail:',
 
 ];

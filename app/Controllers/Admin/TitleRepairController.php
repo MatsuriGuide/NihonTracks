@@ -46,7 +46,15 @@ class TitleRepairController extends AdminController
             $fixed++;
         }
 
-        $this->renderPage(['processed' => count($rows), 'fixed' => $fixed]);
+        // Miniatures manquantes (même cause : la liste "uploads" ne les fournit
+        // pas pour ces vidéos). L'URL standard YouTube ne demande aucun appel API.
+        $thumbs = $db->query(
+            'UPDATE videos
+             SET thumbnail_url = CONCAT("https://i.ytimg.com/vi/", youtube_id, "/hqdefault.jpg")
+             WHERE thumbnail_url IS NULL OR thumbnail_url = ""'
+        )->rowCount();
+
+        $this->renderPage(['processed' => count($rows), 'fixed' => $fixed, 'thumbs' => $thumbs]);
     }
 
     private function renderPage(?array $result): void
@@ -55,6 +63,14 @@ class TitleRepairController extends AdminController
             'SELECT COUNT(*) AS n FROM videos_i18n WHERE title IN ("Deleted video", "Private video")'
         )['n'] ?? 0);
 
-        $this->render('admin/title-repair/index', ['result' => $result, 'remaining' => $count]);
+        $missingThumbs = (int) (Database::getInstance()->fetchOne(
+            'SELECT COUNT(*) AS n FROM videos WHERE thumbnail_url IS NULL OR thumbnail_url = ""'
+        )['n'] ?? 0);
+
+        $this->render('admin/title-repair/index', [
+            'result'        => $result,
+            'remaining'     => $count,
+            'missingThumbs' => $missingThumbs,
+        ]);
     }
 }

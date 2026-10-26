@@ -6,12 +6,14 @@
     <p class="hint hint-success">
         <?= e(t('admin.title_repair.processed')) ?> <?= (int) $result['processed'] ?>
         — <?= e(t('admin.title_repair.fixed')) ?> <?= (int) $result['fixed'] ?>
+        — <?= e(t('admin.title_repair.thumbs_fixed')) ?> <?= (int) $result['thumbs'] ?>
     </p>
 <?php endif; ?>
 
-<p><?= e(t('admin.title_repair.remaining')) ?> <strong><?= (int) $remaining ?></strong></p>
+<p><?= e(t('admin.title_repair.remaining')) ?> <strong><?= (int) $remaining ?></strong>
+   · <?= e(t('admin.title_repair.missing_thumbs')) ?> <strong><?= (int) $missingThumbs ?></strong></p>
 
-<?php if ($remaining > 0): ?>
+<?php if ($remaining > 0 || $missingThumbs > 0): ?>
     <form method="post" action="<?= url('/admin/title-repair/run') ?>">
         <button type="submit"><?= e(t('admin.title_repair.run')) ?></button>
     </form>

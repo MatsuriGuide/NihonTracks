@@ -571,5 +571,7 @@ return [
     'admin.title_repair.run' => 'タイトルを修復',
     'admin.title_repair.batch_hint' => '1回につき100件。件数が減らない場合、その動画はAPI上で本当に利用できません。タイトルを手動で編集してください。',
     'admin.title_repair.none' => '修復するタイトルはありません。',
+    'admin.title_repair.thumbs_fixed' => 'サムネイル追加：',
+    'admin.title_repair.missing_thumbs' => 'サムネイルなし：',
 
 ];
