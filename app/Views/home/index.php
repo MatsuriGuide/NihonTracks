@@ -193,11 +193,11 @@ $placeholderThumb = static function (?string $url): string {
     <ul class="home-grid is-compact">
         <?php foreach ($discoverArtists as $artist): ?>
             <li class="card">
-                <a href="<?= url('/artists/' . $artist['slug']) ?>">
+                <a href="<?= url(\App\Models\Artist::path($artist)) ?>">
                     <div class="card-thumb" style="aspect-ratio: 1 / 1;<?= !empty($artist['avatar_path']) ? " background-image:url('" . e($artist['avatar_path']) . "')" : '' ?>"></div>
                 </a>
                 <div class="card-body">
-                    <a href="<?= url('/artists/' . $artist['slug']) ?>" class="card-title">
+                    <a href="<?= url(\App\Models\Artist::path($artist)) ?>" class="card-title">
                         <?= e($artist['name'] ?? $artist['slug']) ?>
                     </a>
                     <span class="card-meta">
@@ -282,11 +282,11 @@ $placeholderThumb = static function (?string $url): string {
     <ul class="home-grid is-compact">
         <?php foreach ($newArtists as $artist): ?>
             <li class="card">
-                <a href="<?= url('/artists/' . $artist['slug']) ?>">
+                <a href="<?= url(\App\Models\Artist::path($artist)) ?>">
                     <div class="card-thumb" style="aspect-ratio: 1 / 1;<?= !empty($artist['avatar_path']) ? " background-image:url('" . e($artist['avatar_path']) . "')" : '' ?>"></div>
                 </a>
                 <div class="card-body">
-                    <a href="<?= url('/artists/' . $artist['slug']) ?>" class="card-title">
+                    <a href="<?= url(\App\Models\Artist::path($artist)) ?>" class="card-title">
                         <?= e($artist['name'] ?? $artist['slug']) ?>
                     </a>
                     <span class="card-meta">

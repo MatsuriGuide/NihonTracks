@@ -4,7 +4,7 @@
     <p class="errors">
         <?= e($error) ?>
         <?php if (!empty($existingArtistSlug)): ?>
-            — <a href="<?= url('/artists/' . $existingArtistSlug) ?>"><?= e(t('artists.quick_create.view_existing')) ?></a>
+            — <a href="<?= url(\App\Models\Artist::path(['id' => $existingArtistId ?? null, 'slug' => $existingArtistSlug])) ?>"><?= e(t('artists.quick_create.view_existing')) ?></a>
         <?php endif; ?>
     </p>
 <?php endif; ?>

@@ -46,7 +46,7 @@ class VideoSuggestion
         $lang ??= \App\Core\Lang::current();
 
         return Database::getInstance()->fetchAll(
-            'SELECT vs.*, COALESCE(ai.name, ai_fr.name) AS artist_name, a.slug AS artist_slug
+            'SELECT vs.*, COALESCE(ai.name, ai_fr.name) AS artist_name, a.id AS artist_id, a.slug AS artist_slug
              FROM video_suggestions vs
              JOIN artists a ON a.id = vs.artist_id
              LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = ?

@@ -92,9 +92,9 @@
 <?php if ($canEdit): ?>
     <p>
         <?php if ($editMode): ?>
-            <a href="<?= url('/artists/' . $artist['slug']) ?>" class="btn btn-small"><?= e(t('artists.view_mode')) ?></a>
+            <a href="<?= url(\App\Models\Artist::path($artist)) ?>" class="btn btn-small"><?= e(t('artists.view_mode')) ?></a>
         <?php else: ?>
-            <a href="<?= url('/artists/' . $artist['slug'] . '?edit=1') ?>" class="btn btn-small"><?= e(t('artists.edit_mode')) ?></a>
+            <a href="<?= url(\App\Models\Artist::path($artist) . '?edit=1') ?>" class="btn btn-small"><?= e(t('artists.edit_mode')) ?></a>
         <?php endif; ?>
     </p>
 <?php endif; ?>
@@ -139,7 +139,7 @@
 
     <?php if ($hasYoutubeLink && \App\Core\Auth::role() === 'admin'): ?>
         <form method="post" action="<?= url('/admin/watch/' . $youtubeLinkId . '/scan') ?>" style="margin-top: 0.5rem;">
-            <input type="hidden" name="return_to" value="<?= url('/artists/' . $artist['slug']) ?>">
+            <input type="hidden" name="return_to" value="<?= url(\App\Models\Artist::path($artist)) ?>">
             <button type="submit"><?= e(t('artists.scan_channel')) ?></button>
         </form>
         <?php if (($_GET['scanned'] ?? '') !== ''): ?>
@@ -239,7 +239,7 @@ $hasRelations = !empty($outgoingRelations) || !empty($incomingRelations);
         <?php foreach ($outgoingRelations as $relation): ?>
             <li>
                 <?= e(t('artists.relations.' . $relationLabels[$relation['relation_type']])) ?> :
-                <a href="<?= url('/artists/' . $relation['other_slug']) ?>"><?= e($relation['other_name'] ?? $relation['other_slug']) ?></a>
+                <a href="<?= url(\App\Models\Artist::path(['id' => $relation['other_id'], 'slug' => $relation['other_slug']])) ?>"><?= e($relation['other_name'] ?? $relation['other_slug']) ?></a>
                 <?php if (!empty($relation['note'])): ?>
                     — <?= e($relation['note']) ?>
                 <?php endif; ?>
@@ -254,7 +254,7 @@ $hasRelations = !empty($outgoingRelations) || !empty($incomingRelations);
         <?php foreach ($incomingRelations as $relation): ?>
             <li>
                 <?= e(t('artists.relations.' . $reverseLabels[$relation['relation_type']])) ?> :
-                <a href="<?= url('/artists/' . $relation['other_slug']) ?>"><?= e($relation['other_name'] ?? $relation['other_slug']) ?></a>
+                <a href="<?= url(\App\Models\Artist::path(['id' => $relation['other_id'], 'slug' => $relation['other_slug']])) ?>"><?= e($relation['other_name'] ?? $relation['other_slug']) ?></a>
                 <?php if (!empty($relation['note'])): ?>
                     — <?= e($relation['note']) ?>
                 <?php endif; ?>

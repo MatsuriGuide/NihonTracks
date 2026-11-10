@@ -80,11 +80,11 @@ $query = static function (array $extra) use ($maxSubscribers, $weekDate): string
             <?php foreach ($artists as $a): ?>
                 <li class="top-row">
                     <span class="top-pos"><?= (int) $a['rank'] ?></span>
-                    <a href="<?= url('/artists/' . $a['slug']) ?>">
+                    <a href="<?= url(\App\Models\Artist::path($a)) ?>">
                         <span class="top-avatar"<?= !empty($a['avatar_path']) ? ' style="background-image:url(\'' . e($a['avatar_path']) . '\')"' : '' ?>></span>
                     </a>
                     <div class="top-info">
-                        <a href="<?= url('/artists/' . $a['slug']) ?>"><?= e($a['name'] ?? '') ?></a>
+                        <a href="<?= url(\App\Models\Artist::path($a)) ?>"><?= e($a['name'] ?? '') ?></a>
                         <span class="top-meta">
                             +<?= $fmt($a['gain']) ?> <?= e(t('top.gain')) ?> · <?= $fmt($a['subscriber_count']) ?> <?= e(t('top.subscribers')) ?>
                         </span>

@@ -61,14 +61,14 @@ class ReportController extends AdminController
 
             case 'artist':
                 $row = $db->fetchOne(
-                    'SELECT ai.name, a.slug
+                    'SELECT ai.name, a.id, a.slug
                      FROM artists a
                      LEFT JOIN artists_i18n ai ON ai.artist_id = a.id AND ai.lang = "fr"
                      WHERE a.id = ?',
                     [$id]
                 );
                 $report['content_label'] = $row['name'] ?? ('Artiste #' . $id);
-                $report['content_url'] = $row ? url('/artists/' . $row['slug']) : null;
+                $report['content_url'] = $row ? url(\App\Models\Artist::path($row)) : null;
 
                 break;
 

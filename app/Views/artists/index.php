@@ -22,7 +22,7 @@
     <ul class="card-grid" id="artist-list">
         <?php foreach ($artists as $artist): ?>
             <li class="card artist-list-item" data-name="<?= e(mb_strtolower($artist['name'] ?? $artist['slug'])) ?>">
-                <a href="<?= url('/artists/' . $artist['slug']) ?>">
+                <a href="<?= url(\App\Models\Artist::path($artist)) ?>">
                     <?php if (!empty($artist['avatar_path'])): ?>
                         <div class="card-thumb" style="background-image:url('<?= e($artist['avatar_path']) ?>'); aspect-ratio: 1 / 1;"></div>
                     <?php else: ?>
@@ -31,7 +31,7 @@
                 </a>
                 <div class="card-body">
                     <span class="catalog-no is-muted"><?= e(catalog_no('a', (int) $artist['id'])) ?></span>
-                    <a href="<?= url('/artists/' . $artist['slug']) ?>" class="card-title">
+                    <a href="<?= url(\App\Models\Artist::path($artist)) ?>" class="card-title">
                         <?= e($artist['name'] ?? $artist['slug']) ?>
                     </a>
                     <span class="card-meta"><?= e(t('artists.type.' . $artist['type'])) ?></span>

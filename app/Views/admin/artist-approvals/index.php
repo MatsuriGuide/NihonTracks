@@ -6,7 +6,7 @@
     <ul>
         <?php foreach ($pending as $artist): ?>
             <li>
-                <a href="<?= url('/artists/' . $artist['slug']) ?>" target="_blank"><?= e($artist['name'] ?? $artist['slug']) ?></a>
+                <a href="<?= url(\App\Models\Artist::path($artist)) ?>" target="_blank"><?= e($artist['name'] ?? $artist['slug']) ?></a>
                 (<?= e(t('artists.type.' . $artist['type'])) ?>)
                 — <?= e(t('admin.artist_approvals.submitted_by')) ?> <?= e($artist['submitted_by_name'] ?? '?') ?>
                 — <?= e($artist['created_at']) ?>

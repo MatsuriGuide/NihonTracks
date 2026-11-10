@@ -20,7 +20,7 @@
     <p>
         <?= e(t('videos.artists_label')) ?> :
         <?php foreach ($artists as $i => $artist): ?>
-            <?= $i > 0 ? ', ' : '' ?><a href="<?= url('/artists/' . $artist['slug']) ?>"><?= e($artist['name'] ?? '') ?></a>
+            <?= $i > 0 ? ', ' : '' ?><a href="<?= url(\App\Models\Artist::path($artist)) ?>"><?= e($artist['name'] ?? '') ?></a>
         <?php endforeach; ?>
     </p>
 <?php endif; ?>

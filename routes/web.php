@@ -34,6 +34,8 @@ $router->post('/artists/{id}/avatar/import-youtube', 'ArtistController@importAva
 $router->post('/artists/{id}/tags', 'ArtistController@updateTags');
 $router->post('/artists/{id}/tags-by-name', 'ArtistController@addTagsByName');
 $router->post('/artists/{id}/suggest-info', 'ArtistController@suggestInfo');
+// Lien stable : /artists/yuika/NT-A060 (le code prime sur le nom, qui peut changer).
+$router->get('/artists/{slug}/{code}', 'ArtistController@showByCode');
 $router->get('/artists/{slug}', 'ArtistController@show');
 
 // Idem : les routes fixes doivent précéder le pattern générique /videos/{id}

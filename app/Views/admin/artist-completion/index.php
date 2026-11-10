@@ -15,7 +15,7 @@
     <ul>
         <?php foreach ($artists as $artist): ?>
             <li>
-                <a href="<?= url('/artists/' . $artist['slug']) ?>" target="_blank"><?= e($artist['name'] ?? $artist['slug']) ?></a>
+                <a href="<?= url(\App\Models\Artist::path($artist)) ?>" target="_blank"><?= e($artist['name'] ?? $artist['slug']) ?></a>
                 —
                 <?php if (empty($artist['bio_fr'])): ?>
                     <span class="tag"><?= e(t('admin.artist_completion.missing_bio')) ?></span>
@@ -26,7 +26,7 @@
                 <?php if (empty($artist['tag_count'])): ?>
                     <span class="tag"><?= e(t('admin.artist_completion.missing_tags')) ?></span>
                 <?php endif; ?>
-                <a href="<?= url('/artists/' . $artist['slug'] . '?edit=1') ?>"><?= e(t('admin.artist_completion.edit')) ?></a>
+                <a href="<?= url(\App\Models\Artist::path($artist) . '?edit=1') ?>"><?= e(t('admin.artist_completion.edit')) ?></a>
             </li>
         <?php endforeach; ?>
     </ul>

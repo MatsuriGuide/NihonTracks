@@ -15,7 +15,7 @@ class WatchController extends AdminController
         $lang = Lang::current();
 
         $links = Database::getInstance()->fetchAll(
-            'SELECT al.id AS link_id, al.url, a.slug AS artist_slug,
+            'SELECT al.id AS link_id, al.url, a.id AS artist_id, a.slug AS artist_slug,
                     COALESCE(ai.name, ai_fr.name) AS artist_name
              FROM artist_links al
              JOIN artists a ON a.id = al.artist_id

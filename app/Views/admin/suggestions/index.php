@@ -16,7 +16,7 @@
                 <div class="card-body">
                     <span class="card-title"><?= e($suggestion['title'] ?? $suggestion['youtube_id']) ?></span>
                     <span class="card-meta">
-                        <a href="<?= url('/artists/' . $suggestion['artist_slug']) ?>"><?= e($suggestion['artist_name'] ?? '') ?></a>
+                        <a href="<?= url(\App\Models\Artist::path(['id' => $suggestion['artist_id'], 'slug' => $suggestion['artist_slug']])) ?>"><?= e($suggestion['artist_name'] ?? '') ?></a>
                         <?php if (!empty($suggestion['published_at'])): ?>
                             — <?= e($suggestion['published_at']) ?>
                         <?php endif; ?>

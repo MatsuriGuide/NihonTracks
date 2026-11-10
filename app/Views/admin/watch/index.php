@@ -12,7 +12,7 @@
     <ul>
         <?php foreach ($channels as $channel): ?>
             <li>
-                <a href="<?= url('/artists/' . $channel['artist_slug']) ?>"><?= e($channel['artist_name'] ?? '') ?></a>
+                <a href="<?= url(\App\Models\Artist::path(['id' => $channel['artist_id'], 'slug' => $channel['artist_slug']])) ?>"><?= e($channel['artist_name'] ?? '') ?></a>
                 —
                 <?php if ($channel['channel_id']): ?>
                     <code><?= e($channel['channel_id']) ?></code>

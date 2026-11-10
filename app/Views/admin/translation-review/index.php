@@ -8,7 +8,7 @@
     <ul>
         <?php foreach ($artists as $artist): ?>
             <li style="margin-bottom: 1.5rem;">
-                <a href="<?= url('/artists/' . $artist['slug']) ?>" target="_blank">
+                <a href="<?= url(\App\Models\Artist::path($artist)) ?>" target="_blank">
                     <strong><?= e($artist['name'] ?? $artist['slug']) ?></strong>
                 </a>
 

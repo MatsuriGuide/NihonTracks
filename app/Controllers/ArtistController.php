@@ -58,6 +58,41 @@ class ArtistController extends Controller
         ]);
     }
 
+    /**
+     * /artists/{slug}/{code} — le code (NT-A060) prime sur le nom : un nom corrigé ne casse plus le lien.
+     */
+    public function showByCode(string $slug, string $code): void
+    {
+        $id = Artist::idFromCode($code);
+
+        if ($id === null) {
+            http_response_code(404);
+            require dirname(__DIR__) . '/Views/errors/404.php';
+
+            return;
+        }
+
+        $artist = Artist::findById($id);
+
+        if ($artist === null) {
+            // Code inconnu : on essaie l'ancien système (par nom), qui renverra 404 si besoin.
+            $this->show($slug);
+
+            return;
+        }
+
+        // Nom corrigé depuis (ou code écrit « NT-060 ») : redirection permanente vers l'adresse à jour.
+        $canonical = Artist::path($artist);
+
+        if ($canonical !== '/artists/' . $slug . '/' . $code) {
+            $query = (string) ($_SERVER['QUERY_STRING'] ?? '');
+            header('Location: ' . url($canonical) . ($query !== '' ? '?' . $query : ''), true, 301);
+            exit;
+        }
+
+        $this->show((string) $artist['slug']);
+    }
+
     public function create(): void
     {
         Auth::requireLogin();
@@ -79,9 +114,9 @@ class ArtistController extends Controller
         $data['slug'] = $this->uniqueSlug($data['name']);
         $moderationStatus = $this->moderationStatusForCurrentUser();
 
-        Artist::create($data, $data['name'], $data['bio'], (int) Auth::id(), $moderationStatus);
+        $newId = Artist::create($data, $data['name'], $data['bio'], (int) Auth::id(), $moderationStatus);
 
-        $this->redirect('/artists/' . $data['slug']);
+        $this->redirect(Artist::path(['id' => $newId, 'slug' => $data['slug']]));
     }
 
     /**
@@ -118,6 +153,7 @@ class ArtistController extends Controller
             $this->render('artists/quick_create_url', [
                 'error' => t('artists.quick_create.already_known') . ' ' . $existing['name'],
                 'existingArtistSlug' => $existing['slug'],
+                'existingArtistId'   => (int) $existing['id'],
             ]);
 
             return;
@@ -207,7 +243,7 @@ class ArtistController extends Controller
             Artist::updateSubscriberCount($artistId, $subscriberCount);
         }
 
-        $this->redirect('/artists/' . $slug);
+        $this->redirect(Artist::path(['id' => $artistId, 'slug' => $slug]));
     }
 
     public function edit(int $id): void
@@ -297,7 +333,7 @@ class ArtistController extends Controller
             return;
         }
 
-        $this->redirect('/artists/' . $data['slug']);
+        $this->redirect(Artist::path(['id' => $id, 'slug' => $data['slug']]));
     }
 
     public function delete(int $id): void
@@ -339,7 +375,7 @@ class ArtistController extends Controller
             Artist::updateAvatar($id, $url);
         }
 
-        $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
+        $this->redirect(Artist::path($artist) . '?edit=1');
     }
 
     public function importAvatarFromYoutube(int $id): void
@@ -376,7 +412,7 @@ class ArtistController extends Controller
             }
         }
 
-        $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
+        $this->redirect(Artist::path($artist) . '?edit=1');
     }
 
     public function updateTags(int $id): void
@@ -395,7 +431,7 @@ class ArtistController extends Controller
         $tagIds = array_map('intval', (array) $this->input('tag_ids', []));
         Artist::setTags($id, $tagIds);
 
-        $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
+        $this->redirect(Artist::path($artist) . '?edit=1');
     }
 
     /**
@@ -447,7 +483,7 @@ class ArtistController extends Controller
         $raw = (string) $this->input('links_bulk', '');
         ArtistLink::addBulk($id, $raw);
 
-        $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
+        $this->redirect(Artist::path($artist) . '?edit=1');
     }
 
     public function deleteLink(int $id, int $linkId): void
@@ -469,7 +505,7 @@ class ArtistController extends Controller
             ArtistLink::delete($linkId);
         }
 
-        $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
+        $this->redirect(Artist::path($artist) . '?edit=1');
     }
 
     public function updateLinkPlatform(int $id, int $linkId): void
@@ -491,7 +527,7 @@ class ArtistController extends Controller
             ArtistLink::updatePlatform($linkId, (string) $this->input('platform', ''));
         }
 
-        $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
+        $this->redirect(Artist::path($artist) . '?edit=1');
     }
 
     public function addRelation(int $id): void
@@ -517,7 +553,7 @@ class ArtistController extends Controller
             ArtistRelation::create($id, $relatedId, $type, $note);
         }
 
-        $this->redirect('/artists/' . $artist['slug'] . '?edit=1');
+        $this->redirect(Artist::path($artist) . '?edit=1');
     }
 
     public function deleteRelation(int $id, int $relationId): void
@@ -548,7 +584,7 @@ class ArtistController extends Controller
         ArtistRelation::delete($relationId);
 
         $artist = Artist::findById($id);
-        $this->redirect($artist ? '/artists/' . $artist['slug'] . '?edit=1' : '/artists');
+        $this->redirect($artist ? Artist::path($artist) . '?edit=1' : '/artists');
     }
 
     /**

@@ -59,6 +59,44 @@ class Artist
         return Database::getInstance()->fetchOne('SELECT * FROM artists WHERE slug = ?', [$slug]);
     }
 
+    /**
+     * Code public de l'artiste, celui affiché sur sa fiche : « NT-A060 » (dérivé de l'identifiant de la base).
+     */
+    public static function code(int $id): string
+    {
+        return catalog_no('a', $id);
+    }
+
+    /**
+     * Identifiant extrait d'un code « NT-A060 » ou « NT-060 » (insensible à la casse, zéros facultatifs), ou null.
+     */
+    public static function idFromCode(string $code): ?int
+    {
+        if (preg_match('/^NT-A?0*([0-9]+)$/i', trim($code), $m) !== 1) {
+            return null;
+        }
+
+        $id = (int) $m[1];
+
+        return $id > 0 ? $id : null;
+    }
+
+    /**
+     * Chemin public d'une fiche artiste : /artists/yuika/NT-A060.
+     * Le code étant dérivé de l'identifiant de la base, le lien survit à une correction du nom.
+     * Sans « id » dans le tableau, on retombe sur l'ancien format /artists/yuika.
+     */
+    public static function path(array $artist): string
+    {
+        $slug = (string) ($artist['slug'] ?? '');
+
+        if (isset($artist['id']) && (int) $artist['id'] > 0) {
+            return '/artists/' . $slug . '/' . self::code((int) $artist['id']);
+        }
+
+        return '/artists/' . $slug;
+    }
+
     public static function translations(int $artistId): array
     {
         $rows = Database::getInstance()->fetchAll(
