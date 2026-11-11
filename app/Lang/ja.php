@@ -389,6 +389,12 @@ return [
     'artists.tags_edit' => 'タグを編集',
     'artists.tags_hint' => 'このタグはこのアーティストの新しい動画に自動的にコピーされます（各動画で個別に編集可能）。',
     'artists.tags_save' => '保存',
+    'artists.theme.title' => 'ページの外観',
+    'artists.theme.select' => 'テンプレート',
+    'artists.theme.default' => 'デフォルト',
+    'artists.theme.accent' => 'アクセントカラーを指定する',
+    'artists.theme.hint' => 'テンプレートでこのページの色とレイアウトが変わります。アクセントカラーはテンプレートの主色を置き換えます。',
+    'artists.theme.save' => '外観を保存',
 
     // Official audio / validation type / remplissage JSON
     'videos.type.official_audio' => 'オフィシャルオーディオ',

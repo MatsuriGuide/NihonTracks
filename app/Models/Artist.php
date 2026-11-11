@@ -418,6 +418,14 @@ class Artist
         }
     }
 
+    public static function updateTheme(int $id, ?string $theme, ?string $accent): void
+    {
+        Database::getInstance()->query(
+            'UPDATE artists SET theme = ?, theme_accent = ? WHERE id = ?',
+            [$theme, $accent, $id]
+        );
+    }
+
     public static function updateAvatar(int $id, ?string $avatarUrl): void
     {
         Database::getInstance()->query(

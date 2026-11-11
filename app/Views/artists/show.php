@@ -1,7 +1,9 @@
-<h1><span class="catalog-no"><?= e(catalog_no('a', (int) $artist['id'])) ?></span><?= e($translation['name'] ?? $artist['slug']) ?></h1>
+<div class="artist-page">
+
+<h1 class="artist-title"><span class="catalog-no"><?= e(catalog_no('a', (int) $artist['id'])) ?></span><?= e($translation['name'] ?? $artist['slug']) ?></h1>
 
 <?php if (!empty($artist['avatar_path'])): ?>
-    <img src="<?= e($artist['avatar_path']) ?>" alt="" style="max-width: 200px; border-radius: 3px; display: block; margin-bottom: 1rem;">
+    <img class="artist-avatar" src="<?= e($artist['avatar_path']) ?>" alt="">
 <?php endif; ?>
 
 <?php if (!empty($artist['subscriber_count'])): ?>
@@ -324,4 +326,34 @@ $hasRelations = !empty($outgoingRelations) || !empty($incomingRelations);
     </details>
 <?php endif; ?>
 
+<?php if (!empty($isAdmin) && $editMode): ?>
+    <details class="artist-theme-admin">
+        <summary><?= e(t('artists.theme.title')) ?></summary>
+        <form method="post" action="<?= url('/artists/' . $artist['id'] . '/theme') ?>">
+            <p>
+                <label for="theme"><?= e(t('artists.theme.select')) ?></label>
+                <select name="theme" id="theme">
+                    <option value=""><?= e(t('artists.theme.default')) ?></option>
+                    <?php foreach ($themes as $slug => $theme): ?>
+                        <option value="<?= e($slug) ?>" <?= ($artist['theme'] ?? '') === $slug ? 'selected' : '' ?>>
+                            <?= e($theme['name']) ?><?= $theme['description'] !== '' ? ' — ' . e($theme['description']) : '' ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </p>
+            <p>
+                <label>
+                    <input type="checkbox" name="theme_accent_on" value="1" <?= !empty($artist['theme_accent']) ? 'checked' : '' ?>>
+                    <?= e(t('artists.theme.accent')) ?>
+                </label>
+                <input type="color" name="theme_accent" value="<?= e(($artist['theme_accent'] ?? null) ?: '#ff6a72') ?>">
+            </p>
+            <p><small><?= e(t('artists.theme.hint')) ?></small></p>
+            <button type="submit"><?= e(t('artists.theme.save')) ?></button>
+        </form>
+    </details>
+<?php endif; ?>
+
 <p><a href="<?= url('/artists') ?>"><?= e(t('artists.back')) ?></a></p>
+
+</div>

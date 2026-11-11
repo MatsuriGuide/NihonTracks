@@ -32,6 +32,7 @@ $router->post('/artists/{id}/links/{linkId}/platform', 'ArtistController@updateL
 $router->post('/artists/{id}/avatar', 'ArtistController@updateAvatar');
 $router->post('/artists/{id}/avatar/import-youtube', 'ArtistController@importAvatarFromYoutube');
 $router->post('/artists/{id}/tags', 'ArtistController@updateTags');
+$router->post('/artists/{id}/theme', 'ArtistController@updateTheme');
 $router->post('/artists/{id}/tags-by-name', 'ArtistController@addTagsByName');
 $router->post('/artists/{id}/suggest-info', 'ArtistController@suggestInfo');
 // Lien stable : /artists/yuika/NT-A060 (le code prime sur le nom, qui peut changer).

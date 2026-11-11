@@ -389,6 +389,12 @@ return [
     'artists.tags_edit' => 'Modifier les tags',
     'artists.tags_hint' => 'Ces tags seront copiés automatiquement sur les nouvelles vidéos de cet artiste (modifiables ensuite indépendamment sur chaque vidéo).',
     'artists.tags_save' => 'Enregistrer',
+    'artists.theme.title' => 'Apparence de la page',
+    'artists.theme.select' => 'Template',
+    'artists.theme.default' => 'Par défaut',
+    'artists.theme.accent' => 'Couleur d\'accent personnalisée',
+    'artists.theme.hint' => 'Le template change les couleurs et la mise en page de cette fiche. La couleur d\'accent remplace la couleur principale du template.',
+    'artists.theme.save' => 'Enregistrer l\'apparence',
 
     // Official audio / validation type / remplissage JSON
     'videos.type.official_audio' => 'Official Audio',

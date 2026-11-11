@@ -55,6 +55,11 @@ class ArtistController extends Controller
             )),
             'canEdit'           => $canEdit,
             'editMode'          => $editMode,
+            // Personnalisation de la page (utilisée par le gabarit général)
+            'pageTheme'         => \App\Services\ThemeService::valid($artist['theme'] ?? null),
+            'pageAccent'        => \App\Services\ThemeService::accent($artist['theme_accent'] ?? null),
+            'themes'            => \App\Services\ThemeService::all(),
+            'isAdmin'           => Auth::role() === 'admin',
         ]);
     }
 
@@ -411,6 +416,32 @@ class ArtistController extends Controller
                 Artist::updateSubscriberCount($id, $channelInfo['subscriber_count']);
             }
         }
+
+        $this->redirect(Artist::path($artist) . '?edit=1');
+    }
+
+    /**
+     * Choix du template et de la couleur d'accent d'une page d'artiste (administrateurs uniquement).
+     */
+    public function updateTheme(int $id): void
+    {
+        Auth::requireRole('admin');
+
+        $artist = Artist::findById($id);
+
+        if (!$artist) {
+            http_response_code(404);
+            require dirname(__DIR__) . '/Views/errors/404.php';
+
+            return;
+        }
+
+        $theme = \App\Services\ThemeService::valid((string) $this->input('theme', ''));
+        $accent = $this->input('theme_accent_on', '') === '1'
+            ? \App\Services\ThemeService::accent((string) $this->input('theme_accent', ''))
+            : null;
+
+        Artist::updateTheme($id, $theme, $accent);
 
         $this->redirect(Artist::path($artist) . '?edit=1');
     }

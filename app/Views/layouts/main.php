@@ -8,6 +8,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
+    <?php if (!empty($pageTheme)): ?>
+        <link rel="stylesheet" href="<?= asset('themes/' . $pageTheme . '/theme.css') ?>">
+    <?php endif; ?>
+    <?php if (!empty($pageAccent)): ?>
+        <style>body { --accent: <?= e($pageAccent) ?>; --coral: <?= e($pageAccent) ?>; }</style>
+    <?php endif; ?>
 
     <!-- Matomo -->
     <script>
@@ -25,7 +31,7 @@
     </script>
     <!-- End Matomo Code -->
 </head>
-<body>
+<body<?= !empty($pageTheme) ? ' class="theme-' . e($pageTheme) . '"' : '' ?>>
     <header class="site-header">
         <a href="<?= url('/') ?>" class="brand">
             <span class="brand-mark">NihonTracks</span>

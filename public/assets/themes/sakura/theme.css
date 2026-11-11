@@ -1,0 +1,42 @@
+/* Thème « Sakura » — thème clair. Couleur principale : --accent (rose cerisier par défaut). */
+html:has(body.theme-sakura) {
+    color-scheme: light;
+}
+
+body.theme-sakura {
+    --navy-950: #fbf3f0;
+    --navy-900: #ffffff;
+    --navy-800: #f7e6e2;
+    --navy-700: #ecd2cd;
+    --paper:    #3a2530;
+    --ink-dim:  #8d6b75;
+    --coral:    var(--accent, #d94f7a);
+    --coral-ink:#ffffff;
+    --mint:     #2f9a85;
+    --line:     rgba(58, 37, 48, 0.16);
+
+    background-image:
+        radial-gradient(ellipse 800px 420px at 12% -8%, rgba(217, 79, 122, 0.16), transparent),
+        radial-gradient(ellipse 700px 420px at 100% 0%, rgba(47, 154, 133, 0.10), transparent);
+}
+
+.theme-sakura .artist-title {
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    border-bottom: 2px solid var(--coral);
+    padding-bottom: 0.4rem;
+}
+
+.theme-sakura .artist-avatar {
+    border-radius: 999px 999px 6px 6px;
+    width: 200px;
+    height: 240px;
+    object-fit: cover;
+    border: 6px solid #fff;
+    box-shadow: 0 6px 24px rgba(58, 37, 48, 0.18);
+}
+
+.theme-sakura .card {
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(58, 37, 48, 0.08);
+}

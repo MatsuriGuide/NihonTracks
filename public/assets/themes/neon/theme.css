@@ -1,0 +1,44 @@
+/* Thème « Néon » — couleurs : --accent (rose par défaut) et cyan. */
+body.theme-neon {
+    --navy-950: #07060f;
+    --navy-900: #0e0b1f;
+    --navy-800: #161233;
+    --navy-700: #261d52;
+    --paper:    #f4f0ff;
+    --ink-dim:  #a79bd8;
+    --coral:    var(--accent, #ff2bd6);
+    --coral-ink:#1a0017;
+    --mint:     #19e6ff;
+    --line:     rgba(167, 155, 216, 0.22);
+
+    background-image:
+        radial-gradient(ellipse 900px 500px at 10% -10%, rgba(255, 43, 214, 0.22), transparent),
+        radial-gradient(ellipse 800px 500px at 100% 10%, rgba(25, 230, 255, 0.16), transparent);
+}
+
+.theme-neon .artist-title {
+    text-shadow: 0 0 6px var(--coral), 0 0 24px color-mix(in srgb, var(--coral) 60%, transparent);
+    letter-spacing: 0.02em;
+}
+
+.theme-neon .artist-avatar {
+    border: 2px solid var(--mint);
+    border-radius: 50%;
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    box-shadow: 0 0 18px rgba(25, 230, 255, 0.55), 0 0 48px rgba(255, 43, 214, 0.25);
+}
+
+.theme-neon .card {
+    border-color: color-mix(in srgb, var(--coral) 45%, transparent);
+}
+
+.theme-neon .card:hover {
+    box-shadow: 0 0 22px color-mix(in srgb, var(--coral) 45%, transparent);
+}
+
+.theme-neon .tag {
+    border-color: var(--mint);
+    color: var(--mint);
+}

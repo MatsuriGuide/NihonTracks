@@ -134,7 +134,7 @@ small {
     gap: 1rem 2rem;
     padding: 1.1rem 1.5rem;
     border-bottom: 1px solid var(--line);
-    background: rgba(16, 18, 42, 0.85);
+    background: color-mix(in srgb, var(--navy-950) 85%, transparent);
     backdrop-filter: blur(6px);
     position: sticky;
     top: 0;
@@ -770,4 +770,14 @@ code {
     * {
         transition: none !important;
     }
+}
+
+/* ------------------------------------------------------------------
+   Fiche artiste : classes de base (les thèmes de /assets/themes/ s'appuient dessus)
+   ------------------------------------------------------------------ */
+.artist-avatar {
+    max-width: 200px;
+    border-radius: 3px;
+    display: block;
+    margin-bottom: 1rem;
 }

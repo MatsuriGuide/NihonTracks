@@ -389,6 +389,12 @@ return [
     'artists.tags_edit' => 'Edit tags',
     'artists.tags_hint' => 'These tags will be automatically copied to new videos from this artist (editable independently afterward on each video).',
     'artists.tags_save' => 'Save',
+    'artists.theme.title' => 'Page appearance',
+    'artists.theme.select' => 'Template',
+    'artists.theme.default' => 'Default',
+    'artists.theme.accent' => 'Custom accent colour',
+    'artists.theme.hint' => 'The template changes the colours and layout of this page. The accent colour replaces the template\'s main colour.',
+    'artists.theme.save' => 'Save appearance',
 
     // Official audio / validation type / remplissage JSON
     'videos.type.official_audio' => 'Official Audio',
