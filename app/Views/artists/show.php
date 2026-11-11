@@ -113,7 +113,17 @@
 
     <details>
         <summary><?= e(t('artists.avatar_label')) ?></summary>
-        <form method="post" action="<?= url('/artists/' . $artist['id'] . '/avatar') ?>">
+        <?php if (!empty($_GET['avatar_error'])): ?>
+            <p class="hint"><?= e(t('artists.avatar_error.' . (in_array($_GET['avatar_error'], ['format', 'size'], true) ? $_GET['avatar_error'] : 'upload'))) ?></p>
+        <?php endif; ?>
+        <form method="post" action="<?= url('/artists/' . $artist['id'] . '/avatar') ?>" enctype="multipart/form-data">
+            <?php if (!empty($canUploadPhoto)): ?>
+                <p>
+                    <label for="avatar_file"><?= e(t('artists.avatar_file')) ?></label><br>
+                    <input type="file" name="avatar_file" id="avatar_file" accept="image/jpeg,image/png,image/webp">
+                </p>
+                <p><small><?= e(t('artists.avatar_file_hint')) ?></small></p>
+            <?php endif; ?>
             <p>
                 <input type="url" name="avatar_url" placeholder="https://..."
                        value="<?= e($artist['avatar_path'] ?? '') ?>" style="width: 100%; max-width: 500px;">

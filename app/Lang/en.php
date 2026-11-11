@@ -354,6 +354,11 @@ return [
     'artists.avatar_label' => 'Profile picture',
     'artists.avatar_hint' => 'Image URL (no file upload, just paste a link). Leave empty and save to remove it.',
     'artists.avatar_save' => 'Save',
+    'artists.avatar_file' => 'Upload a photo',
+    'artists.avatar_file_hint' => 'JPEG, PNG or WebP, 12 MB maximum. The photo is resized (1400 px) and converted to JPEG. It replaces the current photo; otherwise paste a URL below.',
+    'artists.avatar_error.format' => 'File rejected: please send a JPEG, PNG or WebP image.',
+    'artists.avatar_error.size' => 'Image too large (12 MB, 40 megapixels maximum).',
+    'artists.avatar_error.upload' => 'Upload failed. Try again, or check the permissions of the public/uploads folder.',
 
     // Import avatar YouTube
     'artists.avatar_import_youtube' => 'Import from YouTube',

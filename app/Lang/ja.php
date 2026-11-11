@@ -354,6 +354,11 @@ return [
     'artists.avatar_label' => 'プロフィール写真',
     'artists.avatar_hint' => '画像のURL（ファイルアップロードではなく、リンクを貼り付けてください）。空欄にして保存すると削除されます。',
     'artists.avatar_save' => '保存',
+    'artists.avatar_file' => '写真をアップロード',
+    'artists.avatar_file_hint' => 'JPEG・PNG・WebP、12MBまで。写真は1400pxに縮小されJPEGに変換されます。現在の写真と置き換わります。URLを貼り付けることもできます。',
+    'artists.avatar_error.format' => 'ファイルが受け付けられません。JPEG・PNG・WebPの画像を送ってください。',
+    'artists.avatar_error.size' => '画像が大きすぎます（12MB・4000万画素まで）。',
+    'artists.avatar_error.upload' => 'アップロードに失敗しました。もう一度お試しください。',
 
     // Import avatar YouTube
     'artists.avatar_import_youtube' => 'YouTubeからインポート',

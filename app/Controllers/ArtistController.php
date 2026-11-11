@@ -60,6 +60,7 @@ class ArtistController extends Controller
             'pageAccent'        => \App\Services\ThemeService::accent($artist['theme_accent'] ?? null),
             'themes'            => \App\Services\ThemeService::all(),
             'isAdmin'           => Auth::role() === 'admin',
+            'canUploadPhoto'    => in_array(Auth::role(), ['admin', 'moderator'], true),
         ]);
     }
 
@@ -372,12 +373,41 @@ class ArtistController extends Controller
             return;
         }
 
+        $old = $artist['avatar_path'] ?? null;
+        $file = $_FILES['avatar_file'] ?? null;
+
+        // Fichier envoyé (administrateurs et modérateurs) : il prime sur l'URL.
+        if (is_array($file) && ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+            if (!in_array(Auth::role(), ['admin', 'moderator'], true)) {
+                http_response_code(403);
+                require dirname(__DIR__) . '/Views/errors/403.php';
+
+                return;
+            }
+
+            try {
+                $path = \App\Services\ImageUploadService::saveArtistPhoto($file, $id);
+            } catch (\RuntimeException $e) {
+                $this->redirect(Artist::path($artist) . '?edit=1&avatar_error=' . urlencode($e->getMessage()));
+            }
+
+            Artist::updateAvatar($id, url($path));
+            \App\Services\ImageUploadService::deleteIfOurs($old);
+
+            $this->redirect(Artist::path($artist) . '?edit=1');
+        }
+
         $url = trim((string) $this->input('avatar_url', ''));
 
         if ($url === '') {
             Artist::updateAvatar($id, null);
+            \App\Services\ImageUploadService::deleteIfOurs($old);
         } elseif (filter_var($url, FILTER_VALIDATE_URL)) {
             Artist::updateAvatar($id, $url);
+
+            if ($url !== $old) {
+                \App\Services\ImageUploadService::deleteIfOurs($old);
+            }
         }
 
         $this->redirect(Artist::path($artist) . '?edit=1');
