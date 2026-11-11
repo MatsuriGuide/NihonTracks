@@ -1,0 +1,110 @@
+/* Thème « Ayakadot » — inspiré de la photo : tirage instantané délavé, voile aqua, pois, rouge corail, bleu denim.
+   Thème clair. Couleur principale : --accent (rouge corail par défaut). */
+html:has(body.theme-ayakadot) {
+    color-scheme: light;
+}
+
+body.theme-ayakadot {
+    --navy-950: #e6f2f2;   /* fond : voile aqua */
+    --navy-900: #ffffff;
+    --navy-800: #d5e9ee;
+    --navy-700: #b6d6e0;
+    --paper:    #11181b;   /* texte : noir de la veste */
+    --ink-dim:  #4d6870;
+    --coral:    var(--accent, #f0503f);
+    --coral-ink:#ffffff;
+    --mint:     #3b86a8;   /* bleu denim */
+    --line:     rgba(17, 24, 27, 0.2);
+    --radius:   0;
+
+    /* pois discrets + voile de lumière en haut, comme un tirage surexposé */
+    background-image:
+        radial-gradient(ellipse 1000px 420px at 20% -10%, rgba(255, 255, 255, 0.85), transparent),
+        radial-gradient(circle, rgba(59, 134, 168, 0.16) 2.2px, transparent 2.6px);
+    background-size: auto, 28px 28px;
+    background-attachment: fixed, scroll;
+}
+
+/* Mise en page : tirage à gauche, texte à droite */
+.theme-ayakadot .artist-page {
+    display: grid;
+    grid-template-columns: minmax(220px, 340px) minmax(0, 1fr);
+    column-gap: 3rem;
+    align-items: start;
+}
+
+.theme-ayakadot .artist-page > * {
+    grid-column: 2;
+}
+
+.theme-ayakadot .artist-avatar {
+    grid-column: 1;
+    grid-row: 1 / span 12;
+    position: sticky;
+    top: 5rem;
+    width: 100%;
+    max-width: none;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: 0;
+    margin-bottom: 0;
+    transform: rotate(-2.2deg);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.9) inset,
+        0 14px 30px rgba(17, 24, 27, 0.28),
+        9px 9px 0 var(--coral);
+}
+
+/* Titre : surligné au marqueur rouge */
+.theme-ayakadot .artist-title {
+    font-size: clamp(2.4rem, 6.5vw, 4.6rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.2rem;
+}
+
+.theme-ayakadot .artist-title .catalog-no {
+    vertical-align: middle;
+}
+
+.theme-ayakadot h2 {
+    color: var(--mint);
+}
+
+/* Cartes : papier blanc, trait noir, ombre denim décalée */
+.theme-ayakadot .card {
+    background: #fff;
+    border: 2px solid var(--paper);
+    box-shadow: 5px 5px 0 var(--mint);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.theme-ayakadot .card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 var(--coral);
+}
+
+.theme-ayakadot .tag {
+    background: var(--coral);
+    border-color: var(--coral);
+    color: var(--coral-ink);
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.theme-ayakadot a {
+    text-underline-offset: 0.2em;
+}
+
+@media (max-width: 800px) {
+    .theme-ayakadot .artist-page {
+        display: block;
+    }
+
+    .theme-ayakadot .artist-avatar {
+        position: static;
+        max-width: 300px;
+        margin: 0.5rem 0 2rem;
+    }
+}
