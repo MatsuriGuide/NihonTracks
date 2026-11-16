@@ -15,6 +15,8 @@
         <style>body { --accent: <?= e($pageAccent) ?>; --coral: <?= e($pageAccent) ?>; }</style>
     <?php endif; ?>
 
+    <?php // Les visites des administrateurs et modérateurs connectés ne sont pas comptées. ?>
+    <?php if (!in_array(\App\Core\Auth::role(), ['admin', 'moderator'], true)): ?>
     <!-- Matomo -->
     <script>
       var _paq = window._paq = window._paq || [];
@@ -30,6 +32,7 @@
       })();
     </script>
     <!-- End Matomo Code -->
+    <?php endif; ?>
 </head>
 <body<?= !empty($pageTheme) ? ' class="theme-' . e($pageTheme) . '"' : '' ?>>
     <header class="site-header">
